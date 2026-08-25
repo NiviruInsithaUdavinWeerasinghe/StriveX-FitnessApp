@@ -55,14 +55,15 @@ export const HeroSection = ({ onStartFreeTrial, onOpenVideoDemo }) => {
           style={{
             marginBottom: '28px',
             padding: '6px 16px',
-            fontSize: '0.82rem',
+            fontSize: '0.78rem',
             background: 'rgba(212, 255, 0, 0.12)',
             backdropFilter: 'blur(16px)',
-            boxShadow: '0 0 20px rgba(212, 255, 0, 0.2)'
+            boxShadow: '0 0 20px rgba(212, 255, 0, 0.2)',
+            whiteSpace: 'nowrap'
           }}
         >
-          <Zap size={14} color="var(--accent)" />
-          <span>Centralized Fitness Management & Athletic Hub</span>
+          <Zap size={13} color="var(--accent)" />
+          <span>CENTRALIZED ATHLETIC PERFORMANCE HUB</span>
         </div>
 
         {/* Two-Tone Main Headline Matching Screenshot */}

@@ -232,14 +232,14 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
                   {activeClient.tier}
                 </span>
               </div>
-              <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
-                {activeClient.name} • Biomechanics & Overload Hub
+              <h3 className="type-h3" style={{ fontSize: '1.15rem', margin: 0, whiteSpace: 'nowrap' }}>
+                {activeClient.name} • Biometrics Hub
               </h3>
             </div>
           </div>
 
           {/* Tab Navigation Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             <button
               type="button"
               onClick={() => setActiveTab('telemetry')}
@@ -248,13 +248,15 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
                 borderRadius: 'var(--radius-pill)',
                 background: activeTab === 'telemetry' ? 'var(--accent)' : 'var(--surface-input)',
                 color: activeTab === 'telemetry' ? '#111111' : 'var(--text-secondary)',
-                fontSize: '0.82rem',
+                fontSize: '0.8rem',
                 fontWeight: 800,
                 border: '1px solid var(--border-subtle)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 cursor: 'pointer'
               }}
             >
-              Telemetry Analytics
+              Telemetry
             </button>
 
             <button
@@ -265,13 +267,15 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
                 borderRadius: 'var(--radius-pill)',
                 background: activeTab === 'form_check' ? 'var(--accent)' : 'var(--surface-input)',
                 color: activeTab === 'form_check' ? '#111111' : 'var(--text-secondary)',
-                fontSize: '0.82rem',
+                fontSize: '0.8rem',
                 fontWeight: 800,
                 border: '1px solid var(--border-subtle)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 cursor: 'pointer'
               }}
             >
-              Video Form-Checks ({activeClient.formVideos.length})
+              Video Checks ({activeClient.formVideos.length})
             </button>
 
             <button
@@ -282,9 +286,11 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
                 borderRadius: 'var(--radius-pill)',
                 background: isInCall ? 'var(--status-error)' : 'rgba(6, 182, 212, 0.2)',
                 color: isInCall ? '#ffffff' : '#06b6d4',
-                fontSize: '0.82rem',
+                fontSize: '0.8rem',
                 fontWeight: 800,
                 border: '1px solid rgba(6, 182, 212, 0.4)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -292,7 +298,7 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
               }}
             >
               <Video size={13} />
-              <span>{isInCall ? 'In HD Call (Live)' : '1-on-1 Live Video Call'}</span>
+              <span>{isInCall ? 'In HD Call (Live)' : '1-on-1 HD Call'}</span>
             </button>
 
             <button
@@ -303,7 +309,8 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
                 borderRadius: 'var(--radius-pill)',
                 background: 'var(--surface-glass)',
                 color: 'var(--text-secondary)',
-                marginLeft: '8px'
+                marginLeft: '6px',
+                flexShrink: 0
               }}
             >
               <X size={18} />
