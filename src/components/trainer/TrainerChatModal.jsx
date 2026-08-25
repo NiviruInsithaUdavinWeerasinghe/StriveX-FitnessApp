@@ -255,7 +255,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         background: 'rgba(0, 0, 0, 0.88)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        padding: '20px'
+        padding: '16px'
       }}
       onClick={onClose}
     >
@@ -263,11 +263,10 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         className="kinetic-card animate-scale-up"
         style={{
           width: '100%',
-          maxWidth: '1020px',
-          height: '82vh',
-          maxHeight: '740px',
-          display: 'flex',
-          flexDirection: 'column',
+          maxWidth: '960px',
+          height: '86vh',
+          display: 'grid',
+          gridTemplateColumns: '280px minmax(0, 1fr)',
           background: 'var(--surface-elevated)',
           border: '1px solid var(--border-hover)',
           borderRadius: 'var(--radius-xl)',
@@ -276,223 +275,209 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Top Header */}
+        {/* ============================================================ */}
+        {/* LEFT COLUMN: ATHLETE ROSTER SIDEBAR */}
+        {/* ============================================================ */}
         <div
           style={{
-            padding: '14px 20px',
-            background: 'var(--surface-glass)',
-            borderBottom: '1px solid var(--border-glass)',
+            background: 'var(--surface-input)',
+            borderRight: '1px solid var(--border-subtle)',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px'
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minWidth: 0
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: 'rgba(212, 255, 0, 0.15)',
-                border: '1px solid var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent)'
-              }}
-            >
-              <Dumbbell size={16} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className="type-eyebrow">COACH ATHLETE DIRECT MESSAGING</span>
-                <span className="kinetic-badge" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>
-                  COACH VIEW
-                </span>
-              </div>
-              <h3 className="type-h4" style={{ margin: 0, whiteSpace: 'nowrap' }}>
-                Athlete Telemetry & Coaching Communications
-              </h3>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-input)',
-              border: '1px solid var(--border-glass)',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* 2-Column Chat Body */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '290px 1fr', overflow: 'hidden' }}>
-          {/* Left Sidebar: Athlete Roster */}
+          {/* Contacts Header */}
           <div
             style={{
-              borderRight: '1px solid var(--border-subtle)',
-              background: 'var(--bg-secondary)',
+              padding: '16px 18px',
+              borderBottom: '1px solid var(--border-subtle)',
               display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden'
+              alignItems: 'center',
+              justifyContent: 'space-between'
             }}
           >
-            {/* Search Athletes */}
-            <div style={{ padding: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)'
-                }}
-              >
-                <Search size={14} color="var(--text-tertiary)" />
-                <input
-                  type="text"
-                  placeholder="Search athletes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.8rem',
-                    width: '100%'
-                  }}
-                />
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Dumbbell size={16} color="var(--accent)" />
+              <span className="type-eyebrow" style={{ color: 'var(--text-primary)', fontSize: '0.74rem' }}>
+                ATHLETE ROSTER
+              </span>
             </div>
+            <span className="kinetic-badge" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>
+              COACH
+            </span>
+          </div>
 
-            {/* Athletes List */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {filteredClients.map((cli) => {
-                  const isSelected = cli.id === activeClientId;
-                  return (
-                    <button
-                      key={cli.id}
-                      type="button"
-                      onClick={() => setActiveClientId(cli.id)}
-                      style={{
-                        padding: '10px 12px',
-                        borderRadius: 'var(--radius-md)',
-                        background: isSelected ? 'var(--surface-elevated)' : 'transparent',
-                        border: `1px solid ${isSelected ? 'var(--accent)' : 'transparent'}`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        transition: 'all var(--transition-fast)'
-                      }}
-                    >
-                      <div style={{ position: 'relative' }}>
-                        <img
-                          src={cli.avatar}
-                          alt={cli.name}
-                          style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                            border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-subtle)'}`
-                          }}
-                        />
-                        <span
-                          style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            right: 0,
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%',
-                            background: cli.status === 'Online' ? 'var(--status-success)' : 'var(--text-tertiary)',
-                            border: '1.5px solid var(--bg-primary)'
-                          }}
-                        />
-                      </div>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                            {cli.name}
-                          </span>
-                          <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700 }}>
-                            {cli.adherence}%
-                          </span>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: '0.72rem',
-                            color: 'var(--text-secondary)',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            marginTop: '2px'
-                          }}
-                        >
-                          {cli.routine}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+          {/* Search Box */}
+          <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
+              <Search size={14} color="var(--text-tertiary)" />
+              <input
+                type="text"
+                placeholder="Search athletes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.8rem',
+                  width: '100%'
+                }}
+              />
             </div>
           </div>
 
-          {/* Right Pane: Active Athlete Conversation */}
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-primary)' }}>
-            {/* Athlete Active Bar */}
-            <div
-              style={{
-                padding: '12px 20px',
-                background: 'var(--surface-glass)',
-                borderBottom: '1px solid var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <img
-                  src={activeClient.avatar}
-                  alt={activeClient.name}
-                  style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1.5px solid var(--accent)' }}
-                />
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                      {activeClient.name}
-                    </span>
-                    <span className="kinetic-badge" style={{ fontSize: '0.64rem', padding: '1px 6px' }}>
-                      {activeClient.tier}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                    Active Split: <strong style={{ color: 'var(--text-primary)' }}>{activeClient.routine}</strong> • Status: {activeClient.status}
-                  </div>
+          {/* Athletes List */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {filteredClients.map((cli) => {
+                const isSelected = cli.id === activeClientId;
+                return (
+                  <button
+                    key={cli.id}
+                    type="button"
+                    onClick={() => setActiveClientId(cli.id)}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: 'var(--radius-md)',
+                      background: isSelected ? 'var(--surface-elevated)' : 'transparent',
+                      border: `1px solid ${isSelected ? 'var(--accent)' : 'transparent'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'all var(--transition-fast)',
+                      width: '100%',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <img
+                        src={cli.avatar}
+                        alt={cli.name}
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-subtle)'}`
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          right: 0,
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: cli.status === 'Online' ? 'var(--status-success)' : 'var(--text-tertiary)',
+                          border: '1.5px solid var(--bg-primary)'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                          {cli.name}
+                        </span>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--accent)', fontWeight: 700 }}>
+                          {cli.adherence}%
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '0.72rem',
+                          color: 'var(--text-secondary)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          marginTop: '2px'
+                        }}
+                      >
+                        {cli.routine}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================ */}
+        {/* RIGHT COLUMN: ACTIVE CHAT CONVERSATION */}
+        {/* ============================================================ */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            background: 'var(--bg-primary)',
+            minWidth: 0,
+            overflow: 'hidden'
+          }}
+        >
+          {/* Chat Header */}
+          <div
+            style={{
+              padding: '14px 20px',
+              background: 'var(--surface-glass)',
+              borderBottom: '1px solid var(--border-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+              flexShrink: 0
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+              <img
+                src={activeClient.avatar}
+                alt={activeClient.name}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid var(--accent)', flexShrink: 0 }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                    {activeClient.name}
+                  </span>
+                  <span className="kinetic-badge" style={{ fontSize: '0.64rem', padding: '1px 6px' }}>
+                    {activeClient.tier}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.72rem',
+                    color: 'var(--text-secondary)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    marginTop: '2px'
+                  }}
+                >
+                  Active Split: <strong style={{ color: 'var(--text-primary)' }}>{activeClient.routine}</strong> • Status: {activeClient.status}
                 </div>
               </div>
+            </div>
 
+            {/* Actions: Telemetry & Close */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
               {onOpenTelemetry && (
                 <button
                   type="button"
@@ -504,161 +489,185 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                   <span>Telemetry Audit</span>
                 </button>
               )}
-            </div>
 
-            {/* Messages Scroll Area */}
-            <div
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '20px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-              }}
-            >
-              {activeClient.messages.map((msg) => {
-                const isCoach = msg.sender === 'coach';
-                return (
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-glass)',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Messages Scroll Area */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              minWidth: 0
+            }}
+          >
+            {activeClient.messages.map((msg) => {
+              const isCoach = msg.sender === 'coach';
+              return (
+                <div
+                  key={msg.id}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: isCoach ? 'flex-end' : 'flex-start',
+                    width: '100%'
+                  }}
+                >
                   <div
-                    key={msg.id}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: isCoach ? 'flex-end' : 'flex-start',
-                      width: '100%'
+                      maxWidth: '72%',
+                      padding: '12px 16px',
+                      borderRadius: isCoach ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      background: isCoach
+                        ? 'linear-gradient(135deg, rgba(212, 255, 0, 0.2), rgba(212, 255, 0, 0.06))'
+                        : 'var(--surface-input)',
+                      border: isCoach
+                        ? '1px solid rgba(212, 255, 0, 0.4)'
+                        : '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.86rem',
+                      lineHeight: 1.5,
+                      wordBreak: 'break-word',
+                      boxShadow: isCoach ? '0 0 16px rgba(212, 255, 0, 0.08)' : 'none'
                     }}
                   >
                     <div
                       style={{
-                        maxWidth: '75%',
-                        padding: '12px 18px',
-                        borderRadius: isCoach ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                        background: isCoach
-                          ? 'linear-gradient(135deg, rgba(212, 255, 0, 0.18), rgba(212, 255, 0, 0.06))'
-                          : 'var(--surface-input)',
-                        border: isCoach
-                          ? '1px solid rgba(212, 255, 0, 0.4)'
-                          : '1px solid var(--border-subtle)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.86rem',
-                        lineHeight: 1.55,
-                        wordBreak: 'break-word',
-                        boxShadow: isCoach ? '0 0 16px rgba(212, 255, 0, 0.08)' : 'none'
+                        fontSize: '0.7rem',
+                        fontWeight: 800,
+                        color: isCoach ? 'var(--accent)' : 'var(--text-tertiary)',
+                        marginBottom: '4px'
                       }}
                     >
-                      <div
-                        style={{
-                          fontSize: '0.7rem',
-                          fontWeight: 800,
-                          color: isCoach ? 'var(--accent)' : 'var(--text-tertiary)',
-                          marginBottom: '4px'
-                        }}
-                      >
-                        {isCoach ? 'Coach Marcus Vance (You)' : msg.senderName}
-                      </div>
-                      <div>{msg.text}</div>
+                      {isCoach ? 'Coach Marcus Vance (You)' : msg.senderName}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px', padding: '0 4px' }}>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>
-                        {msg.time}
-                      </span>
-                      {isCoach && <CheckCheck size={12} color="var(--accent)" />}
-                    </div>
+                    <div>{msg.text}</div>
                   </div>
-                );
-              })}
-
-              {isAthleteTyping && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-tertiary)', fontSize: '0.74rem' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' }} />
-                  <span>{activeClient.name} is typing response...</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px', padding: '0 4px' }}>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>
+                      {msg.time}
+                    </span>
+                    {isCoach && <CheckCheck size={12} color="var(--accent)" />}
+                  </div>
                 </div>
-              )}
+              );
+            })}
 
-              <div ref={messagesEndRef} />
-            </div>
+            {isAthleteTyping && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-tertiary)', fontSize: '0.74rem' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' }} />
+                <span>{activeClient.name} is typing response...</span>
+              </div>
+            )}
 
-            {/* Quick Coach Cues Pill Bar */}
-            <div
-              style={{
-                padding: '8px 16px',
-                background: 'var(--surface-glass)',
-                borderTop: '1px solid var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                overflowX: 'auto',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <span style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                <Sparkles size={12} /> Cues:
-              </span>
-              {QUICK_COACH_CUES.map((cue, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSendMessage(cue)}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'var(--surface-input)',
-                    border: '1px solid var(--border-glass)',
-                    color: 'var(--text-secondary)',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0
-                  }}
-                >
-                  {cue}
-                </button>
-              ))}
-            </div>
+            <div ref={messagesEndRef} />
+          </div>
 
-            {/* Input Composer */}
-            <div
-              style={{
-                padding: '12px 16px',
-                background: 'var(--surface-glass)',
-                borderTop: '1px solid var(--border-glass)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
-              }}
-            >
-              <input
-                type="text"
-                placeholder={`Message ${activeClient.name} with coaching cues or technique feedback...`}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSendMessage();
-                }}
+          {/* Quick Coach Cues Pill Bar */}
+          <div
+            style={{
+              padding: '8px 16px',
+              background: 'var(--surface-glass)',
+              borderTop: '1px solid var(--border-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
+            }}
+          >
+            <span style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+              <Sparkles size={12} /> Cues:
+            </span>
+            {QUICK_COACH_CUES.map((cue, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSendMessage(cue)}
                 style={{
-                  flex: 1,
-                  padding: '10px 16px',
+                  padding: '4px 10px',
                   borderRadius: 'var(--radius-pill)',
                   background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.86rem',
-                  outline: 'none'
+                  border: '1px solid var(--border-glass)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
-              />
-
-              <button
-                type="button"
-                onClick={() => handleSendMessage()}
-                className="kinetic-btn-primary"
-                style={{ padding: '10px 18px', fontSize: '0.82rem', whiteSpace: 'nowrap', flexShrink: 0 }}
               >
-                <Send size={14} />
-                <span>Send</span>
+                {cue}
               </button>
-            </div>
+            ))}
+          </div>
+
+          {/* Input Composer */}
+          <div
+            style={{
+              padding: '12px 16px',
+              background: 'var(--surface-glass)',
+              borderTop: '1px solid var(--border-glass)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flexShrink: 0
+            }}
+          >
+            <input
+              type="text"
+              placeholder={`Message ${activeClient.name} with coaching instructions or feedback...`}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSendMessage();
+              }}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-primary)',
+                fontSize: '0.86rem',
+                outline: 'none',
+                minWidth: 0
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() => handleSendMessage()}
+              className="kinetic-btn-primary"
+              style={{ padding: '10px 18px', fontSize: '0.82rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <Send size={14} />
+              <span>Send</span>
+            </button>
           </div>
         </div>
       </div>
