@@ -43,13 +43,45 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
     cardName: '',
     cardNumber: '',
     cardExpiry: '',
-    cardCVC: ''
+    cardCVC: '',
+    promoCode: ''
   });
 
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoMessage, setPromoMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
   if (!isOpen) return null;
+
+  const handleApplyPromo = () => {
+    const code = formData.promoCode.trim().toUpperCase();
+    if (code === 'STRIVEX20') {
+      setPromoDiscount(20);
+      setPromoMessage('20% Exclusive Athlete Discount Applied!');
+      addToast({
+        type: 'success',
+        title: 'Promo Code Applied',
+        message: '20% discount applied to your membership tier'
+      });
+    } else if (code === 'VIP10') {
+      setPromoDiscount(10);
+      setPromoMessage('10% VIP Launch Discount Applied!');
+      addToast({
+        type: 'success',
+        title: 'Promo Code Applied',
+        message: '10% discount applied to your membership tier'
+      });
+    } else {
+      setPromoDiscount(0);
+      setPromoMessage('Invalid promo code. Try STRIVEX20');
+      addToast({
+        type: 'error',
+        title: 'Invalid Promo Code',
+        message: 'Please enter a valid code (e.g. STRIVEX20)'
+      });
+    }
+  };
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -455,12 +487,20 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
                   {formData.selectedPlan}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  {formData.isAnnualBilling ? 'Annual Billing ($39/mo, Save 20%)' : 'Monthly Billing ($49/mo)'}
+                  {formData.isAnnualBilling ? 'Annual Billing (Save 20%)' : 'Monthly Billing'}
+                  {promoDiscount > 0 && <span style={{ color: 'var(--status-success)', fontWeight: 700 }}> • {promoDiscount}% PROMO OFF</span>}
                 </div>
               </div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--accent)' }}>
-                {formData.isAnnualBilling ? '$39' : '$49'}
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>/mo</span>
+              <div style={{ textAlign: 'right' }}>
+                {promoDiscount > 0 && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', textDecoration: 'line-through' }}>
+                    {formData.isAnnualBilling ? '$39' : '$49'}/mo
+                  </div>
+                )}
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--accent)' }}>
+                  ${formData.isAnnualBilling ? (39 * (1 - promoDiscount / 100)).toFixed(0) : (49 * (1 - promoDiscount / 100)).toFixed(0)}
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>/mo</span>
+                </div>
               </div>
             </div>
 
@@ -522,6 +562,42 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
                 />
                 {errors.cardCVC && <span className="kinetic-input-error">{errors.cardCVC}</span>}
               </div>
+            </div>
+
+            {/* Promo Code Input */}
+            <div className="kinetic-input-group" style={{ marginTop: '4px' }}>
+              <label className="kinetic-label">Promo / Referral Code</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="e.g. STRIVEX20"
+                  value={formData.promoCode}
+                  onChange={(e) => handleChange('promoCode', e.target.value)}
+                  className="kinetic-input"
+                  style={{ textTransform: 'uppercase' }}
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyPromo}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '0 16px', fontSize: '0.82rem', fontWeight: 700, flexShrink: 0 }}
+                >
+                  Apply
+                </button>
+              </div>
+              {promoMessage && (
+                <span
+                  style={{
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    color: promoDiscount > 0 ? 'var(--status-success)' : 'var(--status-error)',
+                    marginTop: '4px',
+                    display: 'block'
+                  }}
+                >
+                  {promoMessage}
+                </span>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>

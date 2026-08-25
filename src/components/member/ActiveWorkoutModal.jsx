@@ -9,10 +9,21 @@ import {
   Trophy,
   Plus,
   FastForward,
-  RotateCcw
+  RotateCcw,
+  Search,
+  BookOpen
 } from 'lucide-react';
 
-export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
+const EXERCISE_DATABASE = [
+  { id: 'lib_1', name: 'Barbell Overhead Press (OHP)', muscle: 'Shoulders & Upper Chest', image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=250&auto=format&fit=crop', defaultWeight: 50, defaultReps: 8 },
+  { id: 'lib_2', name: 'Barbell Romanian Deadlift (RDL)', muscle: 'Hamstrings & Glutes', image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=250&auto=format&fit=crop', defaultWeight: 100, defaultReps: 8 },
+  { id: 'lib_3', name: 'Incline Dumbbell Bicep Curls', muscle: 'Biceps Long Head', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=250&auto=format&fit=crop', defaultWeight: 16, defaultReps: 12 },
+  { id: 'lib_4', name: 'Weighted Pull-Ups', muscle: 'Latissimus Dorsi & Biceps', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=250&auto=format&fit=crop', defaultWeight: 10, defaultReps: 8 },
+  { id: 'lib_5', name: 'Cable Tricep Rope Pushdowns', muscle: 'Triceps Lateral Head', image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=250&auto=format&fit=crop', defaultWeight: 25, defaultReps: 15 },
+  { id: 'lib_6', name: 'Leg Press 45°', muscle: 'Quadriceps & Glutes', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=250&auto=format&fit=crop', defaultWeight: 180, defaultReps: 10 }
+];
+
+export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, activeRoutine }) => {
   const { addToast } = useToast();
 
   // Workout live timer state
@@ -22,58 +33,36 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
   // Rest interval countdown timer state
   const [restSeconds, setRestSeconds] = useState(0);
   const [isRestActive, setIsRestActive] = useState(false);
+  const [restPreset, setRestPreset] = useState(60);
 
   // Completed workout celebration summary modal
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
+  // Exercise library modal
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [librarySearch, setLibrarySearch] = useState('');
+
   // Active routine exercises and logged sets
-  const [exercises, setExercises] = useState([
-    {
-      id: 'ex_1',
-      name: 'Barbell Bench Press',
-      targetMuscle: 'Pectorals & Triceps',
-      image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=250&auto=format&fit=crop',
-      sets: [
-        { setNumber: 1, prevWeight: 80, prevReps: 8, weight: 80, reps: 8, completed: false },
-        { setNumber: 2, prevWeight: 85, prevReps: 8, weight: 85, reps: 8, completed: false },
-        { setNumber: 3, prevWeight: 90, prevReps: 6, weight: 90, reps: 6, completed: false },
-        { setNumber: 4, prevWeight: 90, prevReps: 6, weight: 90, reps: 6, completed: false }
-      ]
-    },
-    {
-      id: 'ex_2',
-      name: 'Incline Dumbbell Flyes',
-      targetMuscle: 'Clavicular Head',
-      image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=250&auto=format&fit=crop',
-      sets: [
-        { setNumber: 1, prevWeight: 22, prevReps: 12, weight: 22, reps: 12, completed: false },
-        { setNumber: 2, prevWeight: 24, prevReps: 10, weight: 24, reps: 10, completed: false },
-        { setNumber: 3, prevWeight: 24, prevReps: 10, weight: 24, reps: 10, completed: false }
-      ]
-    },
-    {
-      id: 'ex_3',
-      name: 'Cable Lateral Raises',
-      targetMuscle: 'Lateral Deltoids',
-      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=250&auto=format&fit=crop',
-      sets: [
-        { setNumber: 1, prevWeight: 12, prevReps: 15, weight: 12, reps: 15, completed: false },
-        { setNumber: 2, prevWeight: 14, prevReps: 15, weight: 14, reps: 15, completed: false },
-        { setNumber: 3, prevWeight: 14, prevReps: 12, weight: 14, reps: 12, completed: false }
-      ]
-    },
-    {
-      id: 'ex_4',
-      name: 'Weighted Chest Dips',
-      targetMuscle: 'Lower Pectorals & Triceps',
-      image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=250&auto=format&fit=crop',
-      sets: [
-        { setNumber: 1, prevWeight: 15, prevReps: 10, weight: 15, reps: 10, completed: false },
-        { setNumber: 2, prevWeight: 20, prevReps: 8, weight: 20, reps: 8, completed: false },
-        { setNumber: 3, prevWeight: 20, prevReps: 8, weight: 20, reps: 8, completed: false }
-      ]
+  const [exercises, setExercises] = useState([]);
+
+  // Reset or load exercises whenever activeRoutine changes
+  useEffect(() => {
+    if (activeRoutine?.exercises) {
+      setExercises(
+        activeRoutine.exercises.map((ex, idx) => ({
+          id: `ex_${idx + 1}`,
+          name: ex.name,
+          targetMuscle: ex.muscle || 'Target Muscle Group',
+          image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=250&auto=format&fit=crop',
+          sets: [
+            { setNumber: 1, prevWeight: 75, prevReps: 10, weight: 75, reps: 10, completed: false },
+            { setNumber: 2, prevWeight: 80, prevReps: 8, weight: 80, reps: 8, completed: false },
+            { setNumber: 3, prevWeight: 85, prevReps: 8, weight: 85, reps: 8, completed: false }
+          ]
+        }))
+      );
     }
-  ]);
+  }, [activeRoutine]);
 
   // Main workout elapsed timer effect
   useEffect(() => {
@@ -121,7 +110,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
     setExercises(updated);
 
     if (nextStatus) {
-      setRestSeconds(60);
+      setRestSeconds(restPreset);
       setIsRestActive(true);
     }
   };
@@ -148,6 +137,30 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
       completed: false
     });
     setExercises(updated);
+  };
+
+  // Add custom exercise from library
+  const handleAddFromLibrary = (libItem) => {
+    setExercises((prev) => [
+      ...prev,
+      {
+        id: `ex_lib_${Date.now()}`,
+        name: libItem.name,
+        targetMuscle: libItem.muscle,
+        image: libItem.image,
+        sets: [
+          { setNumber: 1, prevWeight: libItem.defaultWeight, prevReps: libItem.defaultReps, weight: libItem.defaultWeight, reps: libItem.defaultReps, completed: false },
+          { setNumber: 2, prevWeight: libItem.defaultWeight, prevReps: libItem.defaultReps, weight: libItem.defaultWeight, reps: libItem.defaultReps, completed: false },
+          { setNumber: 3, prevWeight: libItem.defaultWeight, prevReps: libItem.defaultReps, weight: libItem.defaultWeight, reps: libItem.defaultReps, completed: false }
+        ]
+      }
+    ]);
+    setIsLibraryOpen(false);
+    addToast({
+      type: 'info',
+      title: 'Exercise Added',
+      message: `${libItem.name} added to your active routine`
+    });
   };
 
   // Calculate statistics
@@ -191,6 +204,12 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
     onClose();
   };
 
+  const filteredLibrary = EXERCISE_DATABASE.filter(
+    (item) =>
+      item.name.toLowerCase().includes(librarySearch.toLowerCase()) ||
+      item.muscle.toLowerCase().includes(librarySearch.toLowerCase())
+  );
+
   return (
     <div
       style={{
@@ -211,7 +230,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
         className="kinetic-card animate-scale-up"
         style={{
           width: '100%',
-          maxWidth: '860px',
+          maxWidth: '880px',
           maxHeight: '92vh',
           display: 'flex',
           flexDirection: 'column',
@@ -249,7 +268,9 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
               >
                 LIVE WORKOUT LOGGER
               </span>
-              <span style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>• Push Day A</span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>
+                • {activeRoutine?.title || 'Hypertrophy Program'}
+              </span>
             </div>
             <h3
               style={{
@@ -259,7 +280,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
                 color: 'var(--text-primary)'
               }}
             >
-              Hypertrophy Push Day A
+              {activeRoutine?.title || 'Hypertrophy Routine'}
             </h3>
           </div>
 
@@ -302,20 +323,44 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
             </button>
           </div>
 
-          {/* Close Action */}
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              padding: '6px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-glass)',
-              color: 'var(--text-secondary)'
-            }}
-            title="Minimize Logger"
-          >
-            <X size={18} />
-          </button>
+          {/* Rest Preset Switcher & Close */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {[45, 60, 90].map((sec) => (
+                <button
+                  key={sec}
+                  type="button"
+                  onClick={() => setRestPreset(sec)}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius-pill)',
+                    background: restPreset === sec ? 'var(--accent)' : 'var(--surface-input)',
+                    color: restPreset === sec ? '#111111' : 'var(--text-secondary)',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    border: '1px solid var(--border-glass)'
+                  }}
+                  title={`Set rest interval to ${sec}s`}
+                >
+                  {sec}s
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                padding: '6px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-glass)',
+                color: 'var(--text-secondary)'
+              }}
+              title="Minimize Logger"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Floating / Docked Rest Interval Banner */}
@@ -561,6 +606,25 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
               </div>
             ))}
           </div>
+
+          {/* Add Exercise from Library CTA */}
+          <button
+            type="button"
+            onClick={() => setIsLibraryOpen(true)}
+            className="kinetic-btn-secondary"
+            style={{
+              width: '100%',
+              padding: '12px',
+              marginTop: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <BookOpen size={16} />
+            <span>+ Add Exercise from Movement Library</span>
+          </button>
         </div>
 
         {/* Modal Footer Controls */}
@@ -594,6 +658,108 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
             </button>
           </div>
         </div>
+
+        {/* Exercise Library Modal Picker Overlay */}
+        {isLibraryOpen && (
+          <div
+            className="animate-fade-in"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 999,
+              background: 'rgba(10, 10, 10, 0.95)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px'
+            }}
+          >
+            <div
+              className="kinetic-card animate-scale-up"
+              style={{
+                width: '100%',
+                maxWidth: '560px',
+                padding: '24px',
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border-hover)'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  Movement Library
+                </h4>
+                <button type="button" onClick={() => setIsLibraryOpen(false)} style={{ color: 'var(--text-secondary)' }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Search Bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)',
+                  marginBottom: '16px'
+                }}
+              >
+                <Search size={16} color="var(--text-tertiary)" />
+                <input
+                  type="text"
+                  placeholder="Search exercises by name or muscle..."
+                  value={librarySearch}
+                  onChange={(e) => setLibrarySearch(e.target.value)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: 'var(--text-primary)',
+                    width: '100%',
+                    fontSize: '0.86rem'
+                  }}
+                />
+              </div>
+
+              {/* Exercises List */}
+              <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {filteredLibrary.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--surface-input)',
+                      border: '1px solid var(--border-subtle)'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {item.name}
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                        {item.muscle} • Default: {item.defaultWeight}kg × {item.defaultReps}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleAddFromLibrary(item)}
+                      className="kinetic-btn-primary"
+                      style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                    >
+                      + Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Workout Complete Summary Modal Overlay */}
         {isSummaryOpen && (
@@ -650,7 +816,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted }) => {
                 Workout Session Crushed!
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Your progressive overload telemetry has been logged and synchronized with Coach Marcus.
+                Your progressive overload telemetry has been logged and synchronized with {activeRoutine?.coach || 'Coach Marcus'}.
               </p>
 
               <div
