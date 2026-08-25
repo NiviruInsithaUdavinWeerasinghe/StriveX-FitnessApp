@@ -68,7 +68,7 @@ export const CustomDropdown = ({
         textAlign: 'left'
       }}
     >
-      {label && <span className="kinetic-label">{label}</span>}
+      {label && <span className="kinetic-label" style={{ whiteSpace: 'nowrap' }}>{label}</span>}
       
       {/* Dropdown Trigger */}
       <button
@@ -83,7 +83,8 @@ export const CustomDropdown = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 16px',
+          gap: '8px',
+          padding: '10px 14px',
           background: 'var(--surface-input)',
           border: `1px solid ${
             error
@@ -94,20 +95,34 @@ export const CustomDropdown = ({
           }`,
           borderRadius: 'var(--radius-md)',
           color: selectedOption ? 'var(--text-primary)' : 'var(--text-tertiary)',
-          fontSize: '0.95rem',
+          fontSize: '0.86rem',
+          fontWeight: 600,
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.6 : 1,
           boxShadow: isOpen ? '0 0 0 3px var(--accent-subtle)' : 'none',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
           transition: 'all var(--transition-fast)'
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flex: 1
+          }}
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown
-          size={18}
+          size={16}
           color="var(--text-secondary)"
           style={{
+            flexShrink: 0,
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
             transition: 'transform var(--transition-fast)'
           }}
@@ -151,13 +166,15 @@ export const CustomDropdown = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '10px 12px',
+                  gap: '8px',
+                  padding: '9px 12px',
                   borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
-                  fontSize: '0.9rem',
+                  fontSize: '0.84rem',
                   fontWeight: isSelected ? 700 : 500,
                   color: isSelected ? 'var(--accent)' : 'var(--text-primary)',
                   background: isSelected ? 'var(--accent-subtle)' : 'transparent',
+                  whiteSpace: 'nowrap',
                   transition: 'background var(--transition-fast)'
                 }}
                 onMouseEnter={(e) => {
@@ -167,11 +184,23 @@ export const CustomDropdown = ({
                   if (!isSelected) e.currentTarget.style.background = 'transparent';
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {option.icon && <span>{option.icon}</span>}
-                  <span>{option.label}</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    flex: 1
+                  }}
+                >
+                  {option.icon && <span style={{ flexShrink: 0 }}>{option.icon}</span>}
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {option.label}
+                  </span>
                 </div>
-                {isSelected && <Check size={16} color="var(--accent)" />}
+                {isSelected && <Check size={15} color="var(--accent)" style={{ flexShrink: 0 }} />}
               </div>
             );
           })}

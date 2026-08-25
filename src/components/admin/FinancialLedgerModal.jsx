@@ -112,7 +112,7 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 const TIER_FILTER_OPTIONS = [
-  { value: 'all', label: 'All Membership Tiers' },
+  { value: 'all', label: 'All Tiers' },
   { value: 'Elite', label: 'Elite Tier' },
   { value: 'Pro', label: 'Pro Tier' },
   { value: 'Starter', label: 'Starter Tier' }
@@ -356,8 +356,8 @@ export const FinancialLedgerModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Custom Dropdown Filters */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '160px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            <div style={{ minWidth: '140px' }}>
               <CustomDropdown
                 options={STATUS_FILTER_OPTIONS}
                 value={statusFilter}
@@ -365,7 +365,7 @@ export const FinancialLedgerModal = ({ isOpen, onClose }) => {
               />
             </div>
 
-            <div style={{ width: '190px' }}>
+            <div style={{ minWidth: '140px' }}>
               <CustomDropdown
                 options={TIER_FILTER_OPTIONS}
                 value={tierFilter}
