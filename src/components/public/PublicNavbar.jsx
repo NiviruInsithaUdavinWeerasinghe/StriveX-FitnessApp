@@ -40,7 +40,7 @@ export const PublicNavbar = ({ onOpenLogin, onOpenRegister, activeSection, setAc
         zIndex: 900,
         width: '100%',
         transition: 'all var(--transition-normal)',
-        background: isScrolled ? 'var(--surface-glass)' : 'rgba(19, 19, 19, 0.85)',
+        background: isScrolled ? 'var(--surface-glass)' : 'rgba(0, 0, 0, 0.85)',
         backdropFilter: 'var(--blur-glass)',
         WebkitBackdropFilter: 'var(--blur-glass)',
         borderBottom: `1px solid ${isScrolled ? 'var(--border-glass)' : 'rgba(255, 255, 255, 0.05)'}`,

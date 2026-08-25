@@ -3,15 +3,15 @@
    ========================================================================== */
 
 :root {
-  /* Dark Mode Default Tokens (Kinetic Glass) */
-  --bg-primary: #131313;
-  --bg-secondary: #181818;
-  --bg-tertiary: #1f1f1f;
+  /* Dark Mode Default Tokens (Pure Black Kinetic Canvas) */
+  --bg-primary: #000000;
+  --bg-secondary: #080808;
+  --bg-tertiary: #101010;
   
-  --surface-glass: rgba(22, 22, 22, 0.72);
-  --surface-card: rgba(28, 28, 28, 0.85);
-  --surface-elevated: rgba(36, 36, 36, 0.95);
-  --surface-input: rgba(18, 18, 18, 0.9);
+  --surface-glass: rgba(12, 12, 12, 0.78);
+  --surface-card: rgba(18, 18, 18, 0.88);
+  --surface-elevated: rgba(24, 24, 24, 0.96);
+  --surface-input: rgba(14, 14, 14, 0.95);
   
   --accent: #d4ff00;
   --accent-hover: #bde600;

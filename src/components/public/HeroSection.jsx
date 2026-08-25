@@ -29,7 +29,7 @@ export const HeroSection = ({ onStartFreeTrial, onOpenVideoDemo }) => {
           boxShadow: 'var(--shadow-lg)',
           background: `
             radial-gradient(circle at 50% 30%, rgba(212, 255, 0, 0.08) 0%, transparent 60%),
-            linear-gradient(180deg, rgba(19, 19, 19, 0.4) 0%, rgba(19, 19, 19, 0.95) 100%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.98) 100%),
             url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat
           `
         }}
