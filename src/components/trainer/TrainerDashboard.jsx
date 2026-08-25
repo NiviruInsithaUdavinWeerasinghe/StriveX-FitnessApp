@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { useToast } from '../../context/ToastContext';
 import { RoutineBuilderModal } from './RoutineBuilderModal';
+import { TrainerConsultationHubModal } from './TrainerConsultationHubModal';
 import { MemberChatModal } from '../member/MemberChatModal';
 import {
   Users,
@@ -89,6 +89,7 @@ const INITIAL_CLIENTS = [
 const TODAY_CONSULTATIONS = [
   {
     id: 'call_1',
+    clientId: 'cli_1',
     time: '9:00 AM',
     clientName: 'Alex Mercer',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop',
@@ -98,6 +99,7 @@ const TODAY_CONSULTATIONS = [
   },
   {
     id: 'call_2',
+    clientId: 'cli_4',
     time: '11:30 AM',
     clientName: 'Maya Lin',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop',
@@ -107,6 +109,7 @@ const TODAY_CONSULTATIONS = [
   },
   {
     id: 'call_3',
+    clientId: 'cli_5',
     time: '2:00 PM',
     clientName: 'Ryan Patel',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop',
@@ -116,6 +119,7 @@ const TODAY_CONSULTATIONS = [
   },
   {
     id: 'call_4',
+    clientId: 'cli_2',
     time: '4:30 PM',
     clientName: 'Kasun Fernando',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop',
@@ -128,16 +132,16 @@ const TODAY_CONSULTATIONS = [
 export const TrainerDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { addToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGoalFilter, setSelectedGoalFilter] = useState('All');
-  const [selectedClientDetail, setSelectedClientDetail] = useState(null);
 
   // Modal states
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [builderTargetClient, setBuilderTargetClient] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isConsultHubOpen, setIsConsultHubOpen] = useState(false);
+  const [consultHubTargetClient, setConsultHubTargetClient] = useState(null);
 
   // Filter clients
   const filteredClients = INITIAL_CLIENTS.filter((cli) => {
@@ -153,12 +157,9 @@ export const TrainerDashboard = () => {
     setIsBuilderOpen(true);
   };
 
-  const handleStartVideoCall = (call) => {
-    addToast({
-      type: 'success',
-      title: 'Joining Live Consultation Room',
-      message: `Connecting secure HD 1-on-1 video call with ${call.clientName}...`
-    });
+  const handleOpenConsultHub = (client) => {
+    setConsultHubTargetClient(client);
+    setIsConsultHubOpen(true);
   };
 
   return (
@@ -219,21 +220,12 @@ export const TrainerDashboard = () => {
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>
-                  TRAINER COMMAND SUITE
-                </span>
+                <span className="type-eyebrow">TRAINER COMMAND SUITE</span>
                 <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 8px' }}>
                   NSCA-CSCS
                 </span>
               </div>
-              <div
-                style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 800,
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-display)'
-                }}
-              >
+              <div className="type-h3" style={{ fontSize: '1.15rem', margin: 0 }}>
                 Coach Marcus Vance
               </div>
             </div>
@@ -335,7 +327,7 @@ export const TrainerDashboard = () => {
         >
           <div className="kinetic-card" style={{ padding: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+              <span className="type-caption" style={{ fontWeight: 800, textTransform: 'uppercase' }}>
                 Total Active Cohort
               </span>
               <Users size={18} color="var(--accent)" />
@@ -350,7 +342,7 @@ export const TrainerDashboard = () => {
 
           <div className="kinetic-card" style={{ padding: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+              <span className="type-caption" style={{ fontWeight: 800, textTransform: 'uppercase' }}>
                 Average Adherence
               </span>
               <TrendingUp size={18} color="var(--status-success)" />
@@ -358,14 +350,14 @@ export const TrainerDashboard = () => {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--status-success)' }}>
               91.4%
             </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            <span className="type-small">
               High progressive compliance
             </span>
           </div>
 
           <div className="kinetic-card" style={{ padding: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+              <span className="type-caption" style={{ fontWeight: 800, textTransform: 'uppercase' }}>
                 Today's Consultations
               </span>
               <Video size={18} color="#06b6d4" />
@@ -373,14 +365,14 @@ export const TrainerDashboard = () => {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: '#06b6d4' }}>
               4 Sessions
             </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            <span className="type-small">
               Next: Maya Lin (11:30 AM)
             </span>
           </div>
 
           <div className="kinetic-card" style={{ padding: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+              <span className="type-caption" style={{ fontWeight: 800, textTransform: 'uppercase' }}>
                 Pending Form Audits
               </span>
               <Activity size={18} color="#f59e0b" />
@@ -388,7 +380,7 @@ export const TrainerDashboard = () => {
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: '#f59e0b' }}>
               2 Videos
             </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            <span className="type-small">
               Alex Mercer (Bench Press)
             </span>
           </div>
@@ -416,10 +408,10 @@ export const TrainerDashboard = () => {
               }}
             >
               <div>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                <h3 className="type-h3" style={{ margin: 0 }}>
                   Athlete Client Roster ({filteredClients.length})
                 </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                <p className="type-small" style={{ margin: '4px 0 0' }}>
                   Monitor individual progressive overload and assign customized routines.
                 </p>
               </div>
@@ -525,7 +517,7 @@ export const TrainerDashboard = () => {
                   {/* Adherence and Action Buttons */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>ADHERENCE</div>
+                      <div className="type-caption">ADHERENCE</div>
                       <div
                         style={{
                           fontSize: '1rem',
@@ -565,10 +557,10 @@ export const TrainerDashboard = () => {
 
                     <button
                       type="button"
-                      onClick={() => setSelectedClientDetail(client)}
+                      onClick={() => handleOpenConsultHub(client)}
                       className="kinetic-btn-ghost"
                       style={{ padding: '8px 12px', fontSize: '0.78rem' }}
-                      title="View Telemetry Breakdown"
+                      title="Open Biometrics & Video Telemetry Hub"
                     >
                       <Activity size={15} color="#06b6d4" />
                     </button>
@@ -583,7 +575,7 @@ export const TrainerDashboard = () => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Calendar size={18} color="var(--accent)" />
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                <h4 className="type-h4" style={{ margin: 0 }}>
                   Today's Schedule
                 </h4>
               </div>
@@ -636,7 +628,7 @@ export const TrainerDashboard = () => {
                       <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                         {call.clientName}
                       </div>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                      <div className="type-caption">
                         {call.type}
                       </div>
                     </div>
@@ -644,7 +636,10 @@ export const TrainerDashboard = () => {
 
                   <button
                     type="button"
-                    onClick={() => handleStartVideoCall(call)}
+                    onClick={() => {
+                      const matched = INITIAL_CLIENTS.find((c) => c.name === call.clientName);
+                      handleOpenConsultHub(matched || INITIAL_CLIENTS[0]);
+                    }}
                     className="kinetic-btn-primary"
                     style={{
                       width: '100%',
@@ -670,107 +665,18 @@ export const TrainerDashboard = () => {
         targetClient={builderTargetClient}
       />
 
+      {/* Trainer Biometric Telemetry & Video Assessment Suite Modal */}
+      <TrainerConsultationHubModal
+        isOpen={isConsultHubOpen}
+        onClose={() => setIsConsultHubOpen(false)}
+        defaultClient={consultHubTargetClient}
+      />
+
       {/* Member/Client Chat Modal */}
       <MemberChatModal
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
       />
-
-      {/* Client Telemetry Detail Drawer / Modal */}
-      {selectedClientDetail && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9995,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.88)',
-            backdropFilter: 'blur(20px)',
-            padding: '16px'
-          }}
-          onClick={() => setSelectedClientDetail(null)}
-        >
-          <div
-            className="kinetic-card animate-scale-up"
-            style={{
-              width: '100%',
-              maxWidth: '540px',
-              padding: '28px',
-              background: 'var(--surface-elevated)',
-              border: '1px solid var(--border-hover)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img
-                  src={selectedClientDetail.avatar}
-                  alt={selectedClientDetail.name}
-                  style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px solid var(--accent)' }}
-                />
-                <div>
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {selectedClientDetail.name}
-                  </h4>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--accent)' }}>
-                    {selectedClientDetail.tier} • {selectedClientDetail.goal} Focus
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedClientDetail(null)}
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-              <div style={{ padding: '12px', background: 'var(--surface-input)', borderRadius: 'var(--radius-md)' }}>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>WEEKLY VOLUME</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--accent)' }}>
-                  {selectedClientDetail.weeklyVolume}
-                </div>
-              </div>
-              <div style={{ padding: '12px', background: 'var(--surface-input)', borderRadius: 'var(--radius-md)' }}>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>ACTIVE STREAK</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--status-success)' }}>
-                  {selectedClientDetail.streak} Days
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  const target = selectedClientDetail;
-                  setSelectedClientDetail(null);
-                  handleOpenBuilderForClient(target);
-                }}
-                className="kinetic-btn-primary"
-                style={{ flex: 1, padding: '12px', fontSize: '0.85rem' }}
-              >
-                <Edit3 size={14} /> Customize Program
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedClientDetail(null);
-                  setIsChatOpen(true);
-                }}
-                className="kinetic-btn-secondary"
-                style={{ flex: 1, padding: '12px', fontSize: '0.85rem' }}
-              >
-                <MessageSquare size={14} /> Send Message
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
