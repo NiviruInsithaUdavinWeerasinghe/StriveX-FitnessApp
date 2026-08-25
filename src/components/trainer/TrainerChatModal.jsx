@@ -5,7 +5,8 @@ import {
   Search,
   Activity,
   Sparkles,
-  Dumbbell
+  Dumbbell,
+  CheckCheck
 } from 'lucide-react';
 
 const INITIAL_CLIENT_CONVERSATIONS = {
@@ -30,7 +31,7 @@ const INITIAL_CLIENT_CONVERSATIONS = {
         id: 'msg_2',
         sender: 'coach',
         senderName: 'Coach Marcus Vance',
-        text: 'Great work Alex! I reviewed your Set 3 video. Scapular retraction looked solid. Next session, try ramping the first set to 87.5kg.',
+        text: 'Great work Alex! I reviewed your Set 3 video. Scapular retraction was locked in. Next session, ramp set 1 to 87.5kg.',
         time: '10:18 AM'
       },
       {
@@ -63,7 +64,7 @@ const INITIAL_CLIENT_CONVERSATIONS = {
         id: 'msg_k2',
         sender: 'coach',
         senderName: 'Coach Marcus Vance',
-        text: 'Checked the telemetry log, 58,400 kg weekly volume is peak strength territory. Take an active recovery walk tomorrow.',
+        text: 'Checked your telemetry, 58,400 kg weekly volume is peak strength zone. Take an active recovery walk tomorrow.',
         time: 'Yesterday'
       }
     ]
@@ -82,14 +83,14 @@ const INITIAL_CLIENT_CONVERSATIONS = {
         id: 'msg_s1',
         sender: 'athlete',
         senderName: 'Sarah Tan',
-        text: 'Hi Marcus, the interval sprint session was intense! Heart rate spiked to 165 bpm during round 4.',
+        text: 'Hi Marcus, the sprint interval session was intense! Heart rate reached 165 bpm in round 4.',
         time: '2 days ago'
       },
       {
         id: 'msg_s2',
         sender: 'coach',
         senderName: 'Coach Marcus Vance',
-        text: 'That puts you right in high-aerobic VO2 threshold. Keep water intake above 3L today.',
+        text: 'That is optimal VO2 threshold work. Hydrate and keep water intake above 3L today.',
         time: '2 days ago'
       }
     ]
@@ -108,14 +109,14 @@ const INITIAL_CLIENT_CONVERSATIONS = {
         id: 'msg_m1',
         sender: 'athlete',
         senderName: 'Maya Lin',
-        text: 'Uploaded my Romanian Deadlift video for form check. Looking forward to our 11:30 AM video call.',
+        text: 'Uploaded my Romanian Deadlift video for form check. Ready for our 11:30 AM video call.',
         time: '8:45 AM'
       },
       {
         id: 'msg_m2',
         sender: 'coach',
         senderName: 'Coach Marcus Vance',
-        text: 'Noted Maya! I will have your progressive overload graph ready for our consultation call.',
+        text: 'Noted Maya! I have your overload curve ready for our session.',
         time: '8:50 AM'
       }
     ]
@@ -134,14 +135,14 @@ const INITIAL_CLIENT_CONVERSATIONS = {
         id: 'msg_r1',
         sender: 'athlete',
         senderName: 'Ryan Patel',
-        text: 'Coach, hip flexors feeling tighter than usual after the stretching routine.',
+        text: 'Coach, hip flexors feeling tight after the mobility routine.',
         time: '3 days ago'
       },
       {
         id: 'msg_r2',
         sender: 'coach',
         senderName: 'Coach Marcus Vance',
-        text: 'Lets review your foam rolling protocol during our 2:00 PM session today.',
+        text: 'We will review your foam rolling protocol during our 2:00 PM session.',
         time: '3 days ago'
       }
     ]
@@ -151,8 +152,8 @@ const INITIAL_CLIENT_CONVERSATIONS = {
 const QUICK_COACH_CUES = [
   'Form looks solid. Add 2.5kg to your next set.',
   'Keep rest intervals strict at 90 seconds.',
-  'Record a video of your next heavy set for telemetry review.',
-  'Great adherence this week! Keep protein above 160g today.'
+  'Record a video of your next heavy set for review.',
+  'Great adherence! Keep protein intake high today.'
 ];
 
 export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelemetry }) => {
@@ -164,7 +165,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
 
   const messagesEndRef = useRef(null);
 
-  // Sync defaultClientId when opened
+  // Sync client selection when modal opens
   useEffect(() => {
     if (defaultClientId && conversations[defaultClientId]) {
       setActiveClientId(defaultClientId);
@@ -207,15 +208,15 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
 
     setInputText('');
 
-    // Simulate realistic athlete reply after 1.5 seconds
+    // Simulate athlete reply
     setIsAthleteTyping(true);
     setTimeout(() => {
       setIsAthleteTyping(false);
       const athleteReplies = [
-        `Thanks Coach! Logged it in my telemetry journal right now.`,
-        `Got it! I will execute that cue on my next workout session.`,
+        `Thanks Coach! Logged it in my journal right now.`,
+        `Got it! I will apply that cue on my next set.`,
         `Understood Marcus! Really feeling the progressive overload gains.`,
-        `Awesome, thanks for the quick feedback on my form!`
+        `Awesome, thanks for the quick technique feedback!`
       ];
       const randomReply = athleteReplies[Math.floor(Math.random() * athleteReplies.length)];
 
@@ -234,7 +235,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
           messages: [...prev[activeClientId].messages, autoReply]
         }
       }));
-    }, 1500);
+    }, 1400);
   };
 
   const filteredClients = Object.values(conversations).filter((cli) =>
@@ -254,7 +255,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         background: 'rgba(0, 0, 0, 0.88)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        padding: '16px'
+        padding: '20px'
       }}
       onClick={onClose}
     >
@@ -262,8 +263,9 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         className="kinetic-card animate-scale-up"
         style={{
           width: '100%',
-          maxWidth: '960px',
-          height: '86vh',
+          maxWidth: '1020px',
+          height: '82vh',
+          maxHeight: '740px',
           display: 'flex',
           flexDirection: 'column',
           background: 'var(--surface-elevated)',
@@ -274,24 +276,24 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
+        {/* Modal Top Header */}
         <div
           style={{
-            padding: '16px 24px',
+            padding: '14px 20px',
             background: 'var(--surface-glass)',
             borderBottom: '1px solid var(--border-glass)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '16px'
+            gap: '12px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
                 background: 'rgba(212, 255, 0, 0.15)',
                 border: '1px solid var(--accent)',
                 display: 'flex',
@@ -300,16 +302,16 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                 color: 'var(--accent)'
               }}
             >
-              <Dumbbell size={18} />
+              <Dumbbell size={16} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span className="type-eyebrow">COACH ATHLETE DIRECT MESSAGING</span>
-                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                <span className="kinetic-badge" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>
                   COACH VIEW
                 </span>
               </div>
-              <h3 className="type-h3" style={{ fontSize: '1.15rem', margin: 0, whiteSpace: 'nowrap' }}>
+              <h3 className="type-h4" style={{ margin: 0, whiteSpace: 'nowrap' }}>
                 Athlete Telemetry & Coaching Communications
               </h3>
             </div>
@@ -319,19 +321,24 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             type="button"
             onClick={onClose}
             style={{
-              padding: '6px',
+              width: '32px',
+              height: '32px',
               borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-glass)',
+              background: 'var(--surface-input)',
+              border: '1px solid var(--border-glass)',
               color: 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               cursor: 'pointer'
             }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* 2-Column Body */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '280px 1fr', overflow: 'hidden' }}>
+        {/* 2-Column Chat Body */}
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '290px 1fr', overflow: 'hidden' }}>
           {/* Left Sidebar: Athlete Roster */}
           <div
             style={{
@@ -343,7 +350,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             }}
           >
             {/* Search Athletes */}
-            <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{ padding: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
               <div
                 style={{
                   display: 'flex',
@@ -374,8 +381,8 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             </div>
 
             {/* Athletes List */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {filteredClients.map((cli) => {
                   const isSelected = cli.id === activeClientId;
                   return (
@@ -401,8 +408,8 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                           src={cli.avatar}
                           alt={cli.name}
                           style={{
-                            width: '38px',
-                            height: '38px',
+                            width: '36px',
+                            height: '36px',
                             borderRadius: '50%',
                             objectFit: 'cover',
                             border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-subtle)'}`
@@ -424,7 +431,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
 
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                             {cli.name}
                           </span>
                           <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700 }}>
@@ -433,7 +440,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                         </div>
                         <div
                           style={{
-                            fontSize: '0.74rem',
+                            fontSize: '0.72rem',
                             color: 'var(--text-secondary)',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -451,9 +458,9 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             </div>
           </div>
 
-          {/* Right Chat Pane */}
+          {/* Right Pane: Active Athlete Conversation */}
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-primary)' }}>
-            {/* Active Athlete Header Strip */}
+            {/* Athlete Active Bar */}
             <div
               style={{
                 padding: '12px 20px',
@@ -472,15 +479,15 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                   style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1.5px solid var(--accent)' }}
                 />
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {activeClient.name}
                     </span>
-                    <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                    <span className="kinetic-badge" style={{ fontSize: '0.64rem', padding: '1px 6px' }}>
                       {activeClient.tier}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
                     Active Split: <strong style={{ color: 'var(--text-primary)' }}>{activeClient.routine}</strong> • Status: {activeClient.status}
                   </div>
                 </div>
@@ -491,7 +498,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                   type="button"
                   onClick={() => onOpenTelemetry(activeClient)}
                   className="kinetic-btn-secondary"
-                  style={{ padding: '6px 12px', fontSize: '0.76rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                  style={{ padding: '6px 12px', fontSize: '0.74rem', whiteSpace: 'nowrap', flexShrink: 0 }}
                 >
                   <Activity size={13} color="var(--accent)" />
                   <span>Telemetry Audit</span>
@@ -504,10 +511,10 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
               style={{
                 flex: 1,
                 overflowY: 'auto',
-                padding: '20px',
+                padding: '20px 24px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px'
+                gap: '16px'
               }}
             >
               {activeClient.messages.map((msg) => {
@@ -518,24 +525,26 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: isCoach ? 'flex-end' : 'flex-start'
+                      alignItems: isCoach ? 'flex-end' : 'flex-start',
+                      width: '100%'
                     }}
                   >
                     <div
                       style={{
-                        maxWidth: '72%',
-                        padding: '12px 16px',
-                        borderRadius: isCoach ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                        maxWidth: '75%',
+                        padding: '12px 18px',
+                        borderRadius: isCoach ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                         background: isCoach
-                          ? 'linear-gradient(135deg, rgba(212, 255, 0, 0.22), rgba(212, 255, 0, 0.08))'
+                          ? 'linear-gradient(135deg, rgba(212, 255, 0, 0.18), rgba(212, 255, 0, 0.06))'
                           : 'var(--surface-input)',
                         border: isCoach
                           ? '1px solid rgba(212, 255, 0, 0.4)'
                           : '1px solid var(--border-subtle)',
                         color: 'var(--text-primary)',
                         fontSize: '0.86rem',
-                        lineHeight: 1.5,
-                        boxShadow: isCoach ? '0 0 16px rgba(212, 255, 0, 0.1)' : 'none'
+                        lineHeight: 1.55,
+                        wordBreak: 'break-word',
+                        boxShadow: isCoach ? '0 0 16px rgba(212, 255, 0, 0.08)' : 'none'
                       }}
                     >
                       <div
@@ -550,9 +559,12 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                       </div>
                       <div>{msg.text}</div>
                     </div>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginTop: '3px', padding: '0 4px' }}>
-                      {msg.time}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px', padding: '0 4px' }}>
+                      <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>
+                        {msg.time}
+                      </span>
+                      {isCoach && <CheckCheck size={12} color="var(--accent)" />}
+                    </div>
                   </div>
                 );
               })}
@@ -594,7 +606,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
                     background: 'var(--surface-input)',
                     border: '1px solid var(--border-glass)',
                     color: 'var(--text-secondary)',
-                    fontSize: '0.74rem',
+                    fontSize: '0.72rem',
                     fontWeight: 600,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
@@ -609,7 +621,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             {/* Input Composer */}
             <div
               style={{
-                padding: '14px 16px',
+                padding: '12px 16px',
                 background: 'var(--surface-glass)',
                 borderTop: '1px solid var(--border-glass)',
                 display: 'flex',
@@ -619,7 +631,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
             >
               <input
                 type="text"
-                placeholder={`Message ${activeClient.name} with coaching instructions or technique feedback...`}
+                placeholder={`Message ${activeClient.name} with coaching cues or technique feedback...`}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => {
