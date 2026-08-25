@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { Menu, X, Sun, Moon, LogIn, ArrowRight } from 'lucide-react';
 
-export const PublicNavbar = ({ onOpenLogin, onOpenRegister, activeSection, setActiveSection }) => {
+export const PublicNavbar = ({ onOpenLogin, onOpenRegister, onOpenBookings, activeSection, setActiveSection, reservedCount = 0 }) => {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -170,6 +170,28 @@ export const PublicNavbar = ({ onOpenLogin, onOpenRegister, activeSection, setAc
           }}
           className="desktop-nav"
         >
+          {reservedCount > 0 && (
+            <button
+              type="button"
+              onClick={onOpenBookings}
+              style={{
+                padding: '9px 18px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'rgba(212, 255, 0, 0.12)',
+                border: '1px solid rgba(212, 255, 0, 0.3)',
+                color: 'var(--accent)',
+                fontSize: '0.88rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              My Bookings ({reservedCount})
+            </button>
+          )}
+
           <button
             type="button"
             onClick={toggleTheme}

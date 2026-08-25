@@ -15,7 +15,7 @@ import {
   Calendar
 } from 'lucide-react';
 
-export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
+export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin, onOpenLegal }) => {
   const { addToast } = useToast();
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
@@ -403,9 +403,9 @@ export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
         >
           <div>© 2026 StriveX Fitness Ecosystem. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '20px' }}>
-            <span style={{ cursor: 'pointer' }}>Privacy Policy</span>
-            <span style={{ cursor: 'pointer' }}>Terms of Service</span>
-            <span style={{ cursor: 'pointer' }}>Facility Regulations</span>
+            <button type="button" onClick={() => onOpenLegal('privacy')} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}>Privacy Policy</button>
+            <button type="button" onClick={() => onOpenLegal('terms')} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}>Terms of Service</button>
+            <button type="button" onClick={() => onOpenLegal('regulations')} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}>Facility Regulations</button>
           </div>
         </div>
       </div>

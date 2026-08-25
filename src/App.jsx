@@ -24,6 +24,8 @@ import { RegistrationModal } from './components/auth/RegistrationModal';
 import { LoginModal } from './components/auth/LoginModal';
 import { DemoVideoModal } from './components/public/DemoVideoModal';
 import { ClassBookingModal } from './components/public/ClassBookingModal';
+import { MyBookingsModal } from './components/public/MyBookingsModal';
+import { LegalModal } from './components/public/LegalModal';
 
 function StriveXApp() {
   const { role } = useAuth();
@@ -35,6 +37,9 @@ function StriveXApp() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isVideoDemoOpen, setIsVideoDemoOpen] = useState(false);
+  const [isBookingsOpen, setIsBookingsOpen] = useState(false);
+  const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [legalDocType, setLegalDocType] = useState('privacy');
   const [bookingClass, setBookingClass] = useState(null);
   const [reservedClassIds, setReservedClassIds] = useState([]);
   const [selectedPlanDetails, setSelectedPlanDetails] = useState({ plan: 'Pro Athlete', isAnnual: true });
@@ -42,6 +47,10 @@ function StriveXApp() {
   // Handle class reservation
   const handleConfirmBooking = (classId) => {
     setReservedClassIds((prev) => [...prev, classId]);
+  };
+
+  const handleCancelBooking = (classId) => {
+    setReservedClassIds((prev) => prev.filter((id) => id !== classId));
   };
 
   // Handle pricing plan selection
@@ -69,8 +78,10 @@ function StriveXApp() {
           <PublicNavbar
             onOpenLogin={() => setIsLoginOpen(true)}
             onOpenRegister={() => setIsRegisterOpen(true)}
+            onOpenBookings={() => setIsBookingsOpen(true)}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
+            reservedCount={reservedClassIds.length}
           />
 
           <main style={{ flex: 1 }}>
@@ -101,6 +112,10 @@ function StriveXApp() {
             }}
             onOpenRegister={() => setIsRegisterOpen(true)}
             onOpenLogin={() => setIsLoginOpen(true)}
+            onOpenLegal={(type) => {
+              setLegalDocType(type);
+              setIsLegalOpen(true);
+            }}
           />
         </div>
       )}
@@ -139,6 +154,19 @@ function StriveXApp() {
         onClose={() => setBookingClass(null)}
         classData={bookingClass}
         onConfirmBooking={handleConfirmBooking}
+      />
+
+      <MyBookingsModal
+        isOpen={isBookingsOpen}
+        onClose={() => setIsBookingsOpen(false)}
+        reservedClassIds={reservedClassIds}
+        onCancelBooking={handleCancelBooking}
+      />
+
+      <LegalModal
+        isOpen={isLegalOpen}
+        onClose={() => setIsLegalOpen(false)}
+        docType={legalDocType}
       />
 
       {/* Global Toast System */}

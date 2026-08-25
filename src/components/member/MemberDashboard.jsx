@@ -118,7 +118,8 @@ export const MemberDashboard = () => {
       title: 'Routine Assigned by Coach Marcus',
       message: 'New Hypertrophy Push Day A routine has been added to your schedule.',
       time: '2 hours ago',
-      unread: true
+      unread: true,
+      routeId: 'push_a'
     },
     {
       id: 'notif_2',
@@ -134,6 +135,21 @@ export const MemberDashboard = () => {
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+  };
+
+  const handleDeleteNotification = (e, id) => {
+    e.stopPropagation();
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const handleNotificationClick = (n) => {
+    if (n.unread) {
+      setNotifications((prev) => prev.map((notif) => notif.id === n.id ? { ...notif, unread: false } : notif));
+    }
+    if (n.routeId) {
+      setSelectedRoutineId(n.routeId);
+      setIsNotifOpen(false);
+    }
   };
 
   const unreadCount = notifications.filter((n) => n.unread).length;
@@ -370,34 +386,60 @@ export const MemberDashboard = () => {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        style={{
-                          padding: '10px',
-                          borderRadius: 'var(--radius-md)',
-                          background: n.unread ? 'var(--accent-subtle)' : 'transparent',
-                          border: `1px solid ${n.unread ? 'var(--border-hover)' : 'transparent'}`
-                        }}
-                      >
-                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                          {n.title}
-                        </div>
+                    {notifications.length === 0 ? (
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', textAlign: 'center', padding: '12px 0' }}>
+                        No new notifications.
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
                         <div
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
                           style={{
-                            fontSize: '0.76rem',
-                            color: 'var(--text-secondary)',
-                            marginTop: '2px',
-                            lineHeight: 1.4
+                            padding: '10px',
+                            borderRadius: 'var(--radius-md)',
+                            background: n.unread ? 'var(--accent-subtle)' : 'transparent',
+                            border: `1px solid ${n.unread ? 'var(--border-hover)' : 'transparent'}`,
+                            cursor: 'pointer',
+                            position: 'relative'
                           }}
                         >
-                          {n.message}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', paddingRight: '20px' }}>
+                              {n.title}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteNotification(e, n.id)}
+                              style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '8px',
+                                color: 'var(--text-tertiary)',
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '2px'
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '0.76rem',
+                              color: 'var(--text-secondary)',
+                              lineHeight: 1.4
+                            }}
+                          >
+                            {n.message}
+                          </div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
+                            {n.time}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-                          {n.time}
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               )}
