@@ -16,6 +16,8 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 
+import { FinancialLedgerModal } from './FinancialLedgerModal';
+
 const EXECUTIVE_METRICS = [
   {
     id: 'mrr',
@@ -113,7 +115,7 @@ const TIER_REVENUE_DISTRIBUTION = [
   { tier: 'Starter Access Tier ($29/mo)', revenue: '$6,400', percentage: 13, members: '220 athletes', color: '#f59e0b' }
 ];
 
-export const AdminDashboard = ({ onOpenFinancialLedger, onOpenStaffManager }) => {
+export const AdminDashboard = ({ onOpenStaffManager }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { addToast } = useToast();
@@ -121,6 +123,7 @@ export const AdminDashboard = ({ onOpenFinancialLedger, onOpenStaffManager }) =>
   const [activeLogFilter, setActiveLogFilter] = useState('all');
   const [searchAudit, setSearchAudit] = useState('');
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [isFinancialLedgerOpen, setIsFinancialLedgerOpen] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastAudience, setBroadcastAudience] = useState('all');
 
@@ -245,18 +248,16 @@ export const AdminDashboard = ({ onOpenFinancialLedger, onOpenStaffManager }) =>
             </button>
 
             {/* Financial Ledger Trigger */}
-            {onOpenFinancialLedger && (
-              <button
-                type="button"
-                onClick={onOpenFinancialLedger}
-                className="kinetic-btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
-                title="View Full Financial Ledger & Transactions"
-              >
-                <CreditCard size={14} color="#06b6d4" />
-                <span>Financial Ledger</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsFinancialLedgerOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
+              title="View Full Financial Ledger & Transactions"
+            >
+              <CreditCard size={14} color="#06b6d4" />
+              <span>Financial Ledger</span>
+            </button>
 
             {/* Export CSV Audit */}
             <button
@@ -697,6 +698,12 @@ export const AdminDashboard = ({ onOpenFinancialLedger, onOpenStaffManager }) =>
           </div>
         </div>
       )}
+
+      {/* Financial Audit & Billing Ledger Modal */}
+      <FinancialLedgerModal
+        isOpen={isFinancialLedgerOpen}
+        onClose={() => setIsFinancialLedgerOpen(false)}
+      />
     </div>
   );
 };
