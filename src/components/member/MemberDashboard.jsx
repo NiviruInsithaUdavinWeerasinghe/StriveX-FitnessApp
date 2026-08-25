@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ActiveWorkoutModal } from './ActiveWorkoutModal';
 import { MemberSettingsModal } from './MemberSettingsModal';
+import { MemberChatModal } from './MemberChatModal';
 import {
   Flame,
   Heart,
@@ -23,15 +24,14 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export const MemberDashboard = ({
-  onOpenChat
-}) => {
+export const MemberDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Modals state
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Biometric state tracking
   const [calories, setCalories] = useState(user?.todayCalories || 680);
@@ -197,7 +197,7 @@ export const MemberDashboard = ({
             {/* Quick Chat Shortcut */}
             <button
               type="button"
-              onClick={onOpenChat}
+              onClick={() => setIsChatOpen(true)}
               style={{
                 width: '38px',
                 height: '38px',
@@ -890,7 +890,7 @@ export const MemberDashboard = ({
               </div>
               <button
                 type="button"
-                onClick={onOpenChat}
+                onClick={() => setIsChatOpen(true)}
                 style={{
                   fontSize: '0.78rem',
                   fontWeight: 700,
@@ -916,6 +916,12 @@ export const MemberDashboard = ({
       <MemberSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* Member - Trainer Direct Chat Modal */}
+      <MemberChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
       />
     </div>
   );

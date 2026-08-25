@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { ToastProvider, useToast } from './context/ToastContext';
+import { ToastProvider } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ui/ToastContainer';
 
@@ -25,7 +25,6 @@ import { ClassBookingModal } from './components/public/ClassBookingModal';
 
 function StriveXApp() {
   const { role } = useAuth();
-  const { addToast } = useToast();
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState('home');
@@ -58,15 +57,6 @@ function StriveXApp() {
   // Handle feature exploration
   const handleExploreFeature = (_featureId) => {
     setIsVideoDemoOpen(true);
-  };
-
-  // Chat placeholder (for Interface 2.4 next task)
-  const handleOpenChat = () => {
-    addToast({
-      type: 'info',
-      title: 'Ready for Interface 2.4',
-      message: 'Member-Trainer Direct Chat view will be built in the upcoming step'
-    });
   };
 
   return (
@@ -114,11 +104,7 @@ function StriveXApp() {
       )}
 
       {/* 2. MEMBER EXPERIENCE (ATHLETE HUB) */}
-      {role === 'member' && (
-        <MemberDashboard
-          onOpenChat={handleOpenChat}
-        />
-      )}
+      {role === 'member' && <MemberDashboard />}
 
       {/* Other Roles placeholders */}
       {role !== 'guest' && role !== 'member' && (
