@@ -60,23 +60,14 @@ export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
         {/* FOOTER TOP: High-Impact Pre-Footer Conversion Banner & Badges */}
         {/* ============================================================ */}
         <div
-          className="kinetic-card"
+          className="kinetic-card footer-top-banner"
           style={{
-            transform: 'translateY(-32px)',
-            marginBottom: '32px',
-            padding: '36px 40px',
             background: `
               radial-gradient(circle at 90% 20%, rgba(212, 255, 0, 0.12) 0%, transparent 60%),
               var(--surface-card)
             `,
             border: '1px solid var(--border-hover)',
-            borderRadius: 'var(--radius-xl)',
-            boxShadow: 'var(--shadow-lg)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '32px',
-            flexWrap: 'wrap'
+            boxShadow: 'var(--shadow-lg)'
           }}
         >
           {/* Left Text & Value Props */}
