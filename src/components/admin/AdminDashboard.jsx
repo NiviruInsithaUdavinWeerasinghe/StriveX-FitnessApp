@@ -13,11 +13,13 @@ import {
   LogOut,
   CreditCard,
   Radio,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Cpu
 } from 'lucide-react';
 
 import { FinancialLedgerModal } from './FinancialLedgerModal';
 import { StaffManagerModal } from './StaffManagerModal';
+import { FacilitySensorGridModal } from './FacilitySensorGridModal';
 
 const EXECUTIVE_METRICS = [
   {
@@ -126,6 +128,7 @@ export const AdminDashboard = () => {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [isFinancialLedgerOpen, setIsFinancialLedgerOpen] = useState(false);
   const [isStaffManagerOpen, setIsStaffManagerOpen] = useState(false);
+  const [isSensorGridOpen, setIsSensorGridOpen] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastAudience, setBroadcastAudience] = useState('all');
 
@@ -247,6 +250,18 @@ export const AdminDashboard = () => {
             >
               <Radio size={14} color="var(--accent)" />
               <span>Broadcast Notice</span>
+            </button>
+
+            {/* Floor Sensor Grid Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsSensorGridOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
+              title="View Live Floor Sensor Grid & IoT Transceivers"
+            >
+              <Cpu size={14} color="var(--accent)" />
+              <span>Floor Sensor Grid</span>
             </button>
 
             {/* Financial Ledger Trigger */}
@@ -709,6 +724,12 @@ export const AdminDashboard = () => {
       <StaffManagerModal
         isOpen={isStaffManagerOpen}
         onClose={() => setIsStaffManagerOpen(false)}
+      />
+
+      {/* Facility Sensor Grid & Floor Load Telemetry Modal */}
+      <FacilitySensorGridModal
+        isOpen={isSensorGridOpen}
+        onClose={() => setIsSensorGridOpen(false)}
       />
     </div>
   );
