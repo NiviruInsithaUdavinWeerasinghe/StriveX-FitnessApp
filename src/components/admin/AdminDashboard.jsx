@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { FinancialLedgerModal } from './FinancialLedgerModal';
+import { StaffManagerModal } from './StaffManagerModal';
 
 const EXECUTIVE_METRICS = [
   {
@@ -115,7 +116,7 @@ const TIER_REVENUE_DISTRIBUTION = [
   { tier: 'Starter Access Tier ($29/mo)', revenue: '$6,400', percentage: 13, members: '220 athletes', color: '#f59e0b' }
 ];
 
-export const AdminDashboard = ({ onOpenStaffManager }) => {
+export const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { addToast } = useToast();
@@ -124,6 +125,7 @@ export const AdminDashboard = ({ onOpenStaffManager }) => {
   const [searchAudit, setSearchAudit] = useState('');
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [isFinancialLedgerOpen, setIsFinancialLedgerOpen] = useState(false);
+  const [isStaffManagerOpen, setIsStaffManagerOpen] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastAudience, setBroadcastAudience] = useState('all');
 
@@ -432,17 +434,15 @@ export const AdminDashboard = ({ onOpenStaffManager }) => {
             </div>
 
             {/* Action link to Staff Management */}
-            {onOpenStaffManager && (
-              <button
-                type="button"
-                onClick={onOpenStaffManager}
-                className="kinetic-btn-secondary"
-                style={{ width: '100%', marginTop: '24px', padding: '10px 16px', fontSize: '0.82rem', justifyContent: 'center' }}
-              >
-                <Users size={14} color="var(--accent)" />
-                <span>Manage Staff & Trainer Roster</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsStaffManagerOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ width: '100%', marginTop: '24px', padding: '10px 16px', fontSize: '0.82rem', justifyContent: 'center' }}
+            >
+              <Users size={14} color="var(--accent)" />
+              <span>Manage Staff & Trainer Roster</span>
+            </button>
           </div>
 
           {/* Column 2: Live System Audit Trail & Events */}
@@ -703,6 +703,12 @@ export const AdminDashboard = ({ onOpenStaffManager }) => {
       <FinancialLedgerModal
         isOpen={isFinancialLedgerOpen}
         onClose={() => setIsFinancialLedgerOpen(false)}
+      />
+
+      {/* Coaching Staff & Capacity Manager Modal */}
+      <StaffManagerModal
+        isOpen={isStaffManagerOpen}
+        onClose={() => setIsStaffManagerOpen(false)}
       />
     </div>
   );
