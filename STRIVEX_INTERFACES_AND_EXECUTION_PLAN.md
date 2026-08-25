@@ -1,10 +1,17 @@
 # StriveX - Master Interfaces Specification and Execution Plan
 
-This document outlines the complete architectural breakdown, user flows, and feature-by-feature execution plan for the StriveX responsive web application. Every single interface, button, state, modal, and drawer is specified with explicit logic and purpose to ensure a zero-dead-button, production-ready system.
+This document outlines the complete architectural breakdown, user flows, and feature-by-feature execution plan for the StriveX responsive web application built with React 19, Vite, and the Kinetic Glass Design System. Every single interface, button, state, modal, and drawer is specified with explicit logic and purpose to ensure a zero-dead-button, production-ready system.
 
 ---
 
 ## 1. System Architecture and Design System Standards
+
+### Core Framework and Styling
+* Framework: React 19 (Component-based Single Page Application) powered by Vite.
+* Styling: Kinetic Glass Design System using Vanilla CSS (CSS custom properties, 40px glass blurs, light and dark themes).
+* Iconography: Lucide React.
+* Typography: Plus Jakarta Sans / Inter.
+* Dual Viewport Standardization: Optimized for 1440px Desktop and 390px Mobile viewports.
 
 ### Visual Identity (Kinetic Glass Design System)
 * Canvas: High-depth dark surface `#131313` with subtle border radiance `rgba(212, 255, 0, 0.15)`.
@@ -59,7 +66,7 @@ This document outlines the complete architectural breakdown, user flows, and fea
 * Footer Section:
   * Brand manifesto, quick navigation links, technology build stack, and developer credits.
 
-#### Interface 1.2: Multi-Step Member Registration Flow (Modal / View)
+#### Interface 1.2: Multi-Step Member Registration Flow (Modal / Dedicated View)
 * Step 1: Personal and Contact Details:
   * Full Name field (real-time error if numbers or symbols entered).
   * Email Address field (real-time RFC format validation).
@@ -228,42 +235,27 @@ This document outlines the complete architectural breakdown, user flows, and fea
 
 To maintain rigorous quality control, each feature is developed and verified in structured, incremental steps:
 
-* **Step 1: Core Foundation and Kinetic Glass Design System**
-  * Setup project structure, HTML canvas, CSS variables, dark/light mode themes, glassmorphism tokens, and responsive reset.
-  * Build Unified Toast Notification Engine.
-  * Build Custom Dropdown Engine and Form Validation Utilities.
-  * Build Developer Toolbar (Role Switcher and 1440px / 390px Viewport Toggle).
+* **Step 1: Core Foundation and Public Gateway (Completed - Awaiting User Review)**
+  * React 19 + Vite setup with Kinetic Glass Design System.
+  * Unified Toast Engine, Real-time Validation Engine, and Custom Dropdowns.
+  * Public Landing Page with Hero, Feature Matrix, Live Class Schedules, and Tiered Pricing.
+  * Multi-Step Member Registration Modal and Role-Aware Login Modal.
+  * Developer Viewport (1440px / 390px) & Role Switcher Toolbar.
 
-* **Step 2: Public Gateway and Onboarding**
-  * Build Sticky Kinetic Glass Navigation and Mobile Drawer.
-  * Build Hero Section with dynamic counters and CTA triggers.
-  * Build Feature Matrix and Interactive Class Schedule with reservation flow.
-  * Build Pricing Tier Matrix with billing toggle and direct checkout hooks.
-  * Build Multi-Step Registration Modal with real-time Sri Lankan/international validation.
-  * Build Role-Aware Login Modal with 1-click demo profiles.
-  * Build Footer with complete navigation and credentials.
+* **Step 2: Member Experience (The Athlete Hub)**
+  * Member Dashboard with biometric KPIs and animated SVG goal rings.
+  * Active Workout Session Modal with live set/rep logger and rest timer.
+  * Member Settings and Profile management view.
+  * Member-Trainer Chat view with instant responses.
 
-* **Step 3: Member Experience (Athlete Hub)**
-  * Build Member Dashboard with KPI cards and animated SVG goal rings.
-  * Build Today's Routine card and Hydration/Calorie quick loggers.
-  * Build Active Workout Session Modal with live set/rep logger and rest timer.
-  * Build Member Settings and Profile management view.
-  * Build Member-Trainer Chat view with instant responses.
+* **Step 3: Trainer Portal**
+  * Trainer Dashboard with active and at-risk client roster.
+  * Client Detail Drawer with progression metrics.
+  * Interactive Workout Routine Builder with exercise library and client assignment.
+  * Trainer Messaging Center with client list and active chat.
 
-* **Step 4: Trainer Portal**
-  * Build Trainer Dashboard with client status overview and session schedule.
-  * Build Client Detail Modal with progression metrics and quick actions.
-  * Build Interactive Workout Routine Builder with exercise search and client assignment.
-  * Build Trainer Messaging Center with client list and active chat.
-
-* **Step 5: Admin Operations Command Center**
-  * Build Admin Operations Dashboard with executive KPIs and audit trail.
-  * Build Financials and Revenue Reporting with transaction ledger and pagination.
-  * Build Staff Management view with permission toggles and add staff modal.
-  * Build Global Command Palette (`Cmd+K`) with real-time search.
-
-* **Step 6: End-to-End Verification and Polish**
-  * Zero-dead-button audit across all roles.
-  * Dual-viewport verification at 1440px Desktop and 390px Mobile.
-  * Dark/Light mode contrast and accessibility review.
-  * Step-by-step Git commits adhering to the 2-line protocol.
+* **Step 4: Admin Operations Command Center**
+  * Admin Operations Dashboard with executive KPIs and live audit trail.
+  * Financials and Revenue Reporting with transaction ledger and pagination.
+  * Staff Management view with permission toggles and add staff modal.
+  * Global Command Palette (`Cmd+K`) with real-time search.

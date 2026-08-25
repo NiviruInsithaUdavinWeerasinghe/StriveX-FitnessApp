@@ -1,0 +1,229 @@
+/* StriveX Command Palette Overlay */
+
+.cmd-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: var(--glass-blur-sm);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 20px 20px;
+  animation: fadeIn 150ms ease-out;
+}
+
+.cmd-modal {
+  width: 100%;
+  max-width: 640px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(212, 255, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cmd-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-glass-strong);
+}
+
+.cmd-search-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.cmd-search-input {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 1.0625rem;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.cmd-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.cmd-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.cmd-kbd {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  padding: 3px 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.cmd-results-list {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cmd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.cmd-item:hover, .cmd-item.is-selected {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary-border);
+}
+
+[data-theme='light'] .cmd-item:hover, [data-theme='light'] .cmd-item.is-selected {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.cmd-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cmd-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .cmd-icon-box {
+  color: #0f172a;
+}
+
+.cmd-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmd-item-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cmd-item-subtitle {
+  font-size: 0.78125rem;
+  color: var(--text-secondary);
+}
+
+.cmd-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmd-category-tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.cmd-arrow-icon {
+  color: var(--color-primary);
+}
+
+[data-theme='light'] .cmd-arrow-icon {
+  color: #0f172a;
+}
+
+.cmd-empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmd-empty-icon {
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.cmd-empty-state p {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cmd-empty-state span {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cmd-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--bg-glass-strong);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cmd-shortcuts-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cmd-shortcuts-hint kbd {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.cmd-brand-tag {
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+[data-theme='light'] .cmd-brand-tag {
+  color: #0f172a;
+}
