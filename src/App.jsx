@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { ToastProvider } from './context/ToastContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ui/ToastContainer';
 
@@ -14,6 +14,9 @@ import { PricingMatrix } from './components/public/PricingMatrix';
 import { TestimonialsSection } from './components/public/TestimonialsSection';
 import { Footer } from './components/public/Footer';
 
+// Member Components
+import { MemberDashboard } from './components/member/MemberDashboard';
+
 // Modals
 import { RegistrationModal } from './components/auth/RegistrationModal';
 import { LoginModal } from './components/auth/LoginModal';
@@ -22,6 +25,7 @@ import { ClassBookingModal } from './components/public/ClassBookingModal';
 
 function StriveXApp() {
   const { role } = useAuth();
+  const { addToast } = useToast();
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState('home');
@@ -45,21 +49,48 @@ function StriveXApp() {
     setIsRegisterOpen(true);
   };
 
-  // Handle trainer consultation -> Launches registration with consultation intent
+  // Handle trainer consultation
   const handleConsultTrainer = (_trainer) => {
     setSelectedPlanDetails({ plan: 'Pro Athlete', isAnnual: true });
     setIsRegisterOpen(true);
   };
 
-  // Handle feature exploration -> Opens platform demo walkthrough modal
+  // Handle feature exploration
   const handleExploreFeature = (_featureId) => {
     setIsVideoDemoOpen(true);
   };
 
+  // Workout launcher placeholder (for Interface 2.2 next task)
+  const handleStartWorkout = () => {
+    addToast({
+      type: 'info',
+      title: 'Ready for Interface 2.2',
+      message: 'Active Workout Logger Session modal will be built in the next step'
+    });
+  };
+
+  // Settings placeholder (for Interface 2.3 next task)
+  const handleOpenSettings = () => {
+    addToast({
+      type: 'info',
+      title: 'Ready for Interface 2.3',
+      message: 'Member Profile & Settings view will be built in the upcoming step'
+    });
+  };
+
+  // Chat placeholder (for Interface 2.4 next task)
+  const handleOpenChat = () => {
+    addToast({
+      type: 'info',
+      title: 'Ready for Interface 2.4',
+      message: 'Member-Trainer Direct Chat view will be built in the upcoming step'
+    });
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      {/* PUBLIC LANDING PAGE */}
-      {role === 'guest' ? (
+      {/* 1. PUBLIC GUEST LANDING PAGE */}
+      {role === 'guest' && (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <PublicNavbar
             onOpenLogin={() => setIsLoginOpen(true)}
@@ -98,7 +129,19 @@ function StriveXApp() {
             onOpenLogin={() => setIsLoginOpen(true)}
           />
         </div>
-      ) : (
+      )}
+
+      {/* 2. MEMBER EXPERIENCE: INTERFACE 2.1 (ATHLETE HUB) */}
+      {role === 'member' && (
+        <MemberDashboard
+          onStartWorkout={handleStartWorkout}
+          onOpenSettings={handleOpenSettings}
+          onOpenChat={handleOpenChat}
+        />
+      )}
+
+      {/* Other Roles placeholders */}
+      {role !== 'guest' && role !== 'member' && (
         <div
           style={{
             minHeight: '70vh',
@@ -114,10 +157,10 @@ function StriveXApp() {
             <span>ROLE: {role.toUpperCase()}</span>
           </div>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
-            {role === 'member' ? 'Member Athlete Hub' : role === 'trainer' ? 'Trainer Portal' : 'Admin Command Center'}
+            {role === 'trainer' ? 'Trainer Portal' : 'Admin Command Center'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '540px', marginBottom: '24px' }}>
-            Currently in Landing Page review mode.
+            Awaiting order execution per master plan.
           </p>
         </div>
       )}
@@ -149,7 +192,7 @@ function StriveXApp() {
         onConfirmBooking={handleConfirmBooking}
       />
 
-      {/* Global Toast System (Reserved only for mandatory actions like auth & bookings) */}
+      {/* Global Toast System */}
       <ToastContainer />
     </div>
   );
