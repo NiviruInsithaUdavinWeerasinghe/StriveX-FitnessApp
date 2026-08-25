@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '../../context/ToastContext';
 import { validateName, validatePhoneNumber } from '../../utils/validation';
-import { X, Calendar, Clock, MapPin, User, Phone, CheckCircle2 } from 'lucide-react';
+import { X, Clock, User, Phone } from 'lucide-react';
 
 export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking }) => {
   const { addToast } = useToast();
@@ -89,7 +89,6 @@ export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div
           style={{
             display: 'flex',
@@ -136,7 +135,6 @@ export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking
           </button>
         </div>
 
-        {/* Class Overview Pill */}
         <div
           style={{
             padding: '14px',
@@ -165,16 +163,14 @@ export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking
           </div>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit}>
-          {/* Athlete Name */}
           <div className="kinetic-input-group">
             <label className="kinetic-label">Athlete Full Name *</label>
             <div className="kinetic-input-wrapper">
               <User size={18} className="kinetic-input-icon" />
               <input
                 type="text"
-                placeholder="e.g. Ruwan Perera"
+                placeholder="e.g. Kasun Fernando"
                 value={athleteName}
                 onChange={handleNameChange}
                 onBlur={() => {
@@ -188,7 +184,6 @@ export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking
             {errors.name && <span className="kinetic-input-error">{errors.name}</span>}
           </div>
 
-          {/* Phone Number with Sri Lankan validation */}
           <div className="kinetic-input-group">
             <label className="kinetic-label">Contact Phone Number (SMS confirmation) *</label>
             <div className="kinetic-input-wrapper">
@@ -213,7 +208,6 @@ export const ClassBookingModal = ({ isOpen, onClose, classData, onConfirmBooking
             )}
           </div>
 
-          {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '28px' }}>
             <button
               type="button"

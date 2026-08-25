@@ -3,7 +3,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ui/ToastContainer';
-import { DeveloperToolbar } from './components/ui/DeveloperToolbar';
 
 // Public Landing Page Components
 import { PublicNavbar } from './components/public/PublicNavbar';
@@ -27,9 +26,6 @@ function StriveXApp() {
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState('home');
-
-  // Viewport mode ('responsive' | 'desktop' | 'mobile')
-  const [viewportMode, setViewportMode] = useState('responsive');
 
   // Modal states
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -68,120 +64,71 @@ function StriveXApp() {
     });
   };
 
-  // Viewport framing container styles
-  const getViewportStyle = () => {
-    if (viewportMode === 'desktop') {
-      return {
-        maxWidth: '1440px',
-        margin: '24px auto',
-        borderRadius: '16px',
-        border: '12px solid #222222',
-        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
-        overflow: 'hidden',
-        background: 'var(--bg-primary)'
-      };
-    }
-    if (viewportMode === 'mobile') {
-      return {
-        maxWidth: '390px',
-        margin: '24px auto',
-        borderRadius: '40px',
-        border: '12px solid #1e1e1e',
-        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)',
-        overflow: 'hidden',
-        background: 'var(--bg-primary)',
-        minHeight: '844px'
-      };
-    }
-    return {
-      width: '100%',
-      minHeight: '100vh',
-      background: 'var(--bg-primary)'
-    };
-  };
-
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
-      {/* Figma Companion Developer Toolbar */}
-      <DeveloperToolbar viewportMode={viewportMode} setViewportMode={setViewportMode} />
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+      {/* PUBLIC LANDING PAGE */}
+      {role === 'guest' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <PublicNavbar
+            onOpenLogin={() => setIsLoginOpen(true)}
+            onOpenRegister={() => setIsRegisterOpen(true)}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
 
-      {/* Main Viewport Container */}
-      <div style={getViewportStyle()}>
-        {/* PUBLIC LANDING PAGE (Step 1 Review) */}
-        {role === 'guest' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <PublicNavbar
-              onOpenLogin={() => setIsLoginOpen(true)}
-              onOpenRegister={() => setIsRegisterOpen(true)}
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
+          <main style={{ flex: 1 }}>
+            <HeroSection
+              onStartFreeTrial={() => setIsRegisterOpen(true)}
+              onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
             />
 
-            <main style={{ flex: 1 }}>
-              <HeroSection
-                onStartFreeTrial={() => setIsRegisterOpen(true)}
-                onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
-              />
+            <FeatureMatrix onExploreFeature={handleExploreFeature} />
 
-              <FeatureMatrix onExploreFeature={handleExploreFeature} />
-
-              <ClassScheduleSection
-                onReserveClass={(cls) => setBookingClass(cls)}
-                reservedClassIds={reservedClassIds}
-              />
-
-              <TrainerRosterSection onConsultTrainer={handleConsultTrainer} />
-
-              <PricingMatrix onSelectPlan={handleSelectPlan} />
-
-              <TestimonialsSection />
-            </main>
-
-            <Footer
-              onNavClick={(id) => {
-                setActiveSection(id);
-                const el = document.getElementById(id);
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onOpenRegister={() => setIsRegisterOpen(true)}
-              onOpenLogin={() => setIsLoginOpen(true)}
+            <ClassScheduleSection
+              onReserveClass={(cls) => setBookingClass(cls)}
+              reservedClassIds={reservedClassIds}
             />
-          </div>
-        ) : (
-          /* Placeholder notification when user clicks another role in developer toolbar */
-          <div
-            style={{
-              minHeight: '70vh',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '40px 24px',
-              textAlign: 'center'
+
+            <TrainerRosterSection onConsultTrainer={handleConsultTrainer} />
+
+            <PricingMatrix onSelectPlan={handleSelectPlan} />
+
+            <TestimonialsSection />
+          </main>
+
+          <Footer
+            onNavClick={(id) => {
+              setActiveSection(id);
+              const el = document.getElementById(id);
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-          >
-            <div className="kinetic-badge" style={{ marginBottom: '16px' }}>
-              <span>ROLE VIEW: {role.toUpperCase()}</span>
-            </div>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
-              {role === 'member' ? 'Member Athlete Hub' : role === 'trainer' ? 'Trainer Portal' : 'Admin Command Center'}
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', maxWidth: '540px', marginBottom: '24px' }}>
-              Currently in Step 1 (Public Landing Page review). Switch back to "Guest" on the top toolbar to explore the complete Landing Page.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                // switch back to guest
-                window.location.reload();
-              }}
-              className="kinetic-btn-primary"
-            >
-              Back to Landing Page
-            </button>
+            onOpenRegister={() => setIsRegisterOpen(true)}
+            onOpenLogin={() => setIsLoginOpen(true)}
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            minHeight: '70vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '40px 24px',
+            textAlign: 'center'
+          }}
+        >
+          <div className="kinetic-badge" style={{ marginBottom: '16px' }}>
+            <span>ROLE: {role.toUpperCase()}</span>
           </div>
-        )}
-      </div>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
+            {role === 'member' ? 'Member Athlete Hub' : role === 'trainer' ? 'Trainer Portal' : 'Admin Command Center'}
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', maxWidth: '540px', marginBottom: '24px' }}>
+            Currently in Landing Page review mode.
+          </p>
+        </div>
+      )}
 
       {/* Interactive Modals */}
       <RegistrationModal

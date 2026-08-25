@@ -1,4 +1,4 @@
-import { X, Play, Zap, CheckCircle2, Shield } from 'lucide-react';
+import { X, Play, Zap, CheckCircle2 } from 'lucide-react';
 
 export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
   if (!isOpen) return null;
@@ -33,7 +33,6 @@ export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div
           style={{
             display: 'flex',
@@ -58,17 +57,13 @@ export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
               padding: '6px',
               borderRadius: 'var(--radius-pill)',
               background: 'var(--surface-glass)',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              color: 'var(--text-secondary)'
             }}
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Video / Visual Simulation Box */}
         <div
           style={{
             width: '100%',
@@ -87,7 +82,6 @@ export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
             marginBottom: '20px'
           }}
         >
-          {/* Animated Glow Center */}
           <div
             style={{
               width: '80px',
@@ -122,7 +116,6 @@ export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
           </p>
         </div>
 
-        {/* Key Tour Highlights */}
         <div
           style={{
             display: 'grid',
@@ -152,7 +145,6 @@ export const DemoVideoModal = ({ isOpen, onClose, onStartTrial }) => {
           ))}
         </div>
 
-        {/* Footer Actions */}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
           <button type="button" onClick={onClose} className="kinetic-btn-ghost">
             Close Preview

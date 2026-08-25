@@ -18,14 +18,11 @@ import {
   Phone,
   Lock,
   CreditCard,
-  Calendar,
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
-  Flame,
-  Target
+  Sparkles
 } from 'lucide-react';
 
 export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete', isAnnual = true }) => {
@@ -138,7 +135,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
       return;
     }
 
-    // Complete registration
     setStep(4);
     setTimeout(() => {
       login('member', {
@@ -183,7 +179,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Step Indicator */}
         <div
           style={{
             display: 'flex',
@@ -233,7 +228,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
           </button>
         </div>
 
-        {/* Progress Step Bar */}
         {step < 4 && (
           <div
             style={{
@@ -258,10 +252,8 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
           </div>
         )}
 
-        {/* Step 1: Personal Credentials */}
         {step === 1 && (
           <div className="animate-fade-in">
-            {/* Full Name */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Full Name *</label>
               <div className="kinetic-input-wrapper">
@@ -278,7 +270,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               {errors.name && <span className="kinetic-input-error">{errors.name}</span>}
             </div>
 
-            {/* Email Address */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Email Address *</label>
               <div className="kinetic-input-wrapper">
@@ -295,7 +286,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               {errors.email && <span className="kinetic-input-error">{errors.email}</span>}
             </div>
 
-            {/* Phone Number with Sri Lankan & international validation */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Phone Number *</label>
               <div className="kinetic-input-wrapper">
@@ -316,7 +306,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               )}
             </div>
 
-            {/* Password */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Password *</label>
               <div className="kinetic-input-wrapper">
@@ -331,7 +320,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
                 />
               </div>
 
-              {/* Password Strength Indicator */}
               {formData.password.length > 0 && (
                 <div style={{ marginTop: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '4px' }}>
@@ -370,7 +358,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               {errors.password && <span className="kinetic-input-error">{errors.password}</span>}
             </div>
 
-            {/* Next Action */}
             <button
               type="button"
               onClick={handleStep1Next}
@@ -383,10 +370,8 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
           </div>
         )}
 
-        {/* Step 2: Fitness Profile & Goals */}
         {step === 2 && (
           <div className="animate-fade-in">
-            {/* Custom Dropdown: Goal */}
             <div style={{ marginBottom: '18px' }}>
               <CustomDropdown
                 label="Primary Fitness Goal *"
@@ -402,7 +387,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               />
             </div>
 
-            {/* Custom Dropdown: Experience */}
             <div style={{ marginBottom: '18px' }}>
               <CustomDropdown
                 label="Training Experience Level *"
@@ -416,7 +400,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               />
             </div>
 
-            {/* Custom Dropdown: Target Days */}
             <div style={{ marginBottom: '24px' }}>
               <CustomDropdown
                 label="Target Training Frequency *"
@@ -452,10 +435,8 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
           </div>
         )}
 
-        {/* Step 3: Plan Checkout & Mock Payment */}
         {step === 3 && (
           <form onSubmit={handleFinalSubmit} className="animate-fade-in">
-            {/* Plan Summary Card */}
             <div
               style={{
                 padding: '16px',
@@ -483,7 +464,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               </div>
             </div>
 
-            {/* Cardholder Name */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Name on Card *</label>
               <input
@@ -497,7 +477,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               {errors.cardName && <span className="kinetic-input-error">{errors.cardName}</span>}
             </div>
 
-            {/* Card Number */}
             <div className="kinetic-input-group">
               <label className="kinetic-label">Card Number *</label>
               <div className="kinetic-input-wrapper">
@@ -515,7 +494,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
               {errors.cardNumber && <span className="kinetic-input-error">{errors.cardNumber}</span>}
             </div>
 
-            {/* Expiry & CVC */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div className="kinetic-input-group">
                 <label className="kinetic-label">Expiry (MM/YY) *</label>
@@ -566,7 +544,6 @@ export const RegistrationModal = ({ isOpen, onClose, initialPlan = 'Pro Athlete'
           </form>
         )}
 
-        {/* Step 4: Success State */}
         {step === 4 && (
           <div
             className="animate-scale-up"
