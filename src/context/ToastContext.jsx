@@ -1,55 +1,51 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { ToastContainer } from '../components/ui/Toast';
+import { createContext, useContext, useState, useCallback } from 'react';
 
-const ToastContext = createContext(null);
+const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
-
-  /**
-   * showToast: Add a single or combined toast message.
-   * @param {Object|String} options - Toast options or message string
-   * @param {'success'|'error'|'warning'|'info'} [options.type='info']
-   * @param {string} options.title - Optional bold title
-   * @param {string} options.message - Notification message
-   * @param {number} [options.duration=4000] - Duration in ms
-   */
-  const showToast = useCallback((options) => {
-    const toastConfig = typeof options === 'string' ? { message: options, type: 'info' } : options;
-    const id = Date.now() + Math.random().toString(36).substring(2, 9);
-    
-    const newToast = {
-      id,
-      type: toastConfig.type || 'info',
-      title: toastConfig.title || '',
-      message: toastConfig.message,
-      duration: toastConfig.duration || 4000,
-    };
-
-    setToasts((prev) => {
-      // If a toast with the exact same message already exists, do not duplicate
-      if (prev.some((t) => t.message === newToast.message)) {
-        return prev;
-      }
-      // Combine if there are already 2 active toasts to prevent clutter
-      if (prev.length >= 2) {
-        return [
-          ...prev.slice(1),
-          newToast
-        ];
-      }
-      return [...prev, newToast];
-    });
-  }, []);
 
   const removeToast = useCallback((id) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
+  const addToast = useCallback(({ type = 'info', title, message, duration = 4500 }) => {
+    const id = Date.now().toString() + Math.random().toString(36).substring(2, 6);
+
+    setToasts((prevToasts) => {
+      const existingIndex = prevToasts.findIndex(
+        (t) => t.message === message && t.type === type
+      );
+
+      if (existingIndex !== -1) {
+        const updated = [...prevToasts];
+        const count = (updated[existingIndex].count || 1) + 1;
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          count,
+          timestamp: Date.now()
+        };
+        return updated;
+      }
+
+      const newToast = { id, type, title, message, duration, count: 1, timestamp: Date.now() };
+      return [...prevToasts.slice(-2), newToast];
+    });
+
+    if (duration > 0) {
+      setTimeout(() => {
+        removeToast(id);
+      }, duration);
+    }
+  }, [removeToast]);
+
+  const clearAllToasts = useCallback(() => {
+    setToasts([]);
+  }, []);
+
   return (
-    <ToastContext.Provider value={{ showToast, removeToast }}>
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, clearAllToasts }}>
       {children}
-      <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </ToastContext.Provider>
   );
 };

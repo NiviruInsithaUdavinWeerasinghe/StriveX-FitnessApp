@@ -66,7 +66,7 @@ This document outlines the complete architectural breakdown, user flows, and fea
 * Footer Section:
   * Brand manifesto, quick navigation links, technology build stack, and developer credits.
 
-#### Interface 1.2: Multi-Step Member Registration Flow (Modal / Dedicated View)
+#### Interface 1.2: Multi-Step Member Registration Flow (Modal / View)
 * Step 1: Personal and Contact Details:
   * Full Name field (real-time error if numbers or symbols entered).
   * Email Address field (real-time RFC format validation).
@@ -233,29 +233,43 @@ This document outlines the complete architectural breakdown, user flows, and fea
 
 ## 3. Step-by-Step Execution Milestones
 
-To maintain rigorous quality control, each feature is developed and verified in structured, incremental steps:
+* **Step 1: Core Foundation and Kinetic Glass Design System**
+  * Setup React 19 + Vite architecture, CSS design system variables, glassmorphism tokens, and responsive resets.
+  * Build Unified Toast Notification Engine (stacked, non-blocking, combined alerts).
+  * Build Custom Dropdown Engine (zero native browser dropdowns) and real-time form validation engine (Sri Lankan numbers `07X` / `+94`, international phone regex, text-only names, RFC email formatting).
+  * Build Developer Toolbar (Role Switcher: Guest, Member, Trainer, Admin; Viewport Frame Switcher: Full Responsive, 1440px Desktop, 390px Mobile).
+  * Build Theme Switcher (Dark Mode `#131313` with `#d4ff00` accents; Light Mode high contrast without grey backgrounds).
 
-* **Step 1: Core Foundation and Public Gateway (Completed - Awaiting User Review)**
-  * React 19 + Vite setup with Kinetic Glass Design System.
-  * Unified Toast Engine, Real-time Validation Engine, and Custom Dropdowns.
-  * Public Landing Page with Hero, Feature Matrix, Live Class Schedules, and Tiered Pricing.
-  * Multi-Step Member Registration Modal and Role-Aware Login Modal.
-  * Developer Viewport (1440px / 390px) & Role Switcher Toolbar.
+* **Step 2: Public Gateway and Onboarding**
+  * Build Sticky Kinetic Glass Navigation and Mobile Drawer.
+  * Build Hero Section with dynamic counters and CTA triggers.
+  * Build Feature Matrix and Interactive Class Schedule with reservation flow.
+  * Build Pricing Tier Matrix with billing toggle and direct checkout hooks.
+  * Build Multi-Step Registration Modal with real-time validation.
+  * Build Role-Aware Login Modal with 1-click demo profiles.
+  * Build Footer with complete navigation and credentials.
 
-* **Step 2: Member Experience (The Athlete Hub)**
-  * Member Dashboard with biometric KPIs and animated SVG goal rings.
-  * Active Workout Session Modal with live set/rep logger and rest timer.
-  * Member Settings and Profile management view.
-  * Member-Trainer Chat view with instant responses.
+* **Step 3: Member Experience (Athlete Hub)**
+  * Build Member Dashboard with KPI cards and animated SVG goal rings.
+  * Build Today's Routine card and Hydration/Calorie quick loggers.
+  * Build Active Workout Session Modal with live set/rep logger and rest timer.
+  * Build Member Settings and Profile management view.
+  * Build Member-Trainer Chat view with instant responses.
 
-* **Step 3: Trainer Portal**
-  * Trainer Dashboard with active and at-risk client roster.
-  * Client Detail Drawer with progression metrics.
-  * Interactive Workout Routine Builder with exercise library and client assignment.
-  * Trainer Messaging Center with client list and active chat.
+* **Step 4: Trainer Portal**
+  * Build Trainer Dashboard with client status overview and session schedule.
+  * Build Client Detail Modal with progression metrics and quick actions.
+  * Build Interactive Workout Routine Builder with exercise search and client assignment.
+  * Build Trainer Messaging Center with client list and active chat.
 
-* **Step 4: Admin Operations Command Center**
-  * Admin Operations Dashboard with executive KPIs and live audit trail.
-  * Financials and Revenue Reporting with transaction ledger and pagination.
-  * Staff Management view with permission toggles and add staff modal.
-  * Global Command Palette (`Cmd+K`) with real-time search.
+* **Step 5: Admin Operations Command Center**
+  * Build Admin Operations Dashboard with executive KPIs and audit trail.
+  * Build Financials and Revenue Reporting with transaction ledger and pagination.
+  * Build Staff Management view with permission toggles and add staff modal.
+  * Build Global Command Palette (`Cmd+K`) with real-time search.
+
+* **Step 6: End-to-End Verification and Polish**
+  * Zero-dead-button audit across all roles.
+  * Dual-viewport verification at 1440px Desktop and 390px Mobile.
+  * Dark/Light mode contrast and accessibility review.
+  * Step-by-step Git commits adhering to the 2-line protocol.

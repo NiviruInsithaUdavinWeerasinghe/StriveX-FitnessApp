@@ -1,127 +1,184 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check, Search } from 'lucide-react';
-import './CustomDropdown.css';
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDown, Check } from 'lucide-react';
 
 export const CustomDropdown = ({
-  label,
   options = [],
   value,
   onChange,
-  placeholder = 'Select an option',
+  placeholder = 'Select option...',
+  label,
+  error,
   disabled = false,
-  error = '',
-  searchable = false,
-  className = '',
-  helperText = '',
-  icon: Icon
+  fullWidth = true
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
 
   // Close dropdown on outside click
   useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelect = (optionValue) => {
-    if (onChange) onChange(optionValue);
-    setIsOpen(false);
-    setSearchTerm('');
+  // Keyboard navigation
+  const handleKeyDown = (e) => {
+    if (disabled) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsOpen((prev) => !prev);
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!isOpen) {
+        setIsOpen(true);
+      } else {
+        const currentIndex = options.findIndex((opt) => opt.value === value);
+        const nextIndex = (currentIndex + 1) % options.length;
+        onChange(options[nextIndex].value);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!isOpen) {
+        setIsOpen(true);
+      } else {
+        const currentIndex = options.findIndex((opt) => opt.value === value);
+        const prevIndex = (currentIndex - 1 + options.length) % options.length;
+        onChange(options[prevIndex].value);
+      }
+    }
   };
 
-  const filteredOptions = searchable
-    ? options.filter((opt) => opt.label.toLowerCase().includes(searchTerm.toLowerCase()))
-    : options;
-
   return (
-    <div className={`custom-dropdown-container ${className}`} ref={dropdownRef}>
-      {label && <label className="form-label">{label}</label>}
-      <div
-        className={`custom-dropdown-trigger ${isOpen ? 'is-open' : ''} ${error ? 'is-error' : ''} ${
-          disabled ? 'is-disabled' : ''
-        }`}
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            if (!disabled) setIsOpen(!isOpen);
-          } else if (e.key === 'Escape') {
-            setIsOpen(false);
-          }
+    <div
+      ref={dropdownRef}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        width: fullWidth ? '100%' : 'auto',
+        position: 'relative',
+        textAlign: 'left'
+      }}
+    >
+      {label && <span className="kinetic-label">{label}</span>}
+      
+      {/* Dropdown Trigger */}
+      <button
+        type="button"
+        onClick={() => !disabled && setIsOpen((prev) => !prev)}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          background: 'var(--surface-input)',
+          border: `1px solid ${
+            error
+              ? 'var(--status-error)'
+              : isOpen
+              ? 'var(--border-focus)'
+              : 'var(--border-glass)'
+          }`,
+          borderRadius: 'var(--radius-md)',
+          color: selectedOption ? 'var(--text-primary)' : 'var(--text-tertiary)',
+          fontSize: '0.95rem',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.6 : 1,
+          boxShadow: isOpen ? '0 0 0 3px var(--accent-subtle)' : 'none',
+          transition: 'all var(--transition-fast)'
         }}
       >
-        <div className="custom-dropdown-value-wrapper">
-          {Icon && <Icon size={18} className="custom-dropdown-icon" />}
-          <span className={`custom-dropdown-selected-text ${!selectedOption ? 'placeholder' : ''}`}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-        </div>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
         <ChevronDown
           size={18}
-          className={`custom-dropdown-arrow ${isOpen ? 'rotate-180' : ''}`}
+          color="var(--text-secondary)"
+          style={{
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
+            transition: 'transform var(--transition-fast)'
+          }}
         />
-      </div>
+      </button>
 
+      {/* Dropdown Options Menu */}
       {isOpen && (
-        <div className="custom-dropdown-menu glass-panel">
-          {searchable && (
-            <div className="custom-dropdown-search-wrapper">
-              <Search size={16} className="search-icon" />
-              <input
-                type="text"
-                className="custom-dropdown-search-input"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                autoFocus
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          )}
-          <div className="custom-dropdown-options-list">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt) => {
-                const isSelected = opt.value === value;
-                return (
-                  <div
-                    key={opt.value}
-                    className={`custom-dropdown-option ${isSelected ? 'is-selected' : ''}`}
-                    onClick={() => handleSelect(opt.value)}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    <div className="option-content">
-                      {opt.icon && <span className="option-custom-icon">{opt.icon}</span>}
-                      <span className="option-label">{opt.label}</span>
-                      {opt.badge && <span className="badge badge-primary opt-badge">{opt.badge}</span>}
-                    </div>
-                    {isSelected && <Check size={16} className="option-check-icon" />}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="custom-dropdown-no-results">No options found</div>
-            )}
-          </div>
+        <div
+          role="listbox"
+          className="animate-slide-up"
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            background: 'var(--surface-elevated)',
+            border: '1px solid var(--border-hover)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
+            maxHeight: '240px',
+            overflowY: 'auto',
+            padding: '6px',
+            backdropFilter: 'var(--blur-card)',
+            WebkitBackdropFilter: 'var(--blur-card)'
+          }}
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <div
+                key={option.value}
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? 'var(--accent)' : 'var(--text-primary)',
+                  background: isSelected ? 'var(--accent-subtle)' : 'transparent',
+                  transition: 'background var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) e.currentTarget.style.background = 'var(--surface-glass)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {option.icon && <span>{option.icon}</span>}
+                  <span>{option.label}</span>
+                </div>
+                {isSelected && <Check size={16} color="var(--accent)" />}
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {error ? (
-        <div className="form-warning">{error}</div>
-      ) : helperText ? (
-        <div className="form-helper">{helperText}</div>
-      ) : null}
+      {error && <span className="kinetic-input-error">{error}</span>}
     </div>
   );
 };

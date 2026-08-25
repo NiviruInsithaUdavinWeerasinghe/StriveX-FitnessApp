@@ -1,296 +1,352 @@
-import React, { useState } from 'react';
-import { 
-  X, 
-  ArrowRight, 
-  Zap, 
-  Lock, 
-  Mail, 
-  User, 
-  Dumbbell, 
-  ShieldCheck, 
-  Users,
-  CheckCircle2
-} from 'lucide-react';
-import { validateEmail } from '../../utils/validators';
+import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import './LoginModal.css';
+import { validateEmail } from '../../utils/validation';
+import { X, Mail, Lock, UserCheck, Shield, Dumbbell, ArrowRight } from 'lucide-react';
 
-export const LoginModal = ({ 
-  isOpen, 
-  onClose, 
-  onRoleSelect, 
-  onOpenRegister 
-}) => {
-  const { showToast } = useToast();
+export const LoginModal = ({ isOpen, onClose, onSwitchToRegister }) => {
+  const { login } = useAuth();
+  const { addToast } = useToast();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
-  const [emailError, setEmailError] = useState('');
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetSent, setResetSent] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isForgot, setIsForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
 
   if (!isOpen) return null;
 
-  const handleLoginSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const emailVal = validateEmail(email);
-    if (!emailVal.isValid) {
-      setEmailError(emailVal.message);
-      showToast({
+    const emailRes = validateEmail(email);
+    if (!emailRes.isValid) {
+      setErrors({ email: emailRes.message });
+      addToast({
         type: 'error',
-        title: 'Login Notice',
-        message: emailVal.message
+        title: 'Sign In Failed',
+        message: emailRes.message
       });
       return;
     }
     if (!password) {
-      showToast({
-        type: 'warning',
-        title: 'Password Required',
-        message: 'Please enter your account password.'
+      setErrors({ password: 'Password is required' });
+      return;
+    }
+
+    // Authenticate as member by default
+    login('member', { email });
+    onClose();
+  };
+
+  const handleDemoLogin = (roleType) => {
+    login(roleType);
+    onClose();
+  };
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    const emailRes = validateEmail(forgotEmail);
+    if (!emailRes.isValid) {
+      addToast({
+        type: 'error',
+        title: 'Invalid Email',
+        message: 'Please enter a valid registered email to reset password'
       });
       return;
     }
-
-    // Role inference by email or default to member
-    let selectedRole = 'member';
-    if (email.includes('trainer') || email.includes('coach')) selectedRole = 'trainer';
-    if (email.includes('admin') || email.includes('ops')) selectedRole = 'admin';
-
-    showToast({
+    addToast({
       type: 'success',
-      title: 'Welcome Back',
-      message: `Signed in as ${email}. Redirecting to workspace...`
+      title: 'Reset Link Dispatched',
+      message: `Password reset instructions sent to ${forgotEmail}`
     });
-
-    onRoleSelect(selectedRole);
-    onClose();
-  };
-
-  const handleQuickDemoLogin = (role) => {
-    const roleLabels = {
-      member: 'Alex Rivera (Member Athlete)',
-      trainer: 'Coach Marcus (Personal Trainer)',
-      admin: 'Niviru Weerasinghe (Admin Ops)'
-    };
-    showToast({
-      type: 'info',
-      title: '1-Click Demo Login',
-      message: `Signed in as ${roleLabels[role]}. Workspace activated.`
-    });
-    onRoleSelect(role);
-    onClose();
-  };
-
-  const handleForgotPasswordSubmit = (e) => {
-    e.preventDefault();
-    const emailVal = validateEmail(resetEmail);
-    if (!emailVal.isValid) {
-      showToast({ type: 'error', title: 'Invalid Email', message: emailVal.message });
-      return;
-    }
-    setResetSent(true);
-    showToast({
-      type: 'success',
-      title: 'Reset Code Sent',
-      message: `Security PIN sent to ${resetEmail}. Check your inbox.`
-    });
+    setIsForgot(false);
   };
 
   return (
-    <div className="auth-modal-backdrop" onClick={onClose}>
-      <div className="auth-modal-container glass-panel" onClick={(e) => e.stopPropagation()}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9995,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        background: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)'
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="kinetic-card animate-scale-up"
+        style={{
+          width: '100%',
+          maxWidth: '480px',
+          padding: '32px',
+          background: 'var(--surface-elevated)',
+          border: '1px solid var(--border-hover)',
+          borderRadius: 'var(--radius-xl)',
+          position: 'relative',
+          boxShadow: 'var(--shadow-lg)'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="auth-modal-header">
-          <div className="auth-header-left">
-            <div className="brand-logo-badge">
-              <Zap size={18} className="brand-pulse-icon" />
-            </div>
-            <div>
-              <h3 className="auth-modal-title">
-                {isForgotPassword ? 'Reset Password' : 'Sign In to StriveX'}
-              </h3>
-              <p className="auth-modal-subtitle">
-                {isForgotPassword ? 'Receive a 6-digit recovery code' : 'Access your unified fitness portal'}
-              </p>
-            </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '24px'
+          }}
+        >
+          <div>
+            <span
+              style={{
+                fontSize: '0.74rem',
+                fontWeight: 800,
+                color: 'var(--accent)',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase'
+              }}
+            >
+              Athlete & Staff Access
+            </span>
+            <h3
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.45rem',
+                fontWeight: 800,
+                color: 'var(--text-primary)',
+                marginTop: '2px'
+              }}
+            >
+              {isForgot ? 'Reset Password' : 'Sign in to StriveX'}
+            </h3>
           </div>
-          <button className="auth-close-btn" onClick={onClose} aria-label="Close">
-            <X size={20} />
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: '6px',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--surface-glass)',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <X size={18} />
           </button>
         </div>
 
-        <div className="auth-modal-body">
-          {!isForgotPassword ? (
-            <>
-              {/* 1-Click Demo Switcher Section */}
-              <div className="demo-accounts-section">
-                <span className="demo-section-label">1-Click Demo Profiles:</span>
-                <div className="demo-buttons-grid">
-                  <button 
-                    type="button"
-                    className="demo-profile-card"
-                    onClick={() => handleQuickDemoLogin('member')}
-                  >
-                    <Dumbbell size={16} className="demo-card-icon" />
-                    <div className="demo-card-text">
-                      <span className="demo-name">Alex Rivera</span>
-                      <span className="demo-role">Member Athlete</span>
-                    </div>
-                  </button>
-
-                  <button 
-                    type="button"
-                    className="demo-profile-card"
-                    onClick={() => handleQuickDemoLogin('trainer')}
-                  >
-                    <Users size={16} className="demo-card-icon" />
-                    <div className="demo-card-text">
-                      <span className="demo-name">Coach Marcus</span>
-                      <span className="demo-role">Personal Trainer</span>
-                    </div>
-                  </button>
-
-                  <button 
-                    type="button"
-                    className="demo-profile-card"
-                    onClick={() => handleQuickDemoLogin('admin')}
-                  >
-                    <ShieldCheck size={16} className="demo-card-icon" />
-                    <div className="demo-card-text">
-                      <span className="demo-name">Operations HQ</span>
-                      <span className="demo-role">Admin Center</span>
-                    </div>
-                  </button>
-                </div>
+        {!isForgot ? (
+          <div>
+            {/* Quick Demo Switcher Section */}
+            <div
+              style={{
+                padding: '12px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)',
+                marginBottom: '24px'
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  color: 'var(--text-tertiary)',
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  marginBottom: '8px'
+                }}
+              >
+                1-Click Quick Demo Sign-In
               </div>
-
-              <div className="auth-or-divider">
-                <span>or continue with credentials</span>
-              </div>
-
-              {/* Standard Login Form */}
-              <form onSubmit={handleLoginSubmit} className="auth-form-step">
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
-                  <div className="input-with-icon">
-                    <Mail size={16} className="field-inner-icon" />
-                    <input
-                      type="email"
-                      className={`form-input has-icon ${emailError ? 'is-error' : ''}`}
-                      placeholder="e.g. member@strivex.fit"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (emailError) setEmailError('');
-                      }}
-                      autoFocus
-                    />
-                  </div>
-                  {emailError && <div className="form-warning">{emailError}</div>}
-                </div>
-
-                <div className="form-group">
-                  <div className="form-label">
-                    <span>Password</span>
-                    <button 
-                      type="button" 
-                      className="forgot-pass-link"
-                      onClick={() => setIsForgotPassword(true)}
-                    >
-                      Forgot?
-                    </button>
-                  </div>
-                  <div className="input-with-icon">
-                    <Lock size={16} className="field-inner-icon" />
-                    <input
-                      type="password"
-                      className="form-input has-icon"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="login-options-row">
-                  <label className="remember-checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                    />
-                    <span>Remember this session</span>
-                  </label>
-                </div>
-
-                <button type="submit" className="btn btn-primary btn-lg auth-submit-btn">
-                  Sign In <ArrowRight size={16} />
-                </button>
-              </form>
-
-              <div className="auth-footer-switch">
-                <span>Don't have an account?</span>
-                <button 
-                  type="button" 
-                  className="switch-action-btn"
-                  onClick={() => {
-                    onClose();
-                    onOpenRegister();
-                  }}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('member')}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '8px 4px', fontSize: '0.74rem', fontWeight: 700 }}
                 >
-                  Join StriveX Now
+                  <UserCheck size={12} color="var(--accent)" /> Member
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('trainer')}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '8px 4px', fontSize: '0.74rem', fontWeight: 700 }}
+                >
+                  <Dumbbell size={12} color="var(--accent)" /> Trainer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('admin')}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '8px 4px', fontSize: '0.74rem', fontWeight: 700 }}
+                >
+                  <Shield size={12} color="var(--accent)" /> Admin
                 </button>
               </div>
-            </>
-          ) : (
-            /* Forgot Password Flow */
-            <div className="forgot-password-view">
-              {!resetSent ? (
-                <form onSubmit={handleForgotPasswordSubmit} className="auth-form-step">
-                  <div className="form-group">
-                    <label className="form-label">Account Email</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="name@domain.com"
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
-                      autoFocus
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary auth-submit-btn">
-                    Send Verification Code
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary auth-submit-btn"
-                    onClick={() => setIsForgotPassword(false)}
-                  >
-                    Back to Sign In
-                  </button>
-                </form>
-              ) : (
-                <div className="reset-sent-confirmation">
-                  <CheckCircle2 size={48} className="reset-icon" />
-                  <h4>Verification Code Sent</h4>
-                  <p>We dispatched a 6-digit PIN to <strong>{resetEmail}</strong>.</p>
-                  <button 
-                    type="button" 
-                    className="btn btn-primary"
-                    onClick={() => {
-                      setIsForgotPassword(false);
-                      setResetSent(false);
+            </div>
+
+            {/* Standard Login Form */}
+            <form onSubmit={handleSubmit}>
+              {/* Email */}
+              <div className="kinetic-input-group">
+                <label className="kinetic-label">Email Address *</label>
+                <div className="kinetic-input-wrapper">
+                  <Mail size={18} className="kinetic-input-icon" />
+                  <input
+                    type="email"
+                    placeholder="athlete@strivex.fit"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((prev) => ({ ...prev, email: '' }));
+                    }}
+                    className={`kinetic-input has-icon ${errors.email ? 'is-invalid' : ''}`}
+                  />
+                </div>
+                {errors.email && <span className="kinetic-input-error">{errors.email}</span>}
+              </div>
+
+              {/* Password */}
+              <div className="kinetic-input-group">
+                <div className="kinetic-label">
+                  <span>Password *</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsForgot(true)}
+                    style={{
+                      color: 'var(--accent)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
                     }}
                   >
-                    Return to Login
+                    Forgot Password?
                   </button>
                 </div>
-              )}
+                <div className="kinetic-input-wrapper">
+                  <Lock size={18} className="kinetic-input-icon" />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: '' }));
+                    }}
+                    className={`kinetic-input has-icon ${errors.password ? 'is-invalid' : ''}`}
+                  />
+                </div>
+                {errors.password && <span className="kinetic-input-error">{errors.password}</span>}
+              </div>
+
+              {/* Remember Me */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '24px',
+                  fontSize: '0.86rem',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  style={{ accentColor: 'var(--accent)', width: '16px', height: '16px' }}
+                />
+                <label htmlFor="remember" style={{ cursor: 'pointer' }}>
+                  Remember this device for 30 days
+                </label>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                className="kinetic-btn-primary"
+                style={{ width: '100%', padding: '14px', fontSize: '0.95rem' }}
+              >
+                Sign In to Account
+                <ArrowRight size={16} />
+              </button>
+            </form>
+
+            {/* Switch to Registration */}
+            <div
+              style={{
+                textAlign: 'center',
+                marginTop: '20px',
+                paddingTop: '16px',
+                borderTop: '1px solid var(--border-subtle)',
+                fontSize: '0.88rem',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              Don't have an athlete account?{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSwitchToRegister();
+                }}
+                style={{ color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Register Here
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Forgot Password Drawer */
+          <form onSubmit={handleForgotSubmit} className="animate-fade-in">
+            <p
+              style={{
+                fontSize: '0.88rem',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+                marginBottom: '20px'
+              }}
+            >
+              Enter your registered email address below. We will send a secure verification code to reset your password.
+            </p>
+
+            <div className="kinetic-input-group">
+              <label className="kinetic-label">Registered Email</label>
+              <div className="kinetic-input-wrapper">
+                <Mail size={18} className="kinetic-input-icon" />
+                <input
+                  type="email"
+                  placeholder="athlete@strivex.fit"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="kinetic-input has-icon"
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button
+                type="button"
+                onClick={() => setIsForgot(false)}
+                className="kinetic-btn-ghost"
+                style={{ flex: 1 }}
+              >
+                Back to Sign In
+              </button>
+              <button type="submit" className="kinetic-btn-primary" style={{ flex: 2 }}>
+                Send Reset Code
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

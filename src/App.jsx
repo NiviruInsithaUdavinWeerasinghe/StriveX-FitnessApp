@@ -1,213 +1,229 @@
-import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
-import { LandingPage } from './components/public/LandingPage';
-import { RegisterModal } from './components/auth/RegisterModal';
+import { useState } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider, useToast } from './context/ToastContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastContainer } from './components/ui/ToastContainer';
+import { DeveloperToolbar } from './components/ui/DeveloperToolbar';
+
+// Public Landing Page Components
+import { PublicNavbar } from './components/public/PublicNavbar';
+import { HeroSection } from './components/public/HeroSection';
+import { FeatureMatrix } from './components/public/FeatureMatrix';
+import { ClassScheduleSection } from './components/public/ClassScheduleSection';
+import { TrainerRosterSection } from './components/public/TrainerRosterSection';
+import { PricingMatrix } from './components/public/PricingMatrix';
+import { TestimonialsSection } from './components/public/TestimonialsSection';
+import { Footer } from './components/public/Footer';
+
+// Modals
+import { RegistrationModal } from './components/auth/RegistrationModal';
 import { LoginModal } from './components/auth/LoginModal';
-import { DeveloperBar } from './components/ui/DeveloperBar';
-import { CommandPalette } from './components/ui/CommandPalette';
-import { MemberDashboard } from './components/member/MemberDashboard';
-import { ActiveWorkoutModal } from './components/member/ActiveWorkoutModal';
-import { MemberSettings } from './components/member/MemberSettings';
-import { useToast } from './context/ToastContext';
-import './App.css';
+import { DemoVideoModal } from './components/public/DemoVideoModal';
+import { ClassBookingModal } from './components/public/ClassBookingModal';
 
-export function App() {
-  const { showToast } = useToast();
-  const [theme, setTheme] = useState('dark');
-  const [currentRole, setCurrentRole] = useState('guest'); // 'guest' | 'member' | 'trainer' | 'admin'
-  const [viewportMode, setViewportMode] = useState('full'); // 'full' | 'desktop' | 'mobile'
-  
-  // Modals
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [registerInitialTier, setRegisterInitialTier] = useState('tier-pro');
+function StriveXApp() {
+  const { role } = useAuth();
+  const { addToast } = useToast();
+
+  // Active navigation section
+  const [activeSection, setActiveSection] = useState('home');
+
+  // Viewport mode ('responsive' | 'desktop' | 'mobile')
+  const [viewportMode, setViewportMode] = useState('responsive');
+
+  // Modal states
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [isActiveWorkoutOpen, setIsActiveWorkoutOpen] = useState(false);
-  
-  // Member Navigation Views
-  const [memberView, setMemberView] = useState('dashboard'); // 'dashboard' | 'settings' | 'chat'
-  const [completedWorkoutSummary, setCompletedWorkoutSummary] = useState(null);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isVideoDemoOpen, setIsVideoDemoOpen] = useState(false);
+  const [bookingClass, setBookingClass] = useState(null);
+  const [reservedClassIds, setReservedClassIds] = useState([]);
+  const [selectedPlanDetails, setSelectedPlanDetails] = useState({ plan: 'Pro Athlete', isAnnual: true });
 
-  // Apply Theme to root
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  // Global Keyboard Shortcuts (Ctrl+K / Cmd+K)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setIsCommandPaletteOpen(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    showToast({
-      type: 'info',
-      title: `${next === 'dark' ? 'Dark' : 'Light'} Mode Activated`,
-      message: `Theme updated to ${next} canvas.`
-    });
+  // Handle class reservation
+  const handleConfirmBooking = (classId) => {
+    setReservedClassIds((prev) => [...prev, classId]);
   };
 
-  const handleRoleChange = (role) => {
-    setCurrentRole(role);
-    setMemberView('dashboard');
-    const roleNames = {
-      guest: 'Public Gateway',
-      member: 'Member Athlete Hub',
-      trainer: 'Trainer Portal',
-      admin: 'Admin Operations'
-    };
-    showToast({
-      type: 'info',
-      title: 'Portal Switched',
-      message: `Navigated to ${roleNames[role] || role}`
-    });
-  };
-
-  const handleOpenRegister = (tierId = 'tier-pro') => {
-    setRegisterInitialTier(tierId);
+  // Handle pricing plan selection
+  const handleSelectPlan = (planName, isAnnual) => {
+    setSelectedPlanDetails({ plan: planName, isAnnual });
     setIsRegisterOpen(true);
   };
 
-  const handleSectionScroll = (sectionId) => {
-    if (currentRole !== 'guest') {
-      setCurrentRole('guest');
-    }
-    setTimeout(() => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
+  // Handle trainer consultation
+  const handleConsultTrainer = (trainer) => {
+    addToast({
+      type: 'info',
+      title: 'Consultation Requested',
+      message: `Direct consultation request submitted to ${trainer.name}`
+    });
   };
 
-  const handleRegistrationSuccess = (athleteData) => {
-    setCurrentRole('member');
-    setMemberView('dashboard');
+  // Handle feature exploration
+  const handleExploreFeature = (featureId) => {
+    addToast({
+      type: 'info',
+      title: 'Feature Capability',
+      message: `Exploring ${featureId.replace('-', ' ').toUpperCase()} module`
+    });
+  };
+
+  // Viewport framing container styles
+  const getViewportStyle = () => {
+    if (viewportMode === 'desktop') {
+      return {
+        maxWidth: '1440px',
+        margin: '24px auto',
+        borderRadius: '16px',
+        border: '12px solid #222222',
+        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+        overflow: 'hidden',
+        background: 'var(--bg-primary)'
+      };
+    }
+    if (viewportMode === 'mobile') {
+      return {
+        maxWidth: '390px',
+        margin: '24px auto',
+        borderRadius: '40px',
+        border: '12px solid #1e1e1e',
+        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)',
+        overflow: 'hidden',
+        background: 'var(--bg-primary)',
+        minHeight: '844px'
+      };
+    }
+    return {
+      width: '100%',
+      minHeight: '100vh',
+      background: 'var(--bg-primary)'
+    };
   };
 
   return (
-    <div className={`simulator-container ${viewportMode !== 'full' ? 'is-simulated' : ''}`}>
-      <div className={`simulator-frame mode-${viewportMode}`}>
-        {/* Navigation Bar */}
-        <Navbar
-          currentRole={currentRole}
-          onRoleChange={handleRoleChange}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-          onOpenLogin={() => setIsLoginOpen(true)}
-          onOpenRegister={handleOpenRegister}
-          onOpenSearch={() => setIsCommandPaletteOpen(true)}
-          onSectionClick={handleSectionScroll}
-        />
+    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+      {/* Figma Companion Developer Toolbar */}
+      <DeveloperToolbar viewportMode={viewportMode} setViewportMode={setViewportMode} />
 
-        {/* Main Workspace View */}
-        <main className="strivex-main-content">
-          {currentRole === 'guest' && (
-            <LandingPage
-              onOpenRegister={handleOpenRegister}
+      {/* Main Viewport Container */}
+      <div style={getViewportStyle()}>
+        {/* PUBLIC LANDING PAGE (Step 1 Review) */}
+        {role === 'guest' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <PublicNavbar
               onOpenLogin={() => setIsLoginOpen(true)}
-              onRoleChange={handleRoleChange}
+              onOpenRegister={() => setIsRegisterOpen(true)}
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
             />
-          )}
 
-          {currentRole === 'member' && (
-            memberView === 'settings' ? (
-              <MemberSettings onBackToDashboard={() => setMemberView('dashboard')} />
-            ) : (
-              <MemberDashboard
-                onStartWorkout={() => setIsActiveWorkoutOpen(true)}
-                onOpenChat={() => {
-                  showToast({ type: 'info', title: 'Coach Chat', message: 'Connecting to Coach Marcus Vance...' });
-                }}
-                onOpenSettings={() => setMemberView('settings')}
-                completedWorkoutData={completedWorkoutSummary}
+            <main style={{ flex: 1 }}>
+              <HeroSection
+                onStartFreeTrial={() => setIsRegisterOpen(true)}
+                onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
               />
-            )
-          )}
 
-          {currentRole === 'trainer' && (
-            <div className="placeholder-portal-card glass-panel">
-              <h3>Trainer Portal Workspace</h3>
-              <p>Step 3 in roadmap. Use role switcher below or top dropdown to return to Public or Athlete Hub.</p>
-              <button className="btn btn-primary" onClick={() => handleRoleChange('guest')}>
-                Return to Public Landing
-              </button>
+              <FeatureMatrix onExploreFeature={handleExploreFeature} />
+
+              <ClassScheduleSection
+                onReserveClass={(cls) => setBookingClass(cls)}
+                reservedClassIds={reservedClassIds}
+              />
+
+              <TrainerRosterSection onConsultTrainer={handleConsultTrainer} />
+
+              <PricingMatrix onSelectPlan={handleSelectPlan} />
+
+              <TestimonialsSection />
+            </main>
+
+            <Footer
+              onNavClick={(id) => {
+                setActiveSection(id);
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onOpenRegister={() => setIsRegisterOpen(true)}
+              onOpenLogin={() => setIsLoginOpen(true)}
+            />
+          </div>
+        ) : (
+          /* Placeholder notification when user clicks another role in developer toolbar */
+          <div
+            style={{
+              minHeight: '70vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px 24px',
+              textAlign: 'center'
+            }}
+          >
+            <div className="kinetic-badge" style={{ marginBottom: '16px' }}>
+              <span>ROLE VIEW: {role.toUpperCase()}</span>
             </div>
-          )}
-
-          {currentRole === 'admin' && (
-            <div className="placeholder-portal-card glass-panel">
-              <h3>Admin Command Operations</h3>
-              <p>Step 4 in roadmap. Use role switcher below or top dropdown to return to Public or Athlete Hub.</p>
-              <button className="btn btn-primary" onClick={() => handleRoleChange('guest')}>
-                Return to Public Landing
-              </button>
-            </div>
-          )}
-        </main>
-
-        {/* Footer */}
-        <Footer
-          onSectionClick={handleSectionScroll}
-          onOpenRegister={handleOpenRegister}
-          onRoleChange={handleRoleChange}
-        />
-
-        {/* Developer Bar / Viewport Simulator */}
-        <DeveloperBar
-          currentRole={currentRole}
-          onRoleChange={handleRoleChange}
-          viewportMode={viewportMode}
-          onViewportChange={setViewportMode}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        />
-
-        {/* Modals & Overlays */}
-        <RegisterModal
-          isOpen={isRegisterOpen}
-          onClose={() => setIsRegisterOpen(false)}
-          initialTier={registerInitialTier}
-          onSuccessRegister={handleRegistrationSuccess}
-        />
-
-        <LoginModal
-          isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
-          onRoleSelect={handleRoleChange}
-          onOpenRegister={handleOpenRegister}
-        />
-
-        <ActiveWorkoutModal
-          isOpen={isActiveWorkoutOpen}
-          onClose={() => setIsActiveWorkoutOpen(false)}
-          onFinishWorkout={(summary) => {
-            setCompletedWorkoutSummary(summary);
-          }}
-        />
-
-        <CommandPalette
-          isOpen={isCommandPaletteOpen}
-          onClose={() => setIsCommandPaletteOpen(false)}
-          onNavigate={(targetView) => {
-            if (targetView === 'settings') setMemberView('settings');
-            if (targetView === 'active-workout') setIsActiveWorkoutOpen(true);
-          }}
-          onRoleChange={handleRoleChange}
-        />
+            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
+              {role === 'member' ? 'Member Athlete Hub' : role === 'trainer' ? 'Trainer Portal' : 'Admin Command Center'}
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: '540px', marginBottom: '24px' }}>
+              Currently in Step 1 (Public Landing Page review). Switch back to "Guest" on the top toolbar to explore the complete Landing Page.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                // switch back to guest
+                window.location.reload();
+              }}
+              className="kinetic-btn-primary"
+            >
+              Back to Landing Page
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Interactive Modals */}
+      <RegistrationModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+        initialPlan={selectedPlanDetails.plan}
+        isAnnual={selectedPlanDetails.isAnnual}
+      />
+
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        onSwitchToRegister={() => setIsRegisterOpen(true)}
+      />
+
+      <DemoVideoModal
+        isOpen={isVideoDemoOpen}
+        onClose={() => setIsVideoDemoOpen(false)}
+        onStartTrial={() => setIsRegisterOpen(true)}
+      />
+
+      <ClassBookingModal
+        isOpen={!!bookingClass}
+        onClose={() => setBookingClass(null)}
+        classData={bookingClass}
+        onConfirmBooking={handleConfirmBooking}
+      />
+
+      {/* Global Toast System */}
+      <ToastContainer />
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <StriveXApp />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
+  );
+}
