@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { RoutineBuilderModal } from './RoutineBuilderModal';
+import { MemberChatModal } from '../member/MemberChatModal';
 import {
   Users,
   Search,
@@ -123,7 +125,7 @@ const TODAY_CONSULTATIONS = [
   }
 ];
 
-export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => {
+export const TrainerDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { addToast } = useToast();
@@ -131,6 +133,11 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGoalFilter, setSelectedGoalFilter] = useState('All');
   const [selectedClientDetail, setSelectedClientDetail] = useState(null);
+
+  // Modal states
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const [builderTargetClient, setBuilderTargetClient] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Filter clients
   const filteredClients = INITIAL_CLIENTS.filter((cli) => {
@@ -140,6 +147,11 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
     const matchesGoal = selectedGoalFilter === 'All' || cli.goal === selectedGoalFilter;
     return matchesSearch && matchesGoal;
   });
+
+  const handleOpenBuilderForClient = (client) => {
+    setBuilderTargetClient(client);
+    setIsBuilderOpen(true);
+  };
 
   const handleStartVideoCall = (call) => {
     addToast({
@@ -247,6 +259,27 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
               <span>28 ACTIVE CLIENTS</span>
             </div>
 
+            {/* Quick Messages */}
+            <button
+              type="button"
+              onClick={() => setIsChatOpen(true)}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-glass)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-primary)'
+              }}
+              title="Client Communications"
+            >
+              <MessageSquare size={17} color="var(--accent)" />
+            </button>
+
+            {/* Theme Toggle */}
             <button
               type="button"
               onClick={toggleTheme}
@@ -266,6 +299,7 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
               {theme === 'dark' ? <Sun size={17} color="var(--accent)" /> : <Moon size={17} color="var(--accent)" />}
             </button>
 
+            {/* Sign Out */}
             <button
               type="button"
               onClick={logout}
@@ -511,16 +545,7 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
                     {/* Action Triggers */}
                     <button
                       type="button"
-                      onClick={() => {
-                        if (onOpenRoutineBuilder) onOpenRoutineBuilder(client);
-                        else {
-                          addToast({
-                            type: 'info',
-                            title: 'Interface 3.2: Routine Builder',
-                            message: `Opening program editor for ${client.name}`
-                          });
-                        }
-                      }}
+                      onClick={() => handleOpenBuilderForClient(client)}
                       className="kinetic-btn-secondary"
                       style={{ padding: '8px 14px', fontSize: '0.78rem', fontWeight: 700 }}
                       title="Assign / Customize Routine"
@@ -530,16 +555,7 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
 
                     <button
                       type="button"
-                      onClick={() => {
-                        if (onOpenClientChat) onOpenClientChat(client);
-                        else {
-                          addToast({
-                            type: 'info',
-                            title: 'Direct Athlete Messaging',
-                            message: `Opening direct telemetry thread with ${client.name}`
-                          });
-                        }
-                      }}
+                      onClick={() => setIsChatOpen(true)}
                       className="kinetic-btn-ghost"
                       style={{ padding: '8px 12px', fontSize: '0.78rem' }}
                       title="Message Athlete"
@@ -647,6 +663,19 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
         </div>
       </main>
 
+      {/* Routine Builder Modal */}
+      <RoutineBuilderModal
+        isOpen={isBuilderOpen}
+        onClose={() => setIsBuilderOpen(false)}
+        targetClient={builderTargetClient}
+      />
+
+      {/* Member/Client Chat Modal */}
+      <MemberChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
+
       {/* Client Telemetry Detail Drawer / Modal */}
       {selectedClientDetail && (
         <div
@@ -718,8 +747,9 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
               <button
                 type="button"
                 onClick={() => {
+                  const target = selectedClientDetail;
                   setSelectedClientDetail(null);
-                  if (onOpenRoutineBuilder) onOpenRoutineBuilder(selectedClientDetail);
+                  handleOpenBuilderForClient(target);
                 }}
                 className="kinetic-btn-primary"
                 style={{ flex: 1, padding: '12px', fontSize: '0.85rem' }}
@@ -730,7 +760,7 @@ export const TrainerDashboard = ({ onOpenRoutineBuilder, onOpenClientChat }) => 
                 type="button"
                 onClick={() => {
                   setSelectedClientDetail(null);
-                  if (onOpenClientChat) onOpenClientChat(selectedClientDetail);
+                  setIsChatOpen(true);
                 }}
                 className="kinetic-btn-secondary"
                 style={{ flex: 1, padding: '12px', fontSize: '0.85rem' }}

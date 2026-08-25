@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { ToastProvider, useToast } from './context/ToastContext';
+import { ToastProvider } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ui/ToastContainer';
 
@@ -26,7 +26,6 @@ import { ClassBookingModal } from './components/public/ClassBookingModal';
 
 function StriveXApp() {
   const { role } = useAuth();
-  const { addToast } = useToast();
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState('home');
@@ -59,15 +58,6 @@ function StriveXApp() {
   // Handle feature exploration
   const handleExploreFeature = (_featureId) => {
     setIsVideoDemoOpen(true);
-  };
-
-  // Routine builder trigger placeholder (for Interface 3.2 next task)
-  const handleOpenRoutineBuilder = (client) => {
-    addToast({
-      type: 'info',
-      title: 'Ready for Interface 3.2',
-      message: `Interactive Program Builder for ${client.name} will be built in the next step`
-    });
   };
 
   return (
@@ -117,12 +107,8 @@ function StriveXApp() {
       {/* 2. MEMBER EXPERIENCE (ATHLETE HUB) */}
       {role === 'member' && <MemberDashboard />}
 
-      {/* 3. TRAINER EXPERIENCE: INTERFACE 3.1 (TRAINER COMMAND SUITE) */}
-      {role === 'trainer' && (
-        <TrainerDashboard
-          onOpenRoutineBuilder={handleOpenRoutineBuilder}
-        />
-      )}
+      {/* 3. TRAINER EXPERIENCE: INTERFACE 3.1 & 3.2 (TRAINER COMMAND SUITE) */}
+      {role === 'trainer' && <TrainerDashboard />}
 
       {/* 4. ADMIN EXPERIENCE (Awaiting Module 4) */}
       {role === 'admin' && (
