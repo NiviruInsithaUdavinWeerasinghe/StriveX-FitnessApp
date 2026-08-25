@@ -1,0 +1,10 @@
+# Agent configuration and credentials
+.agents/
+.env
+.env.local
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
