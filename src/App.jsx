@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { ToastProvider, useToast } from './context/ToastContext';
+import { ToastProvider } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ui/ToastContainer';
 
@@ -22,7 +22,6 @@ import { ClassBookingModal } from './components/public/ClassBookingModal';
 
 function StriveXApp() {
   const { role } = useAuth();
-  const { addToast } = useToast();
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState('home');
@@ -46,22 +45,15 @@ function StriveXApp() {
     setIsRegisterOpen(true);
   };
 
-  // Handle trainer consultation
-  const handleConsultTrainer = (trainer) => {
-    addToast({
-      type: 'info',
-      title: 'Consultation Requested',
-      message: `Direct consultation request submitted to ${trainer.name}`
-    });
+  // Handle trainer consultation -> Launches registration with consultation intent
+  const handleConsultTrainer = (_trainer) => {
+    setSelectedPlanDetails({ plan: 'Pro Athlete', isAnnual: true });
+    setIsRegisterOpen(true);
   };
 
-  // Handle feature exploration
-  const handleExploreFeature = (featureId) => {
-    addToast({
-      type: 'info',
-      title: 'Feature Capability',
-      message: `Exploring ${featureId.replace('-', ' ').toUpperCase()} module`
-    });
+  // Handle feature exploration -> Opens platform demo walkthrough modal
+  const handleExploreFeature = (_featureId) => {
+    setIsVideoDemoOpen(true);
   };
 
   return (
@@ -157,7 +149,7 @@ function StriveXApp() {
         onConfirmBooking={handleConfirmBooking}
       />
 
-      {/* Global Toast System */}
+      {/* Global Toast System (Reserved only for mandatory actions like auth & bookings) */}
       <ToastContainer />
     </div>
   );
