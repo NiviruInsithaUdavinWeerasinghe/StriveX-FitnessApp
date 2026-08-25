@@ -14,9 +14,10 @@ import { PricingMatrix } from './components/public/PricingMatrix';
 import { TestimonialsSection } from './components/public/TestimonialsSection';
 import { Footer } from './components/public/Footer';
 
-// Member & Trainer Components
+// Member, Trainer & Admin Components
 import { MemberDashboard } from './components/member/MemberDashboard';
 import { TrainerDashboard } from './components/trainer/TrainerDashboard';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 // Modals
 import { RegistrationModal } from './components/auth/RegistrationModal';
@@ -110,30 +111,8 @@ function StriveXApp() {
       {/* 3. TRAINER EXPERIENCE: INTERFACE 3.1 & 3.2 (TRAINER COMMAND SUITE) */}
       {role === 'trainer' && <TrainerDashboard />}
 
-      {/* 4. ADMIN EXPERIENCE (Awaiting Module 4) */}
-      {role === 'admin' && (
-        <div
-          style={{
-            minHeight: '70vh',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 24px',
-            textAlign: 'center'
-          }}
-        >
-          <div className="kinetic-badge" style={{ marginBottom: '16px' }}>
-            <span>ROLE: ADMIN OPERATIONS</span>
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
-            Admin Command Center
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '540px', marginBottom: '24px' }}>
-            Scheduled for Module 4 execution in master plan.
-          </p>
-        </div>
-      )}
+      {/* 4. ADMIN EXPERIENCE: INTERFACE 4.1 (ENTERPRISE COMMAND CENTER) */}
+      {role === 'admin' && <AdminDashboard />}
 
       {/* Interactive Modals */}
       <RegistrationModal
