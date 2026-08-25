@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ActiveWorkoutModal } from './ActiveWorkoutModal';
+import { MemberSettingsModal } from './MemberSettingsModal';
 import {
   Flame,
   Heart,
@@ -23,14 +24,14 @@ import {
 } from 'lucide-react';
 
 export const MemberDashboard = ({
-  onOpenSettings,
   onOpenChat
 }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Active workout modal state
+  // Modals state
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Biometric state tracking
   const [calories, setCalories] = useState(user?.todayCalories || 680);
@@ -353,7 +354,7 @@ export const MemberDashboard = ({
             {/* Settings Trigger */}
             <button
               type="button"
-              onClick={onOpenSettings}
+              onClick={() => setIsSettingsOpen(true)}
               style={{
                 width: '38px',
                 height: '38px',
@@ -909,6 +910,12 @@ export const MemberDashboard = ({
         isOpen={isWorkoutModalOpen}
         onClose={() => setIsWorkoutModalOpen(false)}
         onWorkoutCompleted={handleWorkoutCompleted}
+      />
+
+      {/* Member Settings & Preferences Modal */}
+      <MemberSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </div>
   );

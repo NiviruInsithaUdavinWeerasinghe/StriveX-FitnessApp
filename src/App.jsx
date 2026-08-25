@@ -60,15 +60,6 @@ function StriveXApp() {
     setIsVideoDemoOpen(true);
   };
 
-  // Settings placeholder (for Interface 2.3 next task)
-  const handleOpenSettings = () => {
-    addToast({
-      type: 'info',
-      title: 'Ready for Interface 2.3',
-      message: 'Member Profile & Settings view will be built in the upcoming step'
-    });
-  };
-
   // Chat placeholder (for Interface 2.4 next task)
   const handleOpenChat = () => {
     addToast({
@@ -125,7 +116,6 @@ function StriveXApp() {
       {/* 2. MEMBER EXPERIENCE (ATHLETE HUB) */}
       {role === 'member' && (
         <MemberDashboard
-          onOpenSettings={handleOpenSettings}
           onOpenChat={handleOpenChat}
         />
       )}
