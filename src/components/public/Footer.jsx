@@ -51,28 +51,29 @@ export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
       style={{
         borderTop: '1px solid var(--border-glass)',
         background: 'var(--bg-secondary)',
-        padding: '0 24px 32px',
+        padding: '64px 24px 32px',
         width: '100%'
       }}
     >
       <div style={{ maxWidth: '1360px', margin: '0 auto' }}>
         {/* ============================================================ */}
-        {/* FOOTER TOP: High-Impact Pre-Footer Conversion Banner & Badges */}
+        {/* FOOTER TOP: Clean Open Layout on Background (No Cards/Panels) */}
         {/* ============================================================ */}
         <div
-          className="kinetic-card footer-top-banner"
           style={{
-            background: `
-              radial-gradient(circle at 90% 20%, rgba(212, 255, 0, 0.12) 0%, transparent 60%),
-              var(--surface-card)
-            `,
-            border: '1px solid var(--border-hover)',
-            boxShadow: 'var(--shadow-lg)'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '32px',
+            flexWrap: 'wrap',
+            paddingBottom: '48px',
+            marginBottom: '48px',
+            borderBottom: '1px solid var(--border-subtle)'
           }}
         >
           {/* Left Text & Value Props */}
-          <div style={{ maxWidth: '640px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ maxWidth: '680px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div className="kinetic-badge">
                 <Sparkles size={13} />
                 <span>START YOUR TRANSFORMATION</span>
@@ -85,11 +86,11 @@ export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
             <h3
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: '1.85rem',
+                fontSize: '2rem',
                 fontWeight: 900,
                 color: 'var(--text-primary)',
                 lineHeight: 1.2,
-                marginBottom: '10px'
+                marginBottom: '12px'
               }}
             >
               Ready to Unlock Your Peak Athletic Potential?
@@ -97,26 +98,26 @@ export const Footer = ({ onNavClick, onOpenRegister, onOpenLogin }) => {
             <p
               style={{
                 color: 'var(--text-secondary)',
-                fontSize: '0.94rem',
-                lineHeight: 1.5,
-                marginBottom: '18px'
+                fontSize: '0.96rem',
+                lineHeight: 1.6,
+                marginBottom: '20px'
               }}
             >
               Join 2,400+ dedicated athletes training with progressive telemetry tracking, customized periodization, and certified 1-on-1 coaching suites.
             </p>
 
             {/* Micro Value Prop Badges */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Zap size={15} color="var(--accent)" />
+                <Zap size={16} color="var(--accent)" />
                 <span style={{ fontWeight: 600 }}>Live Telemetry Sync</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Award size={15} color="var(--accent)" />
+                <Award size={16} color="var(--accent)" />
                 <span style={{ fontWeight: 600 }}>CSCS-Certified Coaches</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CheckCircle2 size={15} color="var(--status-success)" />
+                <CheckCircle2 size={16} color="var(--status-success)" />
                 <span style={{ fontWeight: 600 }}>24/7 Digital Access</span>
               </div>
             </div>
