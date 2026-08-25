@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { ActiveWorkoutModal } from './ActiveWorkoutModal';
 import {
   Flame,
   Heart,
@@ -22,18 +23,20 @@ import {
 } from 'lucide-react';
 
 export const MemberDashboard = ({
-  onStartWorkout,
   onOpenSettings,
   onOpenChat
 }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
+  // Active workout modal state
+  const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
+
   // Biometric state tracking
-  const [calories] = useState(user?.todayCalories || 680);
+  const [calories, setCalories] = useState(user?.todayCalories || 680);
   const targetCalories = user?.targetCalories || 800;
 
-  const [activeMins] = useState(user?.activeMinutes || 54);
+  const [activeMins, setActiveMins] = useState(user?.activeMinutes || 54);
   const targetMins = user?.targetMinutes || 60;
 
   const [standHours] = useState(10);
@@ -73,6 +76,12 @@ export const MemberDashboard = ({
   };
   const handleRemoveWater = (amount) => {
     setWaterMl((prev) => Math.max(prev - amount, 0));
+  };
+
+  // Workout completed synchronization callback
+  const handleWorkoutCompleted = ({ addedCalories, addedMins }) => {
+    setCalories((prev) => prev + addedCalories);
+    setActiveMins((prev) => prev + addedMins);
   };
 
   // Ring calculations
@@ -618,7 +627,7 @@ export const MemberDashboard = ({
 
               <button
                 type="button"
-                onClick={onStartWorkout}
+                onClick={() => setIsWorkoutModalOpen(true)}
                 className="kinetic-btn-primary"
                 style={{ padding: '14px 28px', fontSize: '1rem', fontWeight: 800 }}
               >
@@ -894,6 +903,13 @@ export const MemberDashboard = ({
           </div>
         </div>
       </main>
+
+      {/* Active Workout Session Modal */}
+      <ActiveWorkoutModal
+        isOpen={isWorkoutModalOpen}
+        onClose={() => setIsWorkoutModalOpen(false)}
+        onWorkoutCompleted={handleWorkoutCompleted}
+      />
     </div>
   );
 };

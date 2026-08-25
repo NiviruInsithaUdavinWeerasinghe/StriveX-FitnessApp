@@ -60,15 +60,6 @@ function StriveXApp() {
     setIsVideoDemoOpen(true);
   };
 
-  // Workout launcher placeholder (for Interface 2.2 next task)
-  const handleStartWorkout = () => {
-    addToast({
-      type: 'info',
-      title: 'Ready for Interface 2.2',
-      message: 'Active Workout Logger Session modal will be built in the next step'
-    });
-  };
-
   // Settings placeholder (for Interface 2.3 next task)
   const handleOpenSettings = () => {
     addToast({
@@ -131,10 +122,9 @@ function StriveXApp() {
         </div>
       )}
 
-      {/* 2. MEMBER EXPERIENCE: INTERFACE 2.1 (ATHLETE HUB) */}
+      {/* 2. MEMBER EXPERIENCE (ATHLETE HUB) */}
       {role === 'member' && (
         <MemberDashboard
-          onStartWorkout={handleStartWorkout}
           onOpenSettings={handleOpenSettings}
           onOpenChat={handleOpenChat}
         />
