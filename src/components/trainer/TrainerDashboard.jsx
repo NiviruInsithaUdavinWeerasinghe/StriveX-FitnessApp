@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { RoutineBuilderModal } from './RoutineBuilderModal';
 import { TrainerConsultationHubModal } from './TrainerConsultationHubModal';
-import { MemberChatModal } from '../member/MemberChatModal';
+import { TrainerChatModal } from './TrainerChatModal';
 import {
   Users,
   Search,
@@ -139,7 +139,10 @@ export const TrainerDashboard = () => {
   // Modal states
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [builderTargetClient, setBuilderTargetClient] = useState(null);
+  
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatTargetClientId, setChatTargetClientId] = useState('cli_1');
+
   const [isConsultHubOpen, setIsConsultHubOpen] = useState(false);
   const [consultHubTargetClient, setConsultHubTargetClient] = useState(null);
 
@@ -155,6 +158,11 @@ export const TrainerDashboard = () => {
   const handleOpenBuilderForClient = (client) => {
     setBuilderTargetClient(client);
     setIsBuilderOpen(true);
+  };
+
+  const handleOpenChatForClient = (clientId) => {
+    setChatTargetClientId(clientId);
+    setIsChatOpen(true);
   };
 
   const handleOpenConsultHub = (client) => {
@@ -225,7 +233,7 @@ export const TrainerDashboard = () => {
                   NSCA-CSCS
                 </span>
               </div>
-              <div className="type-h3" style={{ fontSize: '1.15rem', margin: 0 }}>
+              <div className="type-h3" style={{ fontSize: '1.15rem', margin: 0, whiteSpace: 'nowrap' }}>
                 Coach Marcus Vance
               </div>
             </div>
@@ -244,7 +252,9 @@ export const TrainerDashboard = () => {
                 border: '1px solid rgba(212, 255, 0, 0.3)',
                 color: 'var(--accent)',
                 fontSize: '0.82rem',
-                fontWeight: 800
+                fontWeight: 800,
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               <Users size={15} color="var(--accent)" />
@@ -254,7 +264,7 @@ export const TrainerDashboard = () => {
             {/* Quick Messages */}
             <button
               type="button"
-              onClick={() => setIsChatOpen(true)}
+              onClick={() => handleOpenChatForClient('cli_1')}
               style={{
                 width: '38px',
                 height: '38px',
@@ -264,7 +274,8 @@ export const TrainerDashboard = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                cursor: 'pointer'
               }}
               title="Client Communications"
             >
@@ -284,7 +295,8 @@ export const TrainerDashboard = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                cursor: 'pointer'
               }}
               title="Toggle theme"
             >
@@ -296,7 +308,7 @@ export const TrainerDashboard = () => {
               type="button"
               onClick={logout}
               className="kinetic-btn-ghost"
-              style={{ padding: '8px 14px', fontSize: '0.82rem' }}
+              style={{ padding: '8px 14px', fontSize: '0.82rem', whiteSpace: 'nowrap', flexShrink: 0 }}
               title="Sign Out"
             >
               <LogOut size={15} />
@@ -431,6 +443,8 @@ export const TrainerDashboard = () => {
                       fontSize: '0.74rem',
                       fontWeight: 800,
                       border: `1px solid ${selectedGoalFilter === g ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       cursor: 'pointer'
                     }}
                   >
@@ -501,7 +515,7 @@ export const TrainerDashboard = () => {
                     />
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                        <span style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                           {client.name}
                         </span>
                         <span className="kinetic-badge" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
@@ -515,8 +529,8 @@ export const TrainerDashboard = () => {
                   </div>
 
                   {/* Adherence and Action Buttons */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ textAlign: 'right' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                    <div style={{ textAlign: 'right', marginRight: '4px' }}>
                       <div className="type-caption">ADHERENCE</div>
                       <div
                         style={{
@@ -547,10 +561,10 @@ export const TrainerDashboard = () => {
 
                     <button
                       type="button"
-                      onClick={() => setIsChatOpen(true)}
+                      onClick={() => handleOpenChatForClient(client.id)}
                       className="kinetic-btn-ghost"
                       style={{ padding: '8px 12px', fontSize: '0.78rem' }}
-                      title="Message Athlete"
+                      title="Direct Chat with Athlete"
                     >
                       <MessageSquare size={15} color="var(--accent)" />
                     </button>
@@ -579,7 +593,7 @@ export const TrainerDashboard = () => {
                   Today's Schedule
                 </h4>
               </div>
-              <span style={{ fontSize: '0.74rem', color: 'var(--accent)', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.74rem', color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
                 {TODAY_CONSULTATIONS.length} BOOKED
               </span>
             </div>
@@ -672,10 +686,15 @@ export const TrainerDashboard = () => {
         defaultClient={consultHubTargetClient}
       />
 
-      {/* Member/Client Chat Modal */}
-      <MemberChatModal
+      {/* Dedicated Trainer - Athlete Direct Chat Modal */}
+      <TrainerChatModal
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
+        defaultClientId={chatTargetClientId}
+        onOpenTelemetry={(cli) => {
+          setIsChatOpen(false);
+          handleOpenConsultHub(cli);
+        }}
       />
     </div>
   );
