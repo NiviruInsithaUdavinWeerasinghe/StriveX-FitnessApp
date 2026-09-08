@@ -1229,27 +1229,14 @@ export const MemberDashboard = () => {
             </div>
 
             {/* Modal Actions */}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+            <div style={{ marginTop: '8px' }}>
               <button
                 type="button"
                 onClick={() => setSelectedProductModal(null)}
-                className="kinetic-btn-ghost"
-                style={{ flex: 1 }}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  alert(`Added ${selectedProductModal.name} to cart!`);
-                  setSelectedProductModal(null);
-                }}
                 className="kinetic-btn-primary"
-                style={{ flex: 2, opacity: selectedProductModal.inStock ? 1 : 0.6, cursor: selectedProductModal.inStock ? 'pointer' : 'not-allowed' }}
-                disabled={!selectedProductModal.inStock}
+                style={{ width: '100%', justifyContent: 'center' }}
               >
-                <ShoppingBag size={16} />
-                <span>{selectedProductModal.inStock ? 'Reserve Product' : 'Out of Stock'}</span>
+                Close Details
               </button>
             </div>
           </div>
