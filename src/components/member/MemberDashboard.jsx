@@ -111,6 +111,16 @@ export const MemberDashboard = () => {
   // Modals state
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLogMealOpen, setIsLogMealOpen] = useState(false);
+
+  // Meal logs state
+  const [mealLogs, setMealLogs] = useState(MEAL_LOGS);
+  const [newMealTitle, setNewMealTitle] = useState('');
+  const [newMealCategory, setNewMealCategory] = useState('Snack');
+  const [newMealKcal, setNewMealKcal] = useState('250');
+  const [newMealP, setNewMealP] = useState('25');
+  const [newMealC, setNewMealC] = useState('30');
+  const [newMealF, setNewMealF] = useState('8');
 
   // Selected routine
   const [selectedRoutineId, setSelectedRoutineId] = useState('push_a');
@@ -127,7 +137,35 @@ export const MemberDashboard = () => {
   const targetWaterMl = 3000;
 
   const handleAddWater = (amount) => setWaterMl((prev) => Math.min(prev + amount, 5000));
-  const handleAddCalories = (amount) => setCalories((prev) => prev + amount);
+  
+  const handleSaveCustomMeal = (e) => {
+    e.preventDefault();
+    const kcalNum = parseInt(newMealKcal) || 0;
+    const pNum = parseInt(newMealP) || 0;
+    const cNum = parseInt(newMealC) || 0;
+    const fNum = parseInt(newMealF) || 0;
+
+    const newLog = {
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      meal: newMealTitle.trim() || `${newMealCategory} Entry`,
+      kcal: kcalNum,
+      p: pNum,
+      c: cNum,
+      f: fNum,
+      type: newMealCategory
+    };
+
+    setMealLogs((prev) => [newLog, ...prev]);
+    setCalories((prev) => prev + kcalNum);
+    setIsLogMealOpen(false);
+
+    // Reset inputs
+    setNewMealTitle('');
+    setNewMealKcal('250');
+    setNewMealP('25');
+    setNewMealC('30');
+    setNewMealF('8');
+  };
 
   const handleWorkoutCompleted = ({ addedCalories, addedMins }) => {
     setCalories((prev) => prev + addedCalories);
@@ -525,13 +563,13 @@ export const MemberDashboard = () => {
                       <p className="type-small" style={{ margin: '4px 0 0' }}>Prescribed by Coach Marcus Vance • Total {calories} kcal logged.</p>
                     </div>
 
-                    <button type="button" onClick={() => handleAddCalories(250)} className="kinetic-btn-primary" style={{ padding: '8px 14px', fontSize: '0.8rem' }}>
-                      <Plus size={14} /> Log Meal (+250 kcal)
+                    <button type="button" onClick={() => setIsLogMealOpen(true)} className="kinetic-btn-primary" style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
+                      <Plus size={15} /> Log Custom Meal / Calories
                     </button>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {MEAL_LOGS.map((m, idx) => (
+                    {mealLogs.map((m, idx) => (
                       <div
                         key={idx}
                         style={{
@@ -825,6 +863,143 @@ export const MemberDashboard = () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
+
+      {/* Customize & Log Meal / Calorie Modal */}
+      {isLogMealOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9995,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.88)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            padding: '16px'
+          }}
+          onClick={() => setIsLogMealOpen(false)}
+        >
+          <div
+            className="kinetic-card animate-scale-up"
+            style={{
+              width: '100%',
+              maxWidth: '520px',
+              padding: '28px',
+              background: 'var(--surface-elevated)',
+              border: '1px solid var(--border-hover)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Apple size={20} color="var(--accent)" />
+                <h4 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
+                  Customize & Log Meal Calories
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLogMealOpen(false)}
+                style={{ color: 'var(--text-secondary)', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCustomMeal} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="kinetic-input-group" style={{ margin: 0 }}>
+                <label className="kinetic-label">Meal Description / Title *</label>
+                <input
+                  type="text"
+                  value={newMealTitle}
+                  onChange={(e) => setNewMealTitle(e.target.value)}
+                  placeholder="e.g. Salmon Bowl with Brown Rice & Avocado"
+                  className="kinetic-input"
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Meal Category</label>
+                  <select
+                    value={newMealCategory}
+                    onChange={(e) => setNewMealCategory(e.target.value)}
+                    className="kinetic-input"
+                    style={{ background: 'var(--surface-input)' }}
+                  >
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Snack">Snack</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Pre-Workout">Pre-Workout</option>
+                    <option value="Post-Workout">Post-Workout</option>
+                  </select>
+                </div>
+
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Calories (kcal) *</label>
+                  <input
+                    type="number"
+                    value={newMealKcal}
+                    onChange={(e) => setNewMealKcal(e.target.value)}
+                    className="kinetic-input"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Macro Customization */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Protein (g)</label>
+                  <input
+                    type="number"
+                    value={newMealP}
+                    onChange={(e) => setNewMealP(e.target.value)}
+                    className="kinetic-input"
+                  />
+                </div>
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Carbs (g)</label>
+                  <input
+                    type="number"
+                    value={newMealC}
+                    onChange={(e) => setNewMealC(e.target.value)}
+                    className="kinetic-input"
+                  />
+                </div>
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Fats (g)</label>
+                  <input
+                    type="number"
+                    value={newMealF}
+                    onChange={(e) => setNewMealF(e.target.value)}
+                    className="kinetic-input"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsLogMealOpen(false)}
+                  className="kinetic-btn-ghost"
+                  style={{ flex: 1 }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="kinetic-btn-primary" style={{ flex: 2 }}>
+                  <Apple size={16} />
+                  <span>Log Meal & Calories</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
