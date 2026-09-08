@@ -653,88 +653,107 @@ export const MemberDashboard = () => {
               </div>
 
               {/* Volume Load Trajectory Visual Bar Chart & Body Weight Section */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '24px', alignItems: 'stretch' }}>
                 {/* Visual Bar Graph Widget */}
-                <div className="kinetic-card" style={{ padding: '32px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <div>
-                      <h3 className="type-h3" style={{ margin: 0, fontSize: '1.2rem' }}>Weekly Tonnage Load Trajectory</h3>
-                      <p className="type-small" style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>Calculated across compound sets (Bench, Squat, RDL, Press).</p>
-                    </div>
-                    <span className="kinetic-badge" style={{ padding: '4px 10px' }}>4-Week Telemetry</span>
-                  </div>
-
-                  {/* Visual Graph Bars */}
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '200px', padding: '0 20px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
-                    {[
-                      { label: 'Week 1', volume: '38.4k kg', height: '55%', color: 'linear-gradient(180deg, #06b6d4 0%, rgba(6, 182, 212, 0.2) 100%)', border: '#06b6d4' },
-                      { label: 'Week 2', volume: '41.2k kg', height: '68%', color: 'linear-gradient(180deg, #3b82f6 0%, rgba(59, 130, 246, 0.2) 100%)', border: '#3b82f6' },
-                      { label: 'Week 3', volume: '44.8k kg', height: '82%', color: 'linear-gradient(180deg, #f59e0b 0%, rgba(245, 158, 11, 0.2) 100%)', border: '#f59e0b' },
-                      { label: 'Week 4 (Current)', volume: '45.2k kg', height: '98%', color: 'linear-gradient(180deg, var(--accent) 0%, rgba(212, 255, 0, 0.25) 100%)', border: 'var(--accent)', glow: true }
-                    ].map((bar, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: bar.border }}>{bar.volume}</span>
-                        <div
-                          style={{
-                            width: '48px',
-                            height: bar.height,
-                            borderRadius: '8px 8px 0 0',
-                            background: bar.color,
-                            border: `1.5px solid ${bar.border}`,
-                            boxShadow: bar.glow ? '0 0 16px var(--accent-glow)' : `0 0 10px ${bar.border}40`,
-                            transition: 'all 0.3s ease'
-                          }}
-                        />
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{bar.label}</span>
+                <div className="kinetic-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                      <div>
+                        <h3 className="type-h3" style={{ margin: 0, fontSize: '1.2rem' }}>Weekly Tonnage Load Trajectory</h3>
+                        <p className="type-small" style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>Calculated across compound sets (Bench, Squat, RDL, Press).</p>
                       </div>
-                    ))}
+                      <span className="kinetic-badge" style={{ padding: '4px 10px' }}>4-Week Telemetry</span>
+                    </div>
+
+                    {/* Visual Graph Bars */}
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '260px', padding: '0 20px 12px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
+                      {[
+                        { label: 'Week 1', volume: '38.4k kg', height: '55%', color: 'linear-gradient(180deg, #06b6d4 0%, rgba(6, 182, 212, 0.2) 100%)', border: '#06b6d4' },
+                        { label: 'Week 2', volume: '41.2k kg', height: '68%', color: 'linear-gradient(180deg, #3b82f6 0%, rgba(59, 130, 246, 0.2) 100%)', border: '#3b82f6' },
+                        { label: 'Week 3', volume: '44.8k kg', height: '82%', color: 'linear-gradient(180deg, #f59e0b 0%, rgba(245, 158, 11, 0.2) 100%)', border: '#f59e0b' },
+                        { label: 'Week 4 (Current)', volume: '45.2k kg', height: '98%', color: 'linear-gradient(180deg, var(--accent) 0%, rgba(212, 255, 0, 0.25) 100%)', border: 'var(--accent)', glow: true }
+                      ].map((bar, idx) => (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 800, color: bar.border }}>{bar.volume}</span>
+                          <div
+                            style={{
+                              width: '56px',
+                              height: bar.height,
+                              borderRadius: '8px 8px 0 0',
+                              background: bar.color,
+                              border: `1.5px solid ${bar.border}`,
+                              boxShadow: bar.glow ? '0 0 16px var(--accent-glow)' : `0 0 10px ${bar.border}40`,
+                              transition: 'all 0.3s ease'
+                            }}
+                          />
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{bar.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Summary Telemetry Metrics Footer */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '20px' }}>
+                      <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                        <span className="type-caption" style={{ color: 'var(--text-tertiary)', fontSize: '0.7rem' }}>Avg Weekly Workload</span>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>42.4k kg</div>
+                      </div>
+                      <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                        <span className="type-caption" style={{ color: 'var(--text-tertiary)', fontSize: '0.7rem' }}>4-Wk Delta</span>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--status-success)', marginTop: '2px' }}>+17.7%</div>
+                      </div>
+                      <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                        <span className="type-caption" style={{ color: 'var(--text-tertiary)', fontSize: '0.7rem' }}>Top Lift Density</span>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent)', marginTop: '2px' }}>Squat / RDL</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Configured Body Weight & Composition Section */}
-                <div className="kinetic-card" style={{ padding: '32px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h3 className="type-h3" style={{ margin: 0, fontSize: '1.1rem' }}>Body Weight Tracker</h3>
-                    <span className="kinetic-badge" style={{ fontSize: '0.66rem' }}>Target: 76.0 kg</span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {/* Quick Weight Logger Bar */}
-                    <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
-                      <label className="type-caption" style={{ display: 'block', marginBottom: '6px' }}>Log Fasted Morning Weight</label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g. 78.2"
-                          className="kinetic-input"
-                          style={{ padding: '6px 10px', fontSize: '0.82rem', width: '100px' }}
-                        />
-                        <button type="button" className="kinetic-btn-primary" style={{ padding: '6px 12px', fontSize: '0.76rem', flex: 1 }}>
-                          Log Weight
-                        </button>
-                      </div>
+                <div className="kinetic-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <h3 className="type-h3" style={{ margin: 0, fontSize: '1.1rem' }}>Body Weight Tracker</h3>
+                      <span className="kinetic-badge" style={{ fontSize: '0.66rem' }}>Target: 76.0 kg</span>
                     </div>
 
-                    {/* Weight History Log Timeline */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>Weight History Trend</span>
-                      {[
-                        { date: 'Today (Fasted)', weight: '78.4 kg', change: '-0.3 kg', status: 'optimal' },
-                        { date: 'Sep 01', weight: '78.7 kg', change: '-0.4 kg', status: 'optimal' },
-                        { date: 'Aug 15', weight: '79.1 kg', change: '-0.9 kg', status: 'optimal' },
-                        { date: 'Aug 01 (Baseline)', weight: '80.0 kg', change: 'Start', status: 'start' }
-                      ].map((log, idx) => (
-                        <div key={idx} style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block' }}>{log.weight}</span>
-                            <span className="type-caption" style={{ fontSize: '0.68rem' }}>{log.date}</span>
-                          </div>
-                          <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: log.status === 'optimal' ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-elevated)', color: log.status === 'optimal' ? 'var(--status-success)' : 'var(--text-secondary)' }}>
-                            {log.change}
-                          </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {/* Quick Weight Logger Bar */}
+                      <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                        <label className="type-caption" style={{ display: 'block', marginBottom: '6px' }}>Log Fasted Morning Weight</label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <input
+                            type="number"
+                            step="0.1"
+                            placeholder="e.g. 78.2"
+                            className="kinetic-input"
+                            style={{ padding: '6px 10px', fontSize: '0.82rem', width: '100px' }}
+                          />
+                          <button type="button" className="kinetic-btn-primary" style={{ padding: '6px 12px', fontSize: '0.76rem', flex: 1 }}>
+                            Log Weight
+                          </button>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Weight History Log Timeline */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>Weight History Trend</span>
+                        {[
+                          { date: 'Today (Fasted)', weight: '78.4 kg', change: '-0.3 kg', status: 'optimal' },
+                          { date: 'Sep 01', weight: '78.7 kg', change: '-0.4 kg', status: 'optimal' },
+                          { date: 'Aug 15', weight: '79.1 kg', change: '-0.9 kg', status: 'optimal' }
+                        ].map((log, idx) => (
+                          <div key={idx} style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block' }}>{log.weight}</span>
+                              <span className="type-caption" style={{ fontSize: '0.68rem' }}>{log.date}</span>
+                            </div>
+                            <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: log.status === 'optimal' ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-elevated)', color: log.status === 'optimal' ? 'var(--status-success)' : 'var(--text-secondary)' }}>
+                              {log.change}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
