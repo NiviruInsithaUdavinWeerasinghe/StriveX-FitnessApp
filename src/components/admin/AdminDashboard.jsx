@@ -14,14 +14,12 @@ import {
   CreditCard,
   Radio,
   FileSpreadsheet,
-  Cpu,
   LayoutDashboard,
   Building2
 } from 'lucide-react';
 
 import { FinancialLedgerModal } from './FinancialLedgerModal';
 import { StaffManagerModal } from './StaffManagerModal';
-import { FacilitySensorGridModal } from './FacilitySensorGridModal';
 
 const EXECUTIVE_METRICS = [
   {
@@ -172,8 +170,7 @@ export const AdminDashboard = () => {
   const navItems = [
     { id: 'overview', label: 'Executive Dashboard', icon: LayoutDashboard },
     { id: 'financials', label: 'Financial Ledger & Revenue', icon: CreditCard },
-    { id: 'staff', label: 'Staff & Trainer Management', icon: Users },
-    { id: 'equipment', label: 'Facility & Sensor Mesh Grid', icon: Cpu }
+    { id: 'staff', label: 'Staff & Trainer Management', icon: Users }
   ];
 
   return (
@@ -328,7 +325,6 @@ export const AdminDashboard = () => {
               {activeTab === 'overview' && 'Executive Operations Dashboard'}
               {activeTab === 'financials' && 'Financial Ledger & Billing Operations'}
               {activeTab === 'staff' && 'Coaching Roster & Staff Management'}
-              {activeTab === 'equipment' && 'Facility IoT Mesh & Sensor Grid'}
             </h1>
           </div>
 
@@ -637,11 +633,6 @@ export const AdminDashboard = () => {
           {/* TAB 3: STAFF MANAGEMENT INLINE */}
           {activeTab === 'staff' && (
             <StaffManagerModal isOpen={true} isInline={true} />
-          )}
-
-          {/* TAB 4: FACILITY SENSOR GRID INLINE */}
-          {activeTab === 'equipment' && (
-            <FacilitySensorGridModal isOpen={true} isInline={true} />
           )}
         </main>
       </div>
