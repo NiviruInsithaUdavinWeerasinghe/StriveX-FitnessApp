@@ -11,7 +11,9 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Plus,
+  Receipt
 } from 'lucide-react';
 
 const INITIAL_TRANSACTIONS = [
@@ -121,6 +123,7 @@ const TIER_FILTER_OPTIONS = [
 export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false }) => {
   const { addToast } = useToast();
 
+  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [tierFilter, setTierFilter] = useState('all');
@@ -128,9 +131,25 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // New Transaction Form State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newMember, setNewMember] = useState('Alex Mercer');
+  const [newTier, setNewTier] = useState('Pro Athlete');
+  const [newAmount, setNewAmount] = useState('89.00');
+  const [newMethod, setNewMethod] = useState('Visa •••• 8892');
+  const [newStatus, setNewStatus] = useState('completed');
+
+  // Dynamic Gross MRR calculation
+  const grossMRR = useMemo(() => {
+    const total = transactions
+      .filter((tx) => tx.status === 'completed')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    return total + 47400; // Base MRR constant plus recorded ledger totals
+  }, [transactions]);
+
   // Filtered transactions
   const filteredTransactions = useMemo(() => {
-    return INITIAL_TRANSACTIONS.filter((tx) => {
+    return transactions.filter((tx) => {
       const matchesSearch =
         tx.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.member.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -139,7 +158,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
       const matchesTier = tierFilter === 'all' || tx.tier.includes(tierFilter);
       return matchesSearch && matchesStatus && matchesTier;
     });
-  }, [searchQuery, statusFilter, tierFilter]);
+  }, [transactions, searchQuery, statusFilter, tierFilter]);
 
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage) || 1;
   const paginatedTransactions = filteredTransactions.slice(
@@ -159,6 +178,45 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
 
   const handlePrintReceipt = (tx) => {
     setSelectedReceipt(tx);
+  };
+
+  const handleCreateTransaction = (e) => {
+    e.preventDefault();
+    if (!newMember || !newAmount) {
+      addToast({
+        type: 'error',
+        title: 'Validation Failed',
+        message: 'Please provide athlete member name and billing amount.'
+      });
+      return;
+    }
+
+    const numAmount = parseFloat(newAmount) || 0;
+    const nextTxNum = 99413 + (transactions.length - INITIAL_TRANSACTIONS.length);
+    const nextInvNum = 882 + (transactions.length - INITIAL_TRANSACTIONS.length);
+    const now = new Date();
+    const formattedDate = `${now.toISOString().split('T')[0]} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+    const newTx = {
+      id: `TX-${nextTxNum}`,
+      date: formattedDate,
+      member: newMember,
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop',
+      tier: newTier,
+      amount: numAmount,
+      method: newMethod,
+      status: newStatus,
+      invoiceNumber: `INV-2026-${String(nextInvNum).padStart(4, '0')}`
+    };
+
+    setTransactions((prev) => [newTx, ...prev]);
+    setIsCreateModalOpen(false);
+
+    addToast({
+      type: 'success',
+      title: 'New Transaction Recorded',
+      message: `${newTx.id} ($${numAmount.toFixed(2)}) billed for ${newMember}`
+    });
   };
 
   const cardContent = (
@@ -221,8 +279,18 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           <button
             type="button"
-            onClick={handleExportCSV}
+            onClick={() => setIsCreateModalOpen(true)}
             className="kinetic-btn-primary"
+            style={{ padding: '8px 18px', fontSize: '0.82rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0, boxShadow: '0 0 16px var(--accent-glow)' }}
+          >
+            <Plus size={15} />
+            <span>Record Manual Transaction</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="kinetic-btn-secondary"
             style={{ padding: '8px 18px', fontSize: '0.82rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             <Download size={15} />
@@ -261,7 +329,9 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
           </div>
           <div>
             <div className="type-caption">GROSS MRR</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>$48,250.00</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+              ${grossMRR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
           </div>
         </div>
 
@@ -543,10 +613,161 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
     </div>
   );
 
+  const createTransactionOverlay = isCreateModalOpen && (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0, 0, 0, 0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        padding: '16px'
+      }}
+      onClick={() => setIsCreateModalOpen(false)}
+    >
+      <div
+        className="kinetic-card animate-scale-up"
+        style={{
+          width: '100%',
+          maxWidth: '520px',
+          padding: '28px',
+          background: 'var(--surface-elevated)',
+          border: '1px solid var(--border-hover)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.8)'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Receipt size={20} color="var(--accent)" />
+            <h4 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
+              Record Manual Transaction
+            </h4>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(false)}
+            style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleCreateTransaction} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', uppercase: 'true', marginBottom: '6px' }}>
+              ATHLETE / MEMBER NAME
+            </label>
+            <input
+              type="text"
+              required
+              value={newMember}
+              onChange={(e) => setNewMember(e.target.value)}
+              placeholder="e.g. Alex Mercer"
+              className="kinetic-input"
+              style={{ width: '100%', padding: '10px 14px', fontSize: '0.88rem' }}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                PLAN TIER / ITEM
+              </label>
+              <CustomDropdown
+                options={[
+                  { value: 'Elite Athlete', label: 'Elite Athlete ($89.00)' },
+                  { value: 'Elite Annual Plan', label: 'Elite Annual Plan ($468.00)' },
+                  { value: 'Pro Athlete', label: 'Pro Athlete ($49.00)' },
+                  { value: 'Starter Access', label: 'Starter Access ($29.00)' },
+                  { value: 'Personal Coaching Pack', label: 'Personal Coaching Pack ($150.00)' }
+                ]}
+                value={newTier}
+                onChange={setNewTier}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                AMOUNT ($ USD)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                required
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+                placeholder="89.00"
+                className="kinetic-input"
+                style={{ width: '100%', padding: '10px 14px', fontSize: '0.88rem', fontWeight: 800, color: 'var(--accent)' }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                PAYMENT METHOD
+              </label>
+              <CustomDropdown
+                options={[
+                  { value: 'Visa •••• 8892', label: 'Visa •••• 8892' },
+                  { value: 'Mastercard •••• 4012', label: 'Mastercard •••• 4012' },
+                  { value: 'Apple Pay', label: 'Apple Pay' },
+                  { value: 'Cash / Front Desk POS', label: 'Cash / Front Desk POS' },
+                  { value: 'Bank Wire Transfer', label: 'Bank Wire Transfer' }
+                ]}
+                value={newMethod}
+                onChange={setNewMethod}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                PAYMENT STATUS
+              </label>
+              <CustomDropdown
+                options={[
+                  { value: 'completed', label: 'Completed' },
+                  { value: 'refunded', label: 'Refunded' }
+                ]}
+                value={newStatus}
+                onChange={setNewStatus}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="kinetic-btn-ghost"
+              style={{ flex: 1, padding: '12px', fontSize: '0.88rem' }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="kinetic-btn-primary"
+              style={{ flex: 1, padding: '12px', fontSize: '0.88rem', fontWeight: 800 }}
+            >
+              Submit Transaction Entry
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
   if (isInline) {
     return (
       <div style={{ width: '100%' }}>
         {cardContent}
+        {createTransactionOverlay}
         {/* Official Receipt Inspection Modal */}
         {selectedReceipt && (
           <div
@@ -645,24 +866,27 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9995,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.9)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        padding: '20px'
-      }}
-      onClick={onClose}
-    >
-      <div style={{ width: '100%', maxWidth: '1080px' }}>
-        {cardContent}
+    <>
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9995,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          padding: '20px'
+        }}
+        onClick={onClose}
+      >
+        <div style={{ width: '100%', maxWidth: '1080px' }}>
+          {cardContent}
+        </div>
       </div>
-    </div>
+      {createTransactionOverlay}
+    </>
   );
 };
