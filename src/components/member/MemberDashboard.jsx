@@ -430,73 +430,47 @@ export const MemberDashboard = () => {
                 </div>
               </div>
 
-              {/* Weekly Streak & Recent Activity Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                {/* Weekly Check-in Calendar */}
-                <div className="kinetic-card" style={{ padding: '24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>Weekly Workout Adherence</h4>
-                    <span className="kinetic-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--status-success)' }}>5-Day Streak 🔥</span>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
-                    {[
-                      { day: 'M', done: true, title: 'Push Day A' },
-                      { day: 'T', done: true, title: 'Pull Day B' },
-                      { day: 'W', done: true, title: 'HIIT Cardio' },
-                      { day: 'T', done: true, title: 'Legs Day C' },
-                      { day: 'F', done: true, title: 'Upper Power' },
-                      { day: 'S', done: false, isToday: true, title: 'Today' },
-                      { day: 'S', done: false, title: 'Rest Day' }
-                    ].map((item, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          padding: '12px 6px',
-                          borderRadius: 'var(--radius-md)',
-                          background: item.isToday ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
-                          border: item.isToday ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: item.isToday ? 'var(--accent)' : 'var(--text-tertiary)' }}>{item.day}</span>
-                        {item.done ? (
-                          <CheckCircle2 size={16} color="var(--status-success)" />
-                        ) : (
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.isToday ? 'var(--accent)' : 'var(--border-subtle)' }} />
-                        )}
-                        <span style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
-                          {item.title}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              {/* Weekly Streak Row */}
+              <div className="kinetic-card" style={{ padding: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>Weekly Workout Adherence</h4>
+                  <span className="kinetic-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--status-success)' }}>5-Day Streak 🔥</span>
                 </div>
 
-                {/* Rest & Recovery Telemetry */}
-                <div className="kinetic-card" style={{ padding: '24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>Recovery & Readiness Score</h4>
-                    <span style={{ fontWeight: 900, color: 'var(--status-success)', fontSize: '1rem' }}>92% Optimal</span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="type-caption">WHOOP HRV Recovery</span>
-                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem' }}>84 ms (Green Zone)</strong>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
+                  {[
+                    { day: 'M', done: true, title: 'Push Day A' },
+                    { day: 'T', done: true, title: 'Pull Day B' },
+                    { day: 'W', done: true, title: 'HIIT Cardio' },
+                    { day: 'T', done: true, title: 'Legs Day C' },
+                    { day: 'F', done: true, title: 'Upper Power' },
+                    { day: 'S', done: false, isToday: true, title: 'Today' },
+                    { day: 'S', done: false, title: 'Rest Day' }
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '12px 6px',
+                        borderRadius: 'var(--radius-md)',
+                        background: item.isToday ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
+                        border: item.isToday ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: item.isToday ? 'var(--accent)' : 'var(--text-tertiary)' }}>{item.day}</span>
+                      {item.done ? (
+                        <CheckCircle2 size={16} color="var(--status-success)" />
+                      ) : (
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.isToday ? 'var(--accent)' : 'var(--border-subtle)' }} />
+                      )}
+                      <span style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
+                        {item.title}
+                      </span>
                     </div>
-                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="type-caption">Sleep Efficiency</span>
-                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem' }}>7h 48m (89% Deep Sleep)</strong>
-                    </div>
-                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="type-caption">Resting Heart Rate</span>
-                      <strong style={{ color: 'var(--status-success)', fontSize: '0.88rem' }}>52 bpm (Optimal)</strong>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </>
