@@ -630,7 +630,7 @@ export const MemberDashboard = () => {
           {activeTab === 'analytics' && (
             <>
               {/* Top Analytics Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
                 <div className="kinetic-card" style={{ padding: '28px' }}>
                   <span className="type-caption">Monthly Tonnage Volume</span>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: 'var(--accent)', marginTop: '6px' }}>
@@ -642,27 +642,17 @@ export const MemberDashboard = () => {
                 </div>
 
                 <div className="kinetic-card" style={{ padding: '28px' }}>
-                  <span className="type-caption">Body Weight Trend</span>
+                  <span className="type-caption">Current Body Weight</span>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: '#06b6d4', marginTop: '6px' }}>
                     78.4 kg
                   </div>
                   <p className="type-caption" style={{ marginTop: '6px', color: 'var(--text-secondary)' }}>
-                    Lean muscle accretion trajectory locked
-                  </p>
-                </div>
-
-                <div className="kinetic-card" style={{ padding: '28px' }}>
-                  <span className="type-caption">Estimated Body Fat %</span>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: '#f59e0b', marginTop: '6px' }}>
-                    12.8%
-                  </div>
-                  <p className="type-caption" style={{ marginTop: '6px', color: 'var(--status-success)', fontWeight: 700 }}>
-                    -1.2% reduction in fat mass
+                    Lean muscle accretion trajectory locked (12.8% Est Fat)
                   </p>
                 </div>
               </div>
 
-              {/* Volume Load Trajectory Visual Bar Chart & Body Metrics Timeline */}
+              {/* Volume Load Trajectory Visual Bar Chart & Body Weight Section */}
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
                 {/* Visual Bar Graph Widget */}
                 <div className="kinetic-card" style={{ padding: '32px' }}>
@@ -701,24 +691,51 @@ export const MemberDashboard = () => {
                   </div>
                 </div>
 
-                {/* Body Composition Milestone Checkpoint */}
+                {/* Configured Body Weight & Composition Section */}
                 <div className="kinetic-card" style={{ padding: '32px' }}>
-                  <h3 className="type-h3" style={{ margin: '0 0 16px 0', fontSize: '1.1rem' }}>Body Scan History</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 className="type-h3" style={{ margin: 0, fontSize: '1.1rem' }}>Body Weight Tracker</h3>
+                    <span className="kinetic-badge" style={{ fontSize: '0.66rem' }}>Target: 76.0 kg</span>
+                  </div>
+
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {[
-                      { date: 'Sep 01 (InBody Scan)', weight: '78.4 kg', fat: '12.8%', muscle: '38.2 kg' },
-                      { date: 'Aug 15 (InBody Scan)', weight: '79.1 kg', fat: '13.4%', muscle: '37.8 kg' },
-                      { date: 'Aug 01 (Baseline Scan)', weight: '80.0 kg', fat: '14.0%', muscle: '37.4 kg' }
-                    ].map((scan, idx) => (
-                      <div key={idx} style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
-                        <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '4px' }}>{scan.date}</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--text-primary)', fontWeight: 700 }}>
-                          <span>{scan.weight}</span>
-                          <span style={{ color: '#06b6d4' }}>{scan.muscle} Muscle</span>
-                          <span style={{ color: '#f59e0b' }}>{scan.fat} Fat</span>
-                        </div>
+                    {/* Quick Weight Logger Bar */}
+                    <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                      <label className="type-caption" style={{ display: 'block', marginBottom: '6px' }}>Log Fasted Morning Weight</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="number"
+                          step="0.1"
+                          placeholder="e.g. 78.2"
+                          className="kinetic-input"
+                          style={{ padding: '6px 10px', fontSize: '0.82rem', width: '100px' }}
+                        />
+                        <button type="button" className="kinetic-btn-primary" style={{ padding: '6px 12px', fontSize: '0.76rem', flex: 1 }}>
+                          Log Weight
+                        </button>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Weight History Log Timeline */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>Weight History Trend</span>
+                      {[
+                        { date: 'Today (Fasted)', weight: '78.4 kg', change: '-0.3 kg', status: 'optimal' },
+                        { date: 'Sep 01', weight: '78.7 kg', change: '-0.4 kg', status: 'optimal' },
+                        { date: 'Aug 15', weight: '79.1 kg', change: '-0.9 kg', status: 'optimal' },
+                        { date: 'Aug 01 (Baseline)', weight: '80.0 kg', change: 'Start', status: 'start' }
+                      ].map((log, idx) => (
+                        <div key={idx} style={{ padding: '10px 12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block' }}>{log.weight}</span>
+                            <span className="type-caption" style={{ fontSize: '0.68rem' }}>{log.date}</span>
+                          </div>
+                          <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: log.status === 'optimal' ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-elevated)', color: log.status === 'optimal' ? 'var(--status-success)' : 'var(--text-secondary)' }}>
+                            {log.change}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

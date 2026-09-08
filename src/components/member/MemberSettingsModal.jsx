@@ -206,7 +206,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
         >
           {[
             { id: 'profile', label: 'Athlete Profile', icon: User },
-            { id: 'biometrics', label: 'Biometric Targets', icon: Target },
+            { id: 'biometrics', label: 'Biometrics', icon: Target },
             { id: 'membership', label: 'Membership & Tier', icon: CreditCard },
             { id: 'preferences', label: 'App Preferences', icon: Bell }
           ].map((tab) => {
