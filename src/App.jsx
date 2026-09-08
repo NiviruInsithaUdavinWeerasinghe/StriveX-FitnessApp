@@ -175,12 +175,16 @@ function StriveXApp() {
   );
 }
 
+import { BroadcastProvider } from './context/BroadcastContext';
+
 export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <StriveXApp />
+          <BroadcastProvider>
+            <StriveXApp />
+          </BroadcastProvider>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>

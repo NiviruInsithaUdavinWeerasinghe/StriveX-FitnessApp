@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useToast } from '../../context/ToastContext';
+import { useBroadcast } from '../../context/BroadcastContext';
 import { ActiveWorkoutModal } from './ActiveWorkoutModal';
 import { MemberSettingsModal } from './MemberSettingsModal';
 import { MemberChatModal } from './MemberChatModal';
+import { LiveBroadcastBanner } from '../ui/LiveBroadcastBanner';
+import { NotificationDrawerModal } from '../ui/NotificationDrawerModal';
 import {
   Flame,
   Heart,
@@ -138,6 +142,10 @@ export const MemberDashboard = () => {
   const [newMealP, setNewMealP] = useState('25');
   const [newMealC, setNewMealC] = useState('30');
   const [newMealF, setNewMealF] = useState('8');
+
+  // Notification Drawer state
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
+  const { unreadCount } = useBroadcast();
 
   // Selected routine
   const [selectedRoutineId, setSelectedRoutineId] = useState(availableRoutines[0]?.id || 'push_a');
@@ -341,6 +349,9 @@ export const MemberDashboard = () => {
 
       {/* MAIN CONTENT SPACE */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+        {/* LIVE BROADCAST BANNER AT TOP */}
+        <LiveBroadcastBanner userRole="member" />
+
         {/* Top Header */}
         <header
           style={{
@@ -370,6 +381,39 @@ export const MemberDashboard = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Notification Bell Button */}
+            <button
+              type="button"
+              onClick={() => setIsNotificationDrawerOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '8px', position: 'relative' }}
+              title="Notification Center & Announcements"
+            >
+              <Zap size={18} color="var(--accent)" />
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-4px',
+                    right: '-4px',
+                    background: '#ff3b30',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: '18px',
+                    height: '18px',
+                    fontSize: '0.65rem',
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid var(--bg-primary)'
+                  }}
+                >
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
             {/* Quick Testing Toggle */}
             <button
               type="button"
@@ -1321,6 +1365,13 @@ export const MemberDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* NOTIFICATION DRAWER MODAL */}
+      <NotificationDrawerModal
+        isOpen={isNotificationDrawerOpen}
+        onClose={() => setIsNotificationDrawerOpen(false)}
+        userRole="member"
+      />
     </div>
   );
 };

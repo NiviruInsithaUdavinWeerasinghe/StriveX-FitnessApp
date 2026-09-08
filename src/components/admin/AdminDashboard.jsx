@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { useBroadcast } from '../../context/BroadcastContext';
 import {
   ShieldCheck,
   Users,
@@ -122,8 +123,9 @@ export const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { addToast } = useToast();
+  const { sendBroadcast } = useBroadcast();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'financials' | 'staff' | 'equipment'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'financials' | 'staff'
   const [activeLogFilter, setActiveLogFilter] = useState('all');
   const [searchAudit, setSearchAudit] = useState('');
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
@@ -148,6 +150,12 @@ export const AdminDashboard = () => {
       });
       return;
     }
+
+    sendBroadcast({
+      title: 'Live Facility Announcement',
+      message: broadcastMessage,
+      audience: broadcastAudience
+    });
 
     addToast({
       type: 'success',

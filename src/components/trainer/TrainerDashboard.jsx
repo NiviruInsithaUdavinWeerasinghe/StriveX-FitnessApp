@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useBroadcast } from '../../context/BroadcastContext';
 import { RoutineBuilderModal } from './RoutineBuilderModal';
 import { TrainerConsultationHubModal } from './TrainerConsultationHubModal';
 import { TrainerChatModal } from './TrainerChatModal';
+import { LiveBroadcastBanner } from '../ui/LiveBroadcastBanner';
+import { NotificationDrawerModal } from '../ui/NotificationDrawerModal';
 import {
   Users,
   Search,
@@ -17,7 +20,8 @@ import {
   LogOut,
   Activity,
   LayoutDashboard,
-  Dumbbell
+  Dumbbell,
+  Zap
 } from 'lucide-react';
 
 const INITIAL_CLIENTS = [
@@ -124,12 +128,14 @@ const TODAY_CONSULTATIONS = [
 export const TrainerDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { unreadCount } = useBroadcast();
 
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'builder' | 'consultations' | 'chat'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGoalFilter, setSelectedGoalFilter] = useState('All');
 
   // Modals / Selected targets
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const [builderTargetClient, setBuilderTargetClient] = useState(null);
   const [chatTargetClientId, setChatTargetClientId] = useState('cli_1');
   const [consultHubTargetClient, setConsultHubTargetClient] = useState(null);
@@ -278,6 +284,9 @@ export const TrainerDashboard = () => {
 
       {/* MAIN CONTENT AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+        {/* LIVE BROADCAST BANNER AT TOP */}
+        <LiveBroadcastBanner userRole="trainer" />
+
         {/* Top Header */}
         <header
           style={{
@@ -306,6 +315,39 @@ export const TrainerDashboard = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Notification Bell Button */}
+            <button
+              type="button"
+              onClick={() => setIsNotificationDrawerOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '8px', position: 'relative' }}
+              title="Notification Center & Announcements"
+            >
+              <Zap size={18} color="var(--accent)" />
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-4px',
+                    right: '-4px',
+                    background: '#ff3b30',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: '18px',
+                    height: '18px',
+                    fontSize: '0.65rem',
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid var(--bg-primary)'
+                  }}
+                >
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
             <button
               type="button"
               onClick={() => setActiveTab('builder')}
@@ -537,6 +579,13 @@ export const TrainerDashboard = () => {
           )}
         </main>
       </div>
+
+      {/* NOTIFICATION DRAWER MODAL */}
+      <NotificationDrawerModal
+        isOpen={isNotificationDrawerOpen}
+        onClose={() => setIsNotificationDrawerOpen(false)}
+        userRole="trainer"
+      />
     </div>
   );
 };
