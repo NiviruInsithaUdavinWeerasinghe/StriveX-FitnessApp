@@ -29,7 +29,12 @@ import {
   ShieldCheck,
   ArrowUpRight,
   Filter,
-  Package
+  Package,
+  Eye,
+  X,
+  Star,
+  CheckCircle,
+  Truck
 } from 'lucide-react';
 
 const ROUTINES = [
@@ -92,12 +97,12 @@ const PERSONAL_RECORDS = [
 ];
 
 const STORE_PRODUCTS = [
-  { id: 'p1', name: 'StriveX Iso-Whey Protein Isolate (2kg)', price: '$64.99', orig: '$75.00', category: 'Supplements', tag: 'Best Seller', rating: '4.9 ★', desc: '100% Cold-filtered whey isolate with 27g protein per scoop.' },
-  { id: 'p2', name: 'Creatine Monohydrate Pure (500g)', price: '$29.99', orig: '$35.00', category: 'Supplements', tag: 'Essential', rating: '5.0 ★', desc: 'Micronized 200-mesh pure creatine monohydrate for ATP burst.' },
-  { id: 'p3', name: 'StriveX Pro Barbell Lifting Straps', price: '$19.99', orig: '$24.00', category: 'Gear', tag: 'Gear', rating: '4.8 ★', desc: 'Heavy-duty cotton webbing with neoprene wrist padding.' },
-  { id: 'p4', name: 'Pre-Workout Telemetry Matrix (400g)', price: '$44.99', orig: '$52.00', category: 'Supplements', tag: 'Energy', rating: '4.9 ★', desc: 'L-Citrulline Malate 8g + Beta-Alanine 3.2g explosive pump.' },
-  { id: 'p5', name: 'StriveX Seamless Compression Top', price: '$39.99', orig: '$48.00', category: 'Apparel', tag: 'New Release', rating: '4.7 ★', desc: 'Four-way stretch sweat-wicking athletic compression weave.' },
-  { id: 'p6', name: 'BCAA Electrolyte Intra-Hydration', price: '$34.99', orig: '$40.00', category: 'Supplements', tag: 'Recovery', rating: '4.9 ★', desc: '2:1:1 Instantiated BCAAs with Pink Himalayan Salt minerals.' }
+  { id: 'p1', name: 'StriveX Iso-Whey Protein Isolate (2kg)', price: '$64.99', orig: '$75.00', category: 'Supplements', tag: 'Best Seller', inStock: true, rating: '4.9 ★', desc: '100% Cold-filtered whey isolate with 27g protein per scoop.', image: '/products/whey.jpg' },
+  { id: 'p2', name: 'Creatine Monohydrate Pure (500g)', price: '$29.99', orig: '$35.00', category: 'Supplements', tag: 'Essential', inStock: true, rating: '5.0 ★', desc: 'Micronized 200-mesh pure creatine monohydrate for ATP burst.', image: '/products/creatine.jpg' },
+  { id: 'p3', name: 'StriveX Pro Barbell Lifting Straps', price: '$19.99', orig: '$24.00', category: 'Gear', tag: 'Gear', inStock: true, rating: '4.8 ★', desc: 'Heavy-duty cotton webbing with neoprene wrist padding.', image: '/products/straps.jpg' },
+  { id: 'p4', name: 'Pre-Workout Telemetry Matrix (400g)', price: '$44.99', orig: '$52.00', category: 'Supplements', tag: 'Energy', inStock: false, rating: '4.9 ★', desc: 'L-Citrulline Malate 8g + Beta-Alanine 3.2g explosive pump.', image: '/products/preworkout.jpg' },
+  { id: 'p5', name: 'StriveX Seamless Compression Top', price: '$39.99', orig: '$48.00', category: 'Apparel', tag: 'New Release', inStock: true, rating: '4.7 ★', desc: 'Four-way stretch sweat-wicking athletic compression weave.', image: '/products/compression.jpg' },
+  { id: 'p6', name: 'BCAA Electrolyte Intra-Hydration', price: '$34.99', orig: '$40.00', category: 'Supplements', tag: 'Recovery', inStock: true, rating: '4.9 ★', desc: '2:1:1 Instantiated BCAAs with Pink Himalayan Salt minerals.', image: '/products/bcaa.jpg' }
 ];
 
 export const MemberDashboard = () => {
@@ -112,6 +117,7 @@ export const MemberDashboard = () => {
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLogMealOpen, setIsLogMealOpen] = useState(false);
+  const [selectedProductModal, setSelectedProductModal] = useState(null);
 
   // Meal logs state
   const [mealLogs, setMealLogs] = useState(MEAL_LOGS);
@@ -855,8 +861,48 @@ export const MemberDashboard = () => {
                     }}
                   >
                     <div>
+                      {/* Product Image Thumbnail */}
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '160px',
+                          borderRadius: 'var(--radius-md)',
+                          overflow: 'hidden',
+                          marginBottom: '14px',
+                          background: 'var(--surface-elevated)',
+                          border: '1px solid var(--border-subtle)',
+                          position: 'relative'
+                        }}
+                      >
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
+                      </div>
+
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                        <span className="kinetic-badge" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>{p.tag}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className="kinetic-badge" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>{p.tag}</span>
+                          <span
+                            style={{
+                              fontSize: '0.66rem',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-pill)',
+                              background: p.inStock ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                              color: p.inStock ? 'var(--status-success)' : '#ef4444',
+                              border: `1px solid ${p.inStock ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                            }}
+                          >
+                            {p.inStock ? 'In Stock' : 'Out of Stock'}
+                          </span>
+                        </div>
                         <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 800 }}>{p.rating}</span>
                       </div>
                       <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 8px 0', color: 'var(--text-primary)', lineHeight: '1.3' }}>{p.name}</h4>
@@ -869,8 +915,13 @@ export const MemberDashboard = () => {
                         <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', textDecoration: 'line-through', marginLeft: '8px' }}>{p.orig}</span>
                       </div>
 
-                      <button type="button" className="kinetic-btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
-                        <ShoppingBag size={14} /> Add to Cart
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProductModal(p)}
+                        className="kinetic-btn-secondary"
+                        style={{ padding: '8px 16px', fontSize: '0.8rem', gap: '6px' }}
+                      >
+                        <Eye size={14} /> View Details
                       </button>
                     </div>
                   </div>
@@ -1033,6 +1084,174 @@ export const MemberDashboard = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Product Details Modal */}
+      {selectedProductModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9996,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            padding: '20px'
+          }}
+          onClick={() => setSelectedProductModal(null)}
+        >
+          <div
+            className="kinetic-card"
+            style={{
+              width: '100%',
+              maxWidth: '520px',
+              padding: '32px',
+              background: 'var(--surface-elevated)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+              animation: 'modalSlide 0.25s ease-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <span className="kinetic-badge" style={{ fontSize: '0.7rem', padding: '3px 10px' }}>
+                    {selectedProductModal.tag}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
+                      padding: '3px 10px',
+                      borderRadius: 'var(--radius-pill)',
+                      background: selectedProductModal.inStock ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: selectedProductModal.inStock ? 'var(--status-success)' : '#ef4444',
+                      border: `1px solid ${selectedProductModal.inStock ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                    }}
+                  >
+                    {selectedProductModal.inStock ? 'In Stock' : 'Out of Stock'}
+                  </span>
+                </div>
+                <h3 className="type-h3" style={{ margin: 0, fontSize: '1.35rem' }}>{selectedProductModal.name}</h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedProductModal(null)}
+                style={{
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Product Image Showcase Banner */}
+            <div
+              style={{
+                width: '100%',
+                height: '200px',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
+              <img
+                src={selectedProductModal.image}
+                alt={selectedProductModal.name}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
+
+            {/* Price & Rating */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+              <div>
+                <span className="type-caption" style={{ display: 'block', color: 'var(--text-tertiary)' }}>Member Tier Price</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '2px' }}>
+                  <span style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>{selectedProductModal.price}</span>
+                  <span style={{ fontSize: '0.88rem', color: 'var(--text-tertiary)', textDecoration: 'line-through' }}>{selectedProductModal.orig}</span>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <span className="type-caption" style={{ display: 'block', color: 'var(--text-tertiary)' }}>Verified Rating</span>
+                <span style={{ fontSize: '1rem', fontWeight: 800, color: '#f59e0b', marginTop: '2px', display: 'block' }}>{selectedProductModal.rating}</span>
+              </div>
+            </div>
+
+            {/* Product Overview */}
+            <div>
+              <h5 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-tertiary)', margin: '0 0 8px 0' }}>Product Telemetry & Specs</h5>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
+                {selectedProductModal.desc} Formulated specifically for StriveX high-performance athletes requiring maximum cellular absorption and rapid recovery telemetry.
+              </p>
+            </div>
+
+            {/* Specifications Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <ShieldCheck size={18} color="var(--accent)" />
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', display: 'block' }}>Quality Guarantee</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>Lab Tested Pure</span>
+                </div>
+              </div>
+
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Truck size={18} color="#06b6d4" />
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', display: 'block' }}>Facility Delivery</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>Same-Day Locker</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedProductModal(null)}
+                className="kinetic-btn-ghost"
+                style={{ flex: 1 }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  alert(`Added ${selectedProductModal.name} to cart!`);
+                  setSelectedProductModal(null);
+                }}
+                className="kinetic-btn-primary"
+                style={{ flex: 2, opacity: selectedProductModal.inStock ? 1 : 0.6, cursor: selectedProductModal.inStock ? 'pointer' : 'not-allowed' }}
+                disabled={!selectedProductModal.inStock}
+              >
+                <ShoppingBag size={16} />
+                <span>{selectedProductModal.inStock ? 'Reserve Product' : 'Out of Stock'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
