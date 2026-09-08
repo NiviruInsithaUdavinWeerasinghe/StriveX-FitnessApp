@@ -14,7 +14,19 @@ export const CustomDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const selectedOption = options.find((opt) => opt.value === value);
+  // Normalize options array to uniform object structure
+  const normalizedOptions = options.map((opt) => {
+    if (typeof opt === 'object' && opt !== null) {
+      return {
+        label: opt.label !== undefined ? opt.label : String(opt.value),
+        value: opt.value,
+        icon: opt.icon
+      };
+    }
+    return { label: String(opt), value: String(opt) };
+  });
+
+  const selectedOption = normalizedOptions.find((opt) => opt.value === value);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -40,18 +52,18 @@ export const CustomDropdown = ({
       if (!isOpen) {
         setIsOpen(true);
       } else {
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        const nextIndex = (currentIndex + 1) % options.length;
-        onChange(options[nextIndex].value);
+        const currentIndex = normalizedOptions.findIndex((opt) => opt.value === value);
+        const nextIndex = (currentIndex + 1) % normalizedOptions.length;
+        onChange(normalizedOptions[nextIndex].value);
       }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (!isOpen) {
         setIsOpen(true);
       } else {
-        const currentIndex = options.findIndex((opt) => opt.value === value);
-        const prevIndex = (currentIndex - 1 + options.length) % options.length;
-        onChange(options[prevIndex].value);
+        const currentIndex = normalizedOptions.findIndex((opt) => opt.value === value);
+        const prevIndex = (currentIndex - 1 + normalizedOptions.length) % normalizedOptions.length;
+        onChange(normalizedOptions[prevIndex].value);
       }
     }
   };
@@ -151,7 +163,7 @@ export const CustomDropdown = ({
             WebkitBackdropFilter: 'var(--blur-card)'
           }}
         >
-          {options.map((option) => {
+          {normalizedOptions.map((option) => {
             const isSelected = option.value === value;
             return (
               <div
