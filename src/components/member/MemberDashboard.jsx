@@ -34,7 +34,8 @@ import {
   X,
   Star,
   CheckCircle,
-  Truck
+  Truck,
+  UserCheck
 } from 'lucide-react';
 
 const ROUTINES = [
@@ -108,6 +109,9 @@ const STORE_PRODUCTS = [
 export const MemberDashboard = () => {
   const { user, logout, publishedRoutines } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  // Mode toggle state for testing
+  const [isCoachedMode, setIsCoachedMode] = useState(!!user?.assignedTrainer);
 
   // Navigation tab
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'nutrition' | 'analytics' | 'store' | 'chat'
@@ -366,6 +370,18 @@ export const MemberDashboard = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Quick Testing Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsCoachedMode((prev) => !prev)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '0.76rem', gap: '6px' }}
+              title="Toggle coach assignment to test both tracking modes"
+            >
+              <UserCheck size={14} color="var(--accent)" />
+              <span>{isCoachedMode ? 'Mode: Coached (Alex)' : 'Mode: Self-Guided'}</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setIsWorkoutModalOpen(true)}
@@ -430,23 +446,20 @@ export const MemberDashboard = () => {
                 </div>
               </div>
 
-              {/* Program Details Card */}
-              <div className="kinetic-card" style={{ padding: '28px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
-                      {userPublishedRoutines.some((r) => r.id === activeRoutine?.id) && (
+              {/* Program Details Card / Direct Inline Execution */}
+              {isCoachedMode ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
                         <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: 'rgba(212, 255, 0, 0.15)', color: 'var(--accent)' }}>
-                          CUSTOM COACH PROGRAM
+                          ASSIGNED BY {user.assignedTrainer.toUpperCase()}
                         </span>
-                      )}
+                      </div>
+                      <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
                     </div>
-                    <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
-                    <p className="type-caption" style={{ margin: '4px 0 0' }}>Assigned by {activeRoutine.coach} • Est. {activeRoutine.duration}</p>
-                  </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {availableRoutines.length > 1 && (
                       <select
                         value={selectedRoutineId}
@@ -461,22 +474,56 @@ export const MemberDashboard = () => {
                         ))}
                       </select>
                     )}
-
-                    <button
-                      type="button"
-                      onClick={() => setIsWorkoutModalOpen(true)}
-                      className="kinetic-btn-primary"
-                      style={{ padding: '10px 20px', fontSize: '0.88rem' }}
-                    >
-                      <Dumbbell size={16} />
-                      <span>Launch Active Workout Tracker</span>
-                    </button>
                   </div>
-                </div>
 
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '20px', lineHeight: '1.5' }}>
-                  {activeRoutine.description}
-                </p>
+                  <ActiveWorkoutModal
+                    isOpen={true}
+                    isInline={true}
+                    isCoachPrescribed={true}
+                    activeRoutine={activeRoutine}
+                    onWorkoutCompleted={handleWorkoutCompleted}
+                  />
+                </div>
+              ) : (
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>SELF-GUIDED WORKOUT PROGRAM</span>
+                      <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
+                      <p className="type-caption" style={{ margin: '4px 0 0' }}>StriveX Program Library • {activeRoutine.split} • Est. {activeRoutine.duration}</p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {availableRoutines.length > 1 && (
+                        <select
+                          value={selectedRoutineId}
+                          onChange={(e) => setSelectedRoutineId(e.target.value)}
+                          className="kinetic-input"
+                          style={{ padding: '8px 12px', fontSize: '0.82rem', background: 'var(--surface-input)', minWidth: '180px' }}
+                        >
+                          {availableRoutines.map((r) => (
+                            <option key={r.id} value={r.id}>
+                              {r.title}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setIsWorkoutModalOpen(true)}
+                        className="kinetic-btn-primary"
+                        style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+                      >
+                        <Dumbbell size={16} />
+                        <span>Launch Active Workout Tracker</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '20px', lineHeight: '1.5' }}>
+                    {activeRoutine.description}
+                  </p>
 
                 {/* Exercises Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
@@ -504,6 +551,7 @@ export const MemberDashboard = () => {
                   ))}
                 </div>
               </div>
+            )}
 
               {/* Weekly Streak Row */}
               <div className="kinetic-card" style={{ padding: '24px' }}>

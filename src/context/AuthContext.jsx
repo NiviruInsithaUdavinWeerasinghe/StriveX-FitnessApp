@@ -20,6 +20,22 @@ const DEMO_USERS = {
     assignedTrainer: 'Coach Marcus Vance',
     joinedDate: 'Jan 2026'
   },
+  selfGuidedMember: {
+    id: 'usr_mem_02',
+    name: 'Jordan Lee (Self-Guided)',
+    email: 'jordan.lee@strivex.fit',
+    phone: '0719876543',
+    role: 'member',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop',
+    tier: 'Starter Member',
+    streakDays: 2,
+    todayCalories: 420,
+    targetCalories: 750,
+    activeMinutes: 30,
+    targetMinutes: 60,
+    assignedTrainer: null, // No coach assigned
+    joinedDate: 'Feb 2026'
+  },
   trainer: {
     id: 'usr_trn_01',
     name: 'Coach Marcus Vance',

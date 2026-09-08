@@ -23,12 +23,13 @@ const EXERCISE_DATABASE = [
   { id: 'lib_6', name: 'Leg Press 45°', muscle: 'Quadriceps & Glutes', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=250&auto=format&fit=crop', defaultWeight: 180, defaultReps: 10 }
 ];
 
-export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, activeRoutine }) => {
+export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, activeRoutine, isInline = false, isCoachPrescribed = false }) => {
   const { addToast } = useToast();
 
   // Workout live timer state
   const [seconds, setSeconds] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   // Rest interval countdown timer state
   const [restSeconds, setRestSeconds] = useState(0);
@@ -67,13 +68,13 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
   // Main workout elapsed timer effect
   useEffect(() => {
     let interval = null;
-    if (isOpen && isTimerRunning && !isSummaryOpen) {
+    if ((isOpen || isInline) && isTimerRunning && !isSummaryOpen) {
       interval = setInterval(() => {
         setSeconds((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isOpen, isTimerRunning, isSummaryOpen]);
+  }, [isOpen, isInline, isTimerRunning, isSummaryOpen]);
 
   // Rest timer countdown effect
   useEffect(() => {
@@ -92,7 +93,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
     return () => clearInterval(restInterval);
   }, [isRestActive, restSeconds]);
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
   // Format MM:SS
   const formatTime = (secs) => {
@@ -210,38 +211,24 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
       item.muscle.toLowerCase().includes(librarySearch.toLowerCase())
   );
 
-  return (
+  const contentUI = (
     <div
+      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
       style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9990,
+        width: '100%',
+        maxWidth: isInline ? '100%' : '880px',
+        height: isInline ? '560px' : 'auto',
+        maxHeight: isInline ? '560px' : '92vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.88)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        padding: '16px'
+        flexDirection: 'column',
+        background: 'var(--surface-elevated)',
+        border: '1px solid var(--border-hover)',
+        borderRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+        overflow: 'hidden',
+        boxShadow: isInline ? 'none' : 'var(--shadow-lg)'
       }}
-      onClick={onClose}
+      onClick={(e) => isInline ? null : e.stopPropagation()}
     >
-      <div
-        className="kinetic-card animate-scale-up"
-        style={{
-          width: '100%',
-          maxWidth: '880px',
-          maxHeight: '92vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--surface-elevated)',
-          border: '1px solid var(--border-hover)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
         {/* Modal Sticky Header */}
         <div
           style={{
@@ -284,47 +271,64 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
             </h3>
           </div>
 
-          {/* Center: Live Timer Control */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '6px 16px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-input)',
-              border: '1px solid var(--border-subtle)'
-            }}
-          >
-            <Clock size={16} color="var(--accent)" />
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '1.25rem',
-                fontWeight: 800,
-                color: 'var(--text-primary)',
-                minWidth: '60px'
-              }}
-            >
-              {formatTime(seconds)}
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsTimerRunning((prev) => !prev)}
-              style={{
-                padding: '4px',
-                color: isTimerRunning ? 'var(--status-warning)' : 'var(--accent)',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              title={isTimerRunning ? 'Pause Timer' : 'Resume Timer'}
-            >
-              {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-          </div>
+          {/* Right Side: Live Timer or Start Button & Rest Presets */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {!hasStarted ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setHasStarted(true);
+                  setIsTimerRunning(true);
+                }}
+                className="kinetic-btn-primary"
+                style={{ padding: '8px 18px', fontSize: '0.84rem', gap: '8px', boxShadow: '0 0 16px var(--accent-glow)' }}
+              >
+                <Play size={16} />
+                <span>Start Workout Session</span>
+              </button>
+            ) : (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '6px 16px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+              >
+                <Clock size={16} color="var(--accent)" />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: 'var(--text-primary)',
+                    minWidth: '60px'
+                  }}
+                >
+                  {formatTime(seconds)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsTimerRunning((prev) => !prev)}
+                  style={{
+                    padding: '4px',
+                    color: isTimerRunning ? 'var(--status-warning)' : 'var(--accent)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  title={isTimerRunning ? 'Pause Timer' : 'Resume Timer'}
+                >
+                  {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
+                </button>
+              </div>
+            )}
 
-          {/* Rest Preset Switcher & Close */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {[45, 60, 90].map((sec) => (
                 <button
@@ -338,9 +342,9 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                     color: restPreset === sec ? '#111111' : 'var(--text-secondary)',
                     fontSize: '0.72rem',
                     fontWeight: 800,
-                    border: '1px solid var(--border-glass)'
+                    border: `1px solid ${restPreset === sec ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                    cursor: 'pointer'
                   }}
-                  title={`Set rest interval to ${sec}s`}
                 >
                   {sec}s
                 </button>
@@ -532,16 +536,18 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                         type="number"
                         value={set.weight}
                         onChange={(e) => handleSetChange(exIndex, setIndex, 'weight', e.target.value)}
+                        readOnly={isCoachPrescribed}
                         style={{
                           width: '100%',
                           textAlign: 'center',
                           padding: '6px',
                           borderRadius: '6px',
-                          background: 'var(--surface-elevated)',
-                          border: '1px solid var(--border-glass)',
-                          color: 'var(--text-primary)',
+                          background: isCoachPrescribed ? 'rgba(255, 255, 255, 0.03)' : 'var(--surface-elevated)',
+                          border: `1px solid ${isCoachPrescribed ? 'transparent' : 'var(--border-glass)'}`,
+                          color: isCoachPrescribed ? 'var(--accent)' : 'var(--text-primary)',
                           fontWeight: 700,
-                          fontSize: '0.9rem'
+                          fontSize: '0.9rem',
+                          cursor: isCoachPrescribed ? 'default' : 'text'
                         }}
                       />
 
@@ -549,16 +555,18 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                         type="number"
                         value={set.reps}
                         onChange={(e) => handleSetChange(exIndex, setIndex, 'reps', e.target.value)}
+                        readOnly={isCoachPrescribed}
                         style={{
                           width: '100%',
                           textAlign: 'center',
                           padding: '6px',
                           borderRadius: '6px',
-                          background: 'var(--surface-elevated)',
-                          border: '1px solid var(--border-glass)',
-                          color: 'var(--text-primary)',
+                          background: isCoachPrescribed ? 'rgba(255, 255, 0, 0.03)' : 'var(--surface-elevated)',
+                          border: `1px solid ${isCoachPrescribed ? 'transparent' : 'var(--border-glass)'}`,
+                          color: isCoachPrescribed ? 'var(--text-primary)' : 'var(--text-primary)',
                           fontWeight: 700,
-                          fontSize: '0.9rem'
+                          fontSize: '0.9rem',
+                          cursor: isCoachPrescribed ? 'default' : 'text'
                         }}
                       />
 
@@ -589,42 +597,46 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                   ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleAddSet(exIndex)}
-                  className="kinetic-btn-ghost"
-                  style={{
-                    marginTop: '12px',
-                    fontSize: '0.78rem',
-                    padding: '6px 12px',
-                    width: '100%',
-                    border: '1px dashed var(--border-glass)'
-                  }}
-                >
-                  <Plus size={14} /> Add Extra Set
-                </button>
+                {!isCoachPrescribed && (
+                  <button
+                    type="button"
+                    onClick={() => handleAddSet(exIndex)}
+                    className="kinetic-btn-ghost"
+                    style={{
+                      marginTop: '12px',
+                      fontSize: '0.78rem',
+                      padding: '6px 12px',
+                      width: '100%',
+                      border: '1px dashed var(--border-glass)'
+                    }}
+                  >
+                    <Plus size={14} /> Add Extra Set
+                  </button>
+                )}
               </div>
             ))}
           </div>
 
-          {/* Add Exercise from Library CTA */}
-          <button
-            type="button"
-            onClick={() => setIsLibraryOpen(true)}
-            className="kinetic-btn-secondary"
-            style={{
-              width: '100%',
-              padding: '12px',
-              marginTop: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}
-          >
-            <BookOpen size={16} />
-            <span>+ Add Exercise from Movement Library</span>
-          </button>
+          {/* Add Exercise from Library CTA (Disabled for Coach-Prescribed Strict Telemetry) */}
+          {!isCoachPrescribed && (
+            <button
+              type="button"
+              onClick={() => setIsLibraryOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{
+                width: '100%',
+                padding: '12px',
+                marginTop: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <BookOpen size={16} />
+              <span>+ Add Exercise from Movement Library</span>
+            </button>
+          )}
         </div>
 
         {/* Modal Footer Controls */}
@@ -658,211 +670,249 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
             </button>
           </div>
         </div>
+      </div>
+    );
 
-        {/* Exercise Library Modal Picker Overlay */}
-        {isLibraryOpen && (
-          <div
-            className="animate-fade-in"
+  const libraryOverlay = isLibraryOpen && (
+    <div
+      className="animate-fade-in"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        background: 'rgba(10, 10, 10, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px'
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="kinetic-card animate-scale-up"
+        style={{
+          width: '100%',
+          maxWidth: '560px',
+          padding: '24px',
+          background: 'var(--surface-elevated)',
+          border: '1px solid var(--border-hover)',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            Movement Library
+          </h4>
+          <button type="button" onClick={() => setIsLibraryOpen(false)} style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-pill)',
+            background: 'var(--surface-input)',
+            border: '1px solid var(--border-subtle)',
+            marginBottom: '16px'
+          }}
+        >
+          <Search size={16} color="var(--text-tertiary)" />
+          <input
+            type="text"
+            placeholder="Search exercises by name or muscle..."
+            value={librarySearch}
+            onChange={(e) => setLibrarySearch(e.target.value)}
             style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 999,
-              background: 'rgba(10, 10, 10, 0.95)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px'
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: 'var(--text-primary)',
+              width: '100%',
+              fontSize: '0.86rem'
             }}
-          >
+          />
+        </div>
+
+        {/* Exercises List */}
+        <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {filteredLibrary.map((item) => (
             <div
-              className="kinetic-card animate-scale-up"
+              key={item.id}
               style={{
-                width: '100%',
-                maxWidth: '560px',
-                padding: '24px',
-                background: 'var(--surface-elevated)',
-                border: '1px solid var(--border-hover)'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Movement Library
-                </h4>
-                <button type="button" onClick={() => setIsLibraryOpen(false)} style={{ color: 'var(--text-secondary)' }}>
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Search Bar */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)',
-                  marginBottom: '16px'
-                }}
-              >
-                <Search size={16} color="var(--text-tertiary)" />
-                <input
-                  type="text"
-                  placeholder="Search exercises by name or muscle..."
-                  value={librarySearch}
-                  onChange={(e) => setLibrarySearch(e.target.value)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: 'var(--text-primary)',
-                    width: '100%',
-                    fontSize: '0.86rem'
-                  }}
-                />
-              </div>
-
-              {/* Exercises List */}
-              <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {filteredLibrary.map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-input)',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {item.name}
-                      </div>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-                        {item.muscle} • Default: {item.defaultWeight}kg × {item.defaultReps}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleAddFromLibrary(item)}
-                      className="kinetic-btn-primary"
-                      style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-                    >
-                      + Add
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Workout Complete Summary Modal Overlay */}
-        {isSummaryOpen && (
-          <div
-            className="animate-fade-in"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 1000,
-              background: 'rgba(15, 15, 15, 0.96)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px',
-              textAlign: 'center'
-            }}
-          >
-            <div
-              className="kinetic-card animate-scale-up"
-              style={{
-                maxWidth: '480px',
-                width: '100%',
-                padding: '36px 28px',
-                background: 'var(--surface-elevated)',
-                border: '2px solid var(--accent)',
-                boxShadow: '0 0 40px var(--accent-glow)'
-              }}
-            >
-              <div
-                style={{
-                  width: '72px',
-                  height: '72px',
-                  borderRadius: '50%',
-                  background: 'var(--accent)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 20px',
-                  boxShadow: '0 0 32px var(--accent)'
-                }}
-              >
-                <Trophy size={38} color="#111111" />
-              </div>
-
-              <h3
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.8rem',
-                  fontWeight: 900,
-                  color: 'var(--text-primary)',
-                  marginBottom: '8px'
-                }}
-              >
-                Workout Session Crushed!
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Your progressive overload telemetry has been logged and synchronized with {activeRoutine?.coach || 'Coach Marcus'}.
-              </p>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
-                  gap: '10px',
-                  padding: '16px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)',
-                  marginBottom: '28px'
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>TIME</div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {formatTime(seconds)}
-                  </div>
+              <div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  {item.name}
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>VOLUME</div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent)' }}>
-                    {totalVolumeKg.toLocaleString()} kg
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>SETS</div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--status-success)' }}>
-                    {totalSetsCompleted}
-                  </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                  {item.muscle} • Default: {item.defaultWeight}kg × {item.defaultReps}
                 </div>
               </div>
-
               <button
                 type="button"
-                onClick={handleConfirmCompletion}
+                onClick={() => handleAddFromLibrary(item)}
                 className="kinetic-btn-primary"
-                style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 800 }}
+                style={{ padding: '6px 14px', fontSize: '0.78rem' }}
               >
-                Synchronize & Return to Dashboard
+                + Add
               </button>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     </div>
+  );
+
+  const summaryOverlay = isSummaryOpen && (
+    <div
+      className="animate-fade-in"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        background: 'rgba(15, 15, 15, 0.88)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        textAlign: 'center'
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="kinetic-card animate-scale-up"
+        style={{
+          maxWidth: '480px',
+          width: '100%',
+          padding: '36px 28px',
+          background: 'var(--surface-elevated)',
+          border: '2px solid var(--accent)',
+          boxShadow: '0 0 40px var(--accent-glow)'
+        }}
+      >
+        <div
+          style={{
+            width: '72px',
+            height: '72px',
+            borderRadius: '50%',
+            background: 'var(--accent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            boxShadow: '0 0 32px var(--accent)'
+          }}
+        >
+          <Trophy size={38} color="#111111" />
+        </div>
+
+        <h3
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.8rem',
+            fontWeight: 900,
+            color: 'var(--text-primary)',
+            marginBottom: '8px'
+          }}
+        >
+          Workout Session Crushed!
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
+          Your progressive overload telemetry has been logged and synchronized with {activeRoutine?.coach || 'Coach Marcus'}.
+        </p>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '10px',
+            padding: '16px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--surface-input)',
+            border: '1px solid var(--border-subtle)',
+            marginBottom: '28px'
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>TIME</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              {formatTime(seconds)}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>VOLUME</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent)' }}>
+              {totalVolumeKg.toLocaleString()} kg
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>SETS</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--status-success)' }}>
+              {totalSetsCompleted}
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleConfirmCompletion}
+          className="kinetic-btn-primary"
+          style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 800 }}
+        >
+          Synchronize & Return to Dashboard
+        </button>
+      </div>
+    </div>
+  );
+
+  if (isInline) {
+    return (
+      <>
+        {contentUI}
+        {libraryOverlay}
+        {summaryOverlay}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9990,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.88)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          padding: '16px'
+        }}
+        onClick={onClose}
+      >
+        {contentUI}
+      </div>
+      {libraryOverlay}
+      {summaryOverlay}
+    </>
   );
 };
