@@ -401,20 +401,10 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
                   Calculated from 5-rep RPE 8 set
                 </div>
               </div>
-
-              <div className="kinetic-card" style={{ padding: '24px', background: 'var(--surface-input)' }}>
-                <span className="type-caption">Live Telemetry Heart Rate</span>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--status-success)', marginTop: '6px' }}>
-                  {activeClient.avgHeartRate}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '6px' }}>
-                  WHOOP BLE Transceiver Sync
-                </div>
-              </div>
             </div>
 
             {/* Detailed Workout History & Set Progression Log */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start', marginTop: '12px' }}>
+            <div style={{ marginTop: '12px' }}>
               {/* Recent Set Performance Logs */}
               <div className="kinetic-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -443,25 +433,6 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* Biomechanical Readiness & Fatigue Index */}
-              <div className="kinetic-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
-                <h4 className="type-h3" style={{ fontSize: '1.1rem', margin: '0 0 16px 0' }}>Biomechanics & Fatigue Index</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="type-caption">Neuromuscular Fatigue</span>
-                    <strong style={{ color: 'var(--status-success)', fontSize: '0.86rem' }}>Low (Optimal)</strong>
-                  </div>
-                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="type-caption">Barbell Velocity Drop</span>
-                    <strong style={{ color: 'var(--accent)', fontSize: '0.86rem' }}>-4.2% (Target &lt;10%)</strong>
-                  </div>
-                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="type-caption">Scapular Symmetry</span>
-                    <strong style={{ color: '#06b6d4', fontSize: '0.86rem' }}>98% Balance</strong>
-                  </div>
                 </div>
               </div>
             </div>
