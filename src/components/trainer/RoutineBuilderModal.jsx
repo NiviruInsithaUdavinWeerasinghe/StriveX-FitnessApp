@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { CustomDropdown } from '../ui/CustomDropdown';
 import {
@@ -30,6 +31,7 @@ const MOVEMENT_LIBRARY = [
 
 export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRoutine, isInline = false }) => {
   const { addToast } = useToast();
+  const { publishRoutine } = useAuth();
 
   // Program Metadata State
   const [routineTitle, setRoutineTitle] = useState('Hypertrophy Push Day A (Overload Phase)');
@@ -149,6 +151,8 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
     if (onSaveRoutine) {
       onSaveRoutine(payload);
     }
+
+    publishRoutine(payload);
 
     addToast({
       type: 'success',

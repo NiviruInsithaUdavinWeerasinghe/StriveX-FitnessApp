@@ -106,7 +106,7 @@ const STORE_PRODUCTS = [
 ];
 
 export const MemberDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, publishedRoutines } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Navigation tab
@@ -119,6 +119,13 @@ export const MemberDashboard = () => {
   const [isLogMealOpen, setIsLogMealOpen] = useState(false);
   const [selectedProductModal, setSelectedProductModal] = useState(null);
 
+  // Filter dynamic routines published specifically for this athlete by name or assigned client
+  const userPublishedRoutines = (publishedRoutines || []).filter(
+    (rtn) => !rtn.clientName || rtn.clientName.toLowerCase() === (user?.name || '').toLowerCase()
+  );
+
+  const availableRoutines = [...userPublishedRoutines, ...ROUTINES];
+
   // Meal logs state
   const [mealLogs, setMealLogs] = useState(MEAL_LOGS);
   const [newMealTitle, setNewMealTitle] = useState('');
@@ -129,8 +136,8 @@ export const MemberDashboard = () => {
   const [newMealF, setNewMealF] = useState('8');
 
   // Selected routine
-  const [selectedRoutineId, setSelectedRoutineId] = useState('push_a');
-  const activeRoutine = ROUTINES.find((r) => r.id === selectedRoutineId) || ROUTINES[0];
+  const [selectedRoutineId, setSelectedRoutineId] = useState(availableRoutines[0]?.id || 'push_a');
+  const activeRoutine = availableRoutines.find((r) => r.id === selectedRoutineId) || availableRoutines[0];
 
   // Biometrics tracking
   const [calories, setCalories] = useState(user?.todayCalories || 1560);
@@ -427,20 +434,44 @@ export const MemberDashboard = () => {
               <div className="kinetic-card" style={{ padding: '28px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
-                    <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
+                      {userPublishedRoutines.some((r) => r.id === activeRoutine?.id) && (
+                        <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: 'rgba(212, 255, 0, 0.15)', color: 'var(--accent)' }}>
+                          CUSTOM COACH PROGRAM
+                        </span>
+                      )}
+                    </div>
                     <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
                     <p className="type-caption" style={{ margin: '4px 0 0' }}>Assigned by {activeRoutine.coach} • Est. {activeRoutine.duration}</p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsWorkoutModalOpen(true)}
-                    className="kinetic-btn-primary"
-                    style={{ padding: '10px 20px', fontSize: '0.88rem' }}
-                  >
-                    <Dumbbell size={16} />
-                    <span>Launch Active Workout Tracker</span>
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {availableRoutines.length > 1 && (
+                      <select
+                        value={selectedRoutineId}
+                        onChange={(e) => setSelectedRoutineId(e.target.value)}
+                        className="kinetic-input"
+                        style={{ padding: '8px 12px', fontSize: '0.82rem', background: 'var(--surface-input)', minWidth: '180px' }}
+                      >
+                        {availableRoutines.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.title}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setIsWorkoutModalOpen(true)}
+                      className="kinetic-btn-primary"
+                      style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+                    >
+                      <Dumbbell size={16} />
+                      <span>Launch Active Workout Tracker</span>
+                    </button>
+                  </div>
                 </div>
 
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '20px', lineHeight: '1.5' }}>

@@ -47,6 +47,7 @@ const DEMO_USERS = {
 export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState('guest');
   const [user, setUser] = useState(null);
+  const [publishedRoutines, setPublishedRoutines] = useState([]);
   const { addToast } = useToast();
 
   const switchRole = (newRole) => {
@@ -70,6 +71,25 @@ export const AuthProvider = ({ children }) => {
         message: `Logged in as ${DEMO_USERS[newRole].name}`
       });
     }
+  };
+
+  const publishRoutine = (routineData) => {
+    const newRoutine = {
+      id: `rtn_dyn_${Date.now()}`,
+      title: routineData.title,
+      split: routineData.split || 'Custom Program',
+      coach: 'Coach Marcus Vance',
+      duration: routineData.duration || '50 mins',
+      clientName: routineData.client,
+      description: routineData.notes || 'Custom program published directly by your coach.',
+      exercises: (routineData.exercises || []).map((ex) => ({
+        name: ex.name,
+        sets: `${ex.sets}×${ex.reps}`,
+        muscle: ex.muscle || ex.target
+      }))
+    };
+
+    setPublishedRoutines((prev) => [newRoutine, ...prev]);
   };
 
   const login = (roleType, customData = {}) => {
@@ -109,6 +129,8 @@ export const AuthProvider = ({ children }) => {
         role,
         user,
         isAuthenticated: role !== 'guest',
+        publishedRoutines,
+        publishRoutine,
         switchRole,
         login,
         logout,
