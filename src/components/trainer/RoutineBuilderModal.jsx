@@ -28,7 +28,7 @@ const MOVEMENT_LIBRARY = [
   { name: 'Hanging Leg Raises', muscle: 'Abdominal Core', defaultSets: 4, defaultReps: '15', defaultRest: 45, defaultRpe: 'RPE 8.5' }
 ];
 
-export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRoutine }) => {
+export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRoutine, isInline = false }) => {
   const { addToast } = useToast();
 
   // Program Metadata State
@@ -58,7 +58,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
       reps: '10',
       rest: 75,
       rpe: 'RPE 8.5',
-      cue: 'Maintain 30-degree incline, full stretch at bottom.'
+      cue: 'Pause 1 second at chest stretch before contracting.'
     },
     {
       id: 'cfg_3',
@@ -68,31 +68,23 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
       reps: '15',
       rest: 60,
       rpe: 'RPE 9',
-      cue: 'Lead with elbows, slight forward torso lean.'
+      cue: 'Slight forward lean, raise in scapular plane.'
     }
   ]);
 
-  // Exercise Library Picker State
+  // Movement Picker Drawer State
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [libraryFilter, setLibraryFilter] = useState('');
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
-  const handleExerciseChange = (id, field, value) => {
+  const handleUpdateExercise = (id, field, value) => {
     setExercises((prev) =>
       prev.map((ex) => (ex.id === id ? { ...ex, [field]: value } : ex))
     );
   };
 
   const handleRemoveExercise = (id) => {
-    if (exercises.length <= 1) {
-      addToast({
-        type: 'warning',
-        title: 'Minimum Exercise Required',
-        message: 'A program routine must contain at least 1 configured exercise.'
-      });
-      return;
-    }
     setExercises((prev) => prev.filter((ex) => ex.id !== id));
   };
 
@@ -164,7 +156,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
       message: `Program assigned to ${assignedClient}. Telemetry updated in athlete hub.`
     });
 
-    onClose();
+    if (onClose) onClose();
   };
 
   const filteredLibrary = MOVEMENT_LIBRARY.filter(
@@ -172,6 +164,356 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
       item.name.toLowerCase().includes(libraryFilter.toLowerCase()) ||
       item.muscle.toLowerCase().includes(libraryFilter.toLowerCase())
   );
+
+  const contentUI = (
+    <div
+      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      style={{
+        width: '100%',
+        maxWidth: isInline ? '100%' : '920px',
+        maxHeight: isInline ? '100%' : '92vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--surface-elevated)',
+        border: '1px solid var(--border-hover)',
+        borderRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+        overflow: 'hidden',
+        boxShadow: isInline ? 'none' : 'var(--shadow-lg)'
+      }}
+      onClick={(e) => isInline ? null : e.stopPropagation()}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: '20px 24px',
+          background: 'var(--surface-glass)',
+          borderBottom: '1px solid var(--border-glass)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexShrink: 0
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'rgba(212, 255, 0, 0.15)',
+              border: '1px solid var(--accent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent)'
+            }}
+          >
+            <Dumbbell size={20} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="type-eyebrow">PROGRAM TELEMETRY ARCHITECT</span>
+              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                EXERCISE SEQUENCE
+              </span>
+            </div>
+            <h3 className="type-h3" style={{ fontSize: '1.25rem', margin: 0 }}>
+              Hypertrophy & Strength Program Builder
+            </h3>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={handlePublish}
+            className="kinetic-btn-primary"
+            style={{ padding: '8px 16px', fontSize: '0.84rem' }}
+          >
+            <Save size={15} />
+            <span>Publish Program</span>
+          </button>
+          {!isInline && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Body */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Metadata Controls */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+          <div className="kinetic-input-group" style={{ margin: 0 }}>
+            <label className="kinetic-label">Program Title *</label>
+            <input
+              type="text"
+              value={routineTitle}
+              onChange={(e) => setRoutineTitle(e.target.value)}
+              className="kinetic-input"
+            />
+          </div>
+
+          <div className="kinetic-input-group" style={{ margin: 0 }}>
+            <label className="kinetic-label">Target Athlete *</label>
+            <CustomDropdown
+              options={['Alex Mercer', 'Kasun Fernando', 'Sarah Tan', 'Maya Lin', 'Ryan Patel']}
+              value={assignedClient}
+              onChange={setAssignedClient}
+            />
+          </div>
+
+          <div className="kinetic-input-group" style={{ margin: 0 }}>
+            <label className="kinetic-label">Movement Split</label>
+            <CustomDropdown
+              options={['Push', 'Pull', 'Legs', 'Upper Power', 'Lower Power', 'Full Body Conditioning']}
+              value={selectedSplit}
+              onChange={setSelectedSplit}
+            />
+          </div>
+
+          <div className="kinetic-input-group" style={{ margin: 0 }}>
+            <label className="kinetic-label">Target Session Duration (Mins)</label>
+            <input
+              type="number"
+              value={targetDuration}
+              onChange={(e) => setTargetDuration(e.target.value)}
+              className="kinetic-input"
+            />
+          </div>
+        </div>
+
+        {/* Exercises List Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h4 className="type-h3" style={{ fontSize: '1.05rem', margin: 0 }}>
+              Movement Sequence ({exercises.length} Drills)
+            </h4>
+            <span className="type-caption">Reorder or adjust volume targets per movement.</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsPickerOpen(true)}
+            className="kinetic-btn-secondary"
+            style={{ padding: '8px 14px', fontSize: '0.8rem' }}
+          >
+            <BookOpen size={14} color="var(--accent)" />
+            <span>Add from Movement Library</span>
+          </button>
+        </div>
+
+        {/* Exercise Sequence List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {exercises.map((ex, idx) => (
+            <div
+              key={ex.id}
+              style={{
+                padding: '16px',
+                borderRadius: 'var(--radius-lg)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveUp(idx)}
+                      disabled={idx === 0}
+                      style={{ background: 'none', border: 'none', color: idx === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}
+                    >
+                      <ArrowUp size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveDown(idx)}
+                      disabled={idx === exercises.length - 1}
+                      style={{ background: 'none', border: 'none', color: idx === exercises.length - 1 ? 'var(--text-tertiary)' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}
+                    >
+                      <ArrowDown size={14} />
+                    </button>
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '0.82rem', marginRight: '6px' }}>
+                      #{idx + 1}
+                    </span>
+                    <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>{ex.name}</strong>
+                    <span className="type-caption" style={{ marginLeft: '8px', color: 'var(--text-tertiary)' }}>
+                      • {ex.muscle}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRemoveExercise(ex.id)}
+                  style={{ background: 'none', border: 'none', color: 'var(--status-danger)', cursor: 'pointer', opacity: 0.8 }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                <div>
+                  <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Sets</label>
+                  <input
+                    type="number"
+                    value={ex.sets}
+                    onChange={(e) => handleUpdateExercise(ex.id, 'sets', parseInt(e.target.value) || 1)}
+                    className="kinetic-input"
+                    style={{ padding: '6px 10px', fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Target Reps</label>
+                  <input
+                    type="text"
+                    value={ex.reps}
+                    onChange={(e) => handleUpdateExercise(ex.id, 'reps', e.target.value)}
+                    className="kinetic-input"
+                    style={{ padding: '6px 10px', fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Rest (Secs)</label>
+                  <input
+                    type="number"
+                    value={ex.rest}
+                    onChange={(e) => handleUpdateExercise(ex.id, 'rest', parseInt(e.target.value) || 0)}
+                    className="kinetic-input"
+                    style={{ padding: '6px 10px', fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Target RPE</label>
+                  <input
+                    type="text"
+                    value={ex.rpe}
+                    onChange={(e) => handleUpdateExercise(ex.id, 'rpe', e.target.value)}
+                    className="kinetic-input"
+                    style={{ padding: '6px 10px', fontSize: '0.82rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Execution Cue / Tempo Note</label>
+                <input
+                  type="text"
+                  value={ex.cue}
+                  onChange={(e) => handleUpdateExercise(ex.id, 'cue', e.target.value)}
+                  className="kinetic-input"
+                  style={{ padding: '6px 10px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Coach Global Program Notes */}
+        <div className="kinetic-input-group" style={{ margin: 0 }}>
+          <label className="kinetic-label">Coach Program Instructions & Recovery Cues</label>
+          <textarea
+            rows={2}
+            value={coachNotes}
+            onChange={(e) => setCoachNotes(e.target.value)}
+            className="kinetic-input"
+            style={{ resize: 'none' }}
+          />
+        </div>
+      </div>
+
+      {/* Movement Library Picker Drawer */}
+      {isPickerOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            background: 'var(--surface-elevated)',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '24px'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
+              Movement Library Reference (StriveX Pro)
+            </h3>
+            <button type="button" onClick={() => setIsPickerOpen(false)} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>
+              ✕
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: 'var(--radius-pill)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', marginBottom: '16px' }}>
+            <Search size={16} color="var(--text-tertiary)" />
+            <input
+              type="text"
+              placeholder="Search exercise by muscle group or name..."
+              value={libraryFilter}
+              onChange={(e) => setLibraryFilter(e.target.value)}
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', width: '100%', fontSize: '0.86rem' }}
+            />
+          </div>
+
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {filteredLibrary.map((item, idx) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>{item.name}</strong>
+                  <div className="type-caption">{item.muscle} • Default {item.defaultSets}×{item.defaultReps}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAddAddFromLibrary(item)}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '6px 12px', fontSize: '0.76rem' }}
+                >
+                  <Plus size={14} />
+                  <span>Select</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  if (isInline) return contentUI;
 
   return (
     <div
@@ -189,534 +531,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
       }}
       onClick={onClose}
     >
-      <div
-        className="kinetic-card animate-scale-up"
-        style={{
-          width: '100%',
-          maxWidth: '920px',
-          maxHeight: '92vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--surface-elevated)',
-          border: '1px solid var(--border-hover)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          style={{
-            padding: '20px 28px',
-            background: 'var(--surface-glass)',
-            borderBottom: '1px solid var(--border-glass)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px'
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <div className="kinetic-badge">
-                <Dumbbell size={13} />
-                <span>COACH PROGRAM ARCHITECT</span>
-              </div>
-              <span style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>
-                Target: {assignedClient}
-              </span>
-            </div>
-            <h3
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '1.4rem',
-                fontWeight: 900,
-                color: 'var(--text-primary)'
-              }}
-            >
-              Interactive Routine & Periodization Builder
-            </h3>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              padding: '6px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-glass)',
-              color: 'var(--text-secondary)'
-            }}
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Scrollable Builder Form */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
-          {/* Section 1: Routine Metadata Grid */}
-          <div
-            style={{
-              padding: '20px',
-              borderRadius: 'var(--radius-lg)',
-              background: 'var(--surface-input)',
-              border: '1px solid var(--border-subtle)',
-              marginBottom: '24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px'
-            }}
-          >
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Routine Title *</label>
-                <input
-                  type="text"
-                  value={routineTitle}
-                  onChange={(e) => setRoutineTitle(e.target.value)}
-                  className="kinetic-input"
-                  placeholder="e.g. Upper Body Hypertrophy Focus"
-                />
-              </div>
-
-              <div>
-                <CustomDropdown
-                  label="Target Athlete Client"
-                  value={assignedClient}
-                  onChange={(val) => setAssignedClient(val)}
-                  options={[
-                    { value: 'Alex Mercer', label: 'Alex Mercer (Pro Athlete)' },
-                    { value: 'Kasun Fernando', label: 'Kasun Fernando (Elite)' },
-                    { value: 'Sarah Tan', label: 'Sarah Tan (Pro Athlete)' },
-                    { value: 'Maya Lin', label: 'Maya Lin (Elite)' },
-                    { value: 'Ryan Patel', label: 'Ryan Patel (Starter)' }
-                  ]}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-              <div>
-                <CustomDropdown
-                  label="Training Split Type"
-                  value={selectedSplit}
-                  onChange={(val) => setSelectedSplit(val)}
-                  options={[
-                    { value: 'Push', label: 'Push (Chest, Delts, Triceps)' },
-                    { value: 'Pull', label: 'Pull (Lats, Upper Back, Biceps)' },
-                    { value: 'Legs', label: 'Legs (Quads, Hamstrings, Calves)' },
-                    { value: 'Upper', label: 'Upper Body Power' },
-                    { value: 'Lower', label: 'Lower Body Hypertrophy' },
-                    { value: 'Conditioning', label: 'Metabolic HIIT & Core' }
-                  ]}
-                />
-              </div>
-
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Estimated Duration (Mins)</label>
-                <input
-                  type="number"
-                  value={targetDuration}
-                  onChange={(e) => setTargetDuration(e.target.value)}
-                  className="kinetic-input"
-                />
-              </div>
-
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Program Complexity</label>
-                <div
-                  style={{
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'var(--surface-elevated)',
-                    border: '1px solid var(--border-glass)',
-                    fontSize: '0.88rem',
-                    fontWeight: 700,
-                    color: 'var(--accent)'
-                  }}
-                >
-                  {exercises.length} Movements Sequence
-                </div>
-              </div>
-            </div>
-
-            <div className="kinetic-input-group" style={{ margin: 0 }}>
-              <label className="kinetic-label">Coach Technique Notes & Cues for Athlete</label>
-              <textarea
-                value={coachNotes}
-                onChange={(e) => setCoachNotes(e.target.value)}
-                className="kinetic-input"
-                rows={2}
-                placeholder="Specific breathing cues, tempo instructions, or warm-up notes..."
-              />
-            </div>
-          </div>
-
-          {/* Section 2: Configured Exercise Sequence List */}
-          <div style={{ marginBottom: '24px' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '16px'
-              }}
-            >
-              <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Configured Exercise Sequence ({exercises.length})
-              </h4>
-              <button
-                type="button"
-                onClick={() => setIsPickerOpen(true)}
-                className="kinetic-btn-primary"
-                style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
-              >
-                <Plus size={15} /> + Add Movement from Library
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {exercises.map((ex, index) => (
-                <div
-                  key={ex.id}
-                  style={{
-                    padding: '20px',
-                    borderRadius: 'var(--radius-lg)',
-                    background: 'var(--surface-input)',
-                    border: '1px solid var(--border-subtle)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '14px'
-                  }}
-                >
-                  {/* Top exercise row */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '50%',
-                          background: 'var(--surface-elevated)',
-                          border: '1px solid var(--border-glass)',
-                          color: 'var(--accent)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.85rem',
-                          fontWeight: 900
-                        }}
-                      >
-                        {index + 1}
-                      </span>
-                      <div>
-                        <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                          {ex.name}
-                        </span>
-                        <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginLeft: '8px' }}>
-                          Target: {ex.muscle}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Order & Remove Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                        style={{
-                          padding: '6px',
-                          color: index === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-                          cursor: index === 0 ? 'default' : 'pointer'
-                        }}
-                        title="Move Up"
-                      >
-                        <ArrowUp size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === exercises.length - 1}
-                        style={{
-                          padding: '6px',
-                          color: index === exercises.length - 1 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-                          cursor: index === exercises.length - 1 ? 'default' : 'pointer'
-                        }}
-                        title="Move Down"
-                      >
-                        <ArrowDown size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveExercise(ex.id)}
-                        style={{ padding: '6px', color: 'var(--status-error)' }}
-                        title="Remove Movement"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Sets / Reps / Rest / RPE Configuration Grid */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                      gap: '12px',
-                      background: 'var(--surface-elevated)',
-                      padding: '12px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border-glass)'
-                    }}
-                  >
-                    <div>
-                      <label style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>
-                        SETS
-                      </label>
-                      <input
-                        type="number"
-                        value={ex.sets}
-                        onChange={(e) => handleExerciseChange(ex.id, 'sets', Number(e.target.value))}
-                        style={{
-                          width: '100%',
-                          padding: '6px',
-                          borderRadius: '6px',
-                          background: 'var(--surface-input)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--text-primary)',
-                          fontWeight: 700,
-                          fontSize: '0.88rem'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>
-                        REPS / TARGET
-                      </label>
-                      <input
-                        type="text"
-                        value={ex.reps}
-                        onChange={(e) => handleExerciseChange(ex.id, 'reps', e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '6px',
-                          borderRadius: '6px',
-                          background: 'var(--surface-input)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--text-primary)',
-                          fontWeight: 700,
-                          fontSize: '0.88rem'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>
-                        REST (SECS)
-                      </label>
-                      <input
-                        type="number"
-                        value={ex.rest}
-                        onChange={(e) => handleExerciseChange(ex.id, 'rest', Number(e.target.value))}
-                        style={{
-                          width: '100%',
-                          padding: '6px',
-                          borderRadius: '6px',
-                          background: 'var(--surface-input)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--text-primary)',
-                          fontWeight: 700,
-                          fontSize: '0.88rem'
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>
-                        INTENSITY / RPE
-                      </label>
-                      <input
-                        type="text"
-                        value={ex.rpe}
-                        onChange={(e) => handleExerciseChange(ex.id, 'rpe', e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '6px',
-                          borderRadius: '6px',
-                          background: 'var(--surface-input)',
-                          border: '1px solid var(--border-subtle)',
-                          color: 'var(--accent)',
-                          fontWeight: 800,
-                          fontSize: '0.88rem'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Form Cue Input */}
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Coach form cue (e.g. Pause 1-sec at chest before pressing)..."
-                      value={ex.cue}
-                      onChange={(e) => handleExerciseChange(ex.id, 'cue', e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: 'transparent',
-                        border: '1px dashed var(--border-subtle)',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.82rem'
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div
-          style={{
-            padding: '16px 28px',
-            background: 'var(--surface-glass)',
-            borderTop: '1px solid var(--border-glass)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px'
-          }}
-        >
-          <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
-            Program will synchronize live to <strong style={{ color: 'var(--accent)' }}>{assignedClient}</strong>'s dashboard.
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button type="button" onClick={onClose} className="kinetic-btn-ghost">
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handlePublish}
-              className="kinetic-btn-primary"
-              style={{ padding: '12px 28px', fontWeight: 800 }}
-            >
-              <Save size={16} /> Publish & Sync to Athlete
-            </button>
-          </div>
-        </div>
-
-        {/* Movement Library Picker Modal Overlay */}
-        {isPickerOpen && (
-          <div
-            className="animate-fade-in"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 1000,
-              background: 'rgba(8, 8, 8, 0.95)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px'
-            }}
-          >
-            <div
-              className="kinetic-card animate-scale-up"
-              style={{
-                width: '100%',
-                maxWidth: '600px',
-                padding: '28px',
-                background: 'var(--surface-elevated)',
-                border: '1px solid var(--border-hover)'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <BookOpen size={18} color="var(--accent)" />
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    Select Movement from Library
-                  </h4>
-                </div>
-                <button type="button" onClick={() => setIsPickerOpen(false)} style={{ color: 'var(--text-secondary)' }}>
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Search Bar */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)',
-                  marginBottom: '16px'
-                }}
-              >
-                <Search size={16} color="var(--text-tertiary)" />
-                <input
-                  type="text"
-                  placeholder="Search movement name or targeted muscle group..."
-                  value={libraryFilter}
-                  onChange={(e) => setLibraryFilter(e.target.value)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: 'var(--text-primary)',
-                    width: '100%',
-                    fontSize: '0.86rem'
-                  }}
-                />
-              </div>
-
-              {/* List */}
-              <div style={{ maxHeight: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {filteredLibrary.map((item, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px 16px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-input)',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {item.name}
-                      </div>
-                      <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
-                        {item.muscle} • Default: {item.defaultSets} sets × {item.defaultReps} reps ({item.defaultRpe})
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddFromLibrary(item)}
-                      className="kinetic-btn-primary"
-                      style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-                    >
-                      + Add
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {contentUI}
     </div>
   );
 };

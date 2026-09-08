@@ -79,74 +79,419 @@ const SENSOR_EQUIPMENT = [
   },
   {
     id: 'eq_3',
-    name: 'Assault AirBike Pro #08',
-    zone: 'Zone C - Aerobic',
-    wearLevel: 72,
-    status: 'warning',
-    lastCalibration: '14 days ago',
-    sensorHealth: '82% Signal'
+    name: 'Prime Fitness Iso-Chest Press #02',
+    zone: 'Zone B - Machine Bay',
+    wearLevel: 82,
+    status: 'maintenance_soon',
+    lastCalibration: '5 days ago',
+    sensorHealth: '91% Signal'
   },
   {
     id: 'eq_4',
-    name: 'Prime Dual Cable Crossover #02',
-    zone: 'Zone B - Machines',
+    name: 'Cryo-Thermal Plunge Tank #01',
+    zone: 'Zone D - Hydro',
     wearLevel: 99,
     status: 'optimal',
     lastCalibration: '3 hours ago',
     sensorHealth: '100% Signal'
-  },
-  {
-    id: 'eq_5',
-    name: 'Nordic Cold Plunge Tub #01',
-    zone: 'Zone D - Recovery',
-    wearLevel: 96,
-    status: 'optimal',
-    lastCalibration: 'Today 06:00 AM',
-    sensorHealth: '100% Signal'
   }
 ];
 
-export const FacilitySensorGridModal = ({ isOpen, onClose }) => {
+export const FacilitySensorGridModal = ({ isOpen, onClose, isInline = false }) => {
   const { addToast } = useToast();
-
-  const [activeTab, setActiveTab] = useState('zones'); // 'zones' | 'equipment' | 'access'
-  const [equipmentList, setEquipmentList] = useState(SENSOR_EQUIPMENT);
+  const [activeTab, setActiveTab] = useState('zones'); // 'zones' | 'telemetry' | 'access'
   const [isCalibrating, setIsCalibrating] = useState(false);
 
-  if (!isOpen) return null;
-
-  const totalOccupancy = FACILITY_ZONES.reduce((acc, z) => acc + z.occupancy, 0);
-  const totalMaxCap = FACILITY_ZONES.reduce((acc, z) => acc + z.maxCap, 0);
-  const totalLoadPercent = Math.round((totalOccupancy / totalMaxCap) * 100);
+  if (!isOpen && !isInline) return null;
 
   const handleCalibrateAll = () => {
     setIsCalibrating(true);
     addToast({
       type: 'info',
-      title: 'Sensor Gateway Ping Initiated',
-      message: 'Broadcasting telemetry pulse across 56 facility BLE & RF transceivers...'
+      title: 'Sensor Mesh Ping Initiated',
+      message: 'Broadcasting telemetry sync signal across 56 BLE hubs...'
     });
 
     setTimeout(() => {
       setIsCalibrating(false);
-      setEquipmentList((prev) =>
-        prev.map((eq) => ({ ...eq, lastCalibration: 'Just now', sensorHealth: '100% Signal' }))
-      );
       addToast({
         type: 'success',
-        title: 'Sensor Grid Calibrated',
-        message: 'All facility IoT gateways synchronized with zero packet loss.'
+        title: 'Calibration Complete',
+        message: 'All 56 IoT sensor nodes verified and synchronized (0.4ms lat).'
       });
-    }, 1500);
+    }, 1400);
   };
 
   const handleScheduleMaintenance = (eqName) => {
     addToast({
-      type: 'success',
+      type: 'info',
       title: 'Work Order Generated',
-      message: `Technician dispatch work order logged for ${eqName}.`
+      message: `Scheduled diagnostic dispatch for ${eqName}. Assigned to Head Tech.`
     });
   };
+
+  const contentUI = (
+    <div
+      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      style={{
+        width: '100%',
+        maxWidth: isInline ? '100%' : '1080px',
+        height: isInline ? '100%' : '88vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--surface-elevated)',
+        border: '1px solid var(--border-hover)',
+        borderRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+        overflow: 'hidden',
+        boxShadow: isInline ? 'none' : 'var(--shadow-lg)'
+      }}
+      onClick={(e) => isInline ? null : e.stopPropagation()}
+    >
+      {/* Modal Header */}
+      <div
+        style={{
+          padding: '16px 24px',
+          background: 'var(--surface-glass)',
+          borderBottom: '1px solid var(--border-glass)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexShrink: 0
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'rgba(212, 255, 0, 0.15)',
+              border: '1px solid var(--accent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent)'
+            }}
+          >
+            <Cpu size={18} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="type-eyebrow">FACILITY SENSOR GRID & IOT MESH</span>
+              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                COLOMBO 07 HUB
+              </span>
+            </div>
+            <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, whiteSpace: 'nowrap' }}>
+              Real-Time Floor Load & Telemetry
+            </h3>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={handleCalibrateAll}
+            disabled={isCalibrating}
+            className="kinetic-btn-secondary"
+            style={{ padding: '8px 14px', fontSize: '0.78rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}
+          >
+            <RotateCcw size={13} className={isCalibrating ? 'animate-spin' : ''} />
+            <span>{isCalibrating ? 'Pinging Nodes...' : 'Calibrate Sensors'}</span>
+          </button>
+
+          {!isInline && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Control Sub-Bar */}
+      <div
+        style={{
+          padding: '12px 24px',
+          background: 'rgba(0,0,0,0.2)',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexWrap: 'wrap'
+        }}
+      >
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[
+            { id: 'zones', label: 'Facility Zones (4)', icon: Layers },
+            { id: 'telemetry', label: 'Equipment Wear Telemetry', icon: Wrench },
+            { id: 'access', label: 'Live RFID Turnstiles', icon: DoorClosed }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={active ? 'kinetic-btn-primary' : 'kinetic-btn-ghost'}
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+              >
+                <Icon size={14} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.78rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--status-success)' }}>
+            <Wifi size={13} />
+            <span style={{ fontWeight: 700 }}>56 / 56 IoT Nodes Online</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-tertiary)' }}>
+            <Wind size={13} />
+            <span>Facility HVAC: 21.2°C Avg</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+        {/* TAB 1: FACILITY ZONES */}
+        {activeTab === 'zones' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+            {FACILITY_ZONES.map((zone) => {
+              const pct = Math.round((zone.occupancy / zone.maxCap) * 100);
+              return (
+                <div
+                  key={zone.id}
+                  style={{
+                    padding: '16px',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'var(--surface-input)',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '14px'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <span className="type-caption" style={{ fontWeight: 800, color: 'var(--accent)' }}>
+                        {zone.gateways}
+                      </span>
+                      <span
+                        className="kinetic-badge"
+                        style={{
+                          background: pct > 85 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                          color: pct > 85 ? '#ef4444' : 'var(--status-success)',
+                          borderColor: pct > 85 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'
+                        }}
+                      >
+                        {pct}% Capacity
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>
+                      {zone.name}
+                    </h4>
+                    <p className="type-caption" style={{ color: 'var(--text-secondary)' }}>
+                      Key Focus: {zone.equipment}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px' }}>
+                      <span style={{ color: 'var(--text-tertiary)' }}>Live Headcount</span>
+                      <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>
+                        {zone.occupancy} / {zone.maxCap} Athletes
+                      </span>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '6px',
+                        borderRadius: '10px',
+                        background: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden',
+                        marginBottom: '12px'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${pct}%`,
+                          height: '100%',
+                          background: pct > 85 ? '#ef4444' : 'var(--accent)',
+                          borderRadius: '10px',
+                          transition: 'width 0.4s ease'
+                        }}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'rgba(0,0,0,0.3)',
+                        fontSize: '0.74rem'
+                      }}
+                    >
+                      <div>
+                        <span style={{ color: 'var(--text-tertiary)', display: 'block' }}>Ambient Temp</span>
+                        <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{zone.temp}</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-tertiary)', display: 'block' }}>HEPA Air Quality</span>
+                        <span style={{ fontWeight: 800, color: 'var(--status-success)' }}>{zone.airQuality}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* TAB 2: EQUIPMENT WEAR TELEMETRY */}
+        {activeTab === 'telemetry' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 100px',
+                padding: '8px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: 'var(--text-tertiary)',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid var(--border-subtle)'
+              }}
+            >
+              <div>Equipment / Station Name</div>
+              <div>Facility Zone</div>
+              <div>Structural Wear Integrity</div>
+              <div>RF Node Signal</div>
+              <div>Last Calibrated</div>
+              <div style={{ textAlign: 'right' }}>Action</div>
+            </div>
+
+            {SENSOR_EQUIPMENT.map((eq) => (
+              <div
+                key={eq.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 100px',
+                  alignItems: 'center',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '0.84rem'
+                }}
+              >
+                <div style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{eq.name}</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>{eq.zone}</div>
+                <div style={{ fontWeight: 800, color: eq.wearLevel >= 90 ? 'var(--status-success)' : '#f59e0b' }}>
+                  {eq.wearLevel}% Integrity
+                </div>
+                <div style={{ color: 'var(--accent)', fontSize: '0.78rem', fontWeight: 700 }}>
+                  {eq.sensorHealth}
+                </div>
+                <div style={{ color: 'var(--text-tertiary)', fontSize: '0.76rem' }}>
+                  {eq.lastCalibration}
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleScheduleMaintenance(eq.name)}
+                    className="kinetic-btn-ghost"
+                    style={{ padding: '4px 8px', fontSize: '0.74rem' }}
+                    title="Dispatch Work Order"
+                  >
+                    <Wrench size={13} color="var(--accent)" />
+                    <span>Service</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* TAB 3: LIVE RFID ACCESS LOGS */}
+        {activeTab === 'access' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[
+              { time: '10:14:22 AM', user: 'Alex Mercer', tier: 'Pro Athlete', gate: 'Turnstile 01 (Main Lobby)', pass: 'NFC Mobile Pass' },
+              { time: '10:08:15 AM', user: 'Sarah Tan', tier: 'Pro Athlete', gate: 'Turnstile 02 (Turf Zone)', pass: 'RFID Key Fob' },
+              { time: '09:55:40 AM', user: 'Coach Marcus Vance', tier: 'Coach Staff', gate: 'Turnstile 01 (Main Lobby)', pass: 'Staff Master Badge' },
+              { time: '09:42:10 AM', user: 'Kasun Fernando', tier: 'Elite Athlete', gate: 'Turnstile 03 (Thermal Recovery)', pass: 'Biometric Palm Scan' }
+            ].map((log, idx) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--surface-input)',
+                  border: '1px solid var(--border-subtle)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <DoorClosed size={16} color="var(--accent)" />
+                  <div>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      {log.user}
+                    </span>
+                    <div className="type-caption">
+                      {log.gate} • {log.pass}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                    {log.tier}
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>
+                    {log.time}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isInline) {
+    return contentUI;
+  }
 
   return (
     <div
@@ -164,367 +509,7 @@ export const FacilitySensorGridModal = ({ isOpen, onClose }) => {
       }}
       onClick={onClose}
     >
-      <div
-        className="kinetic-card animate-scale-up"
-        style={{
-          width: '100%',
-          maxWidth: '1080px',
-          height: '88vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--surface-elevated)',
-          border: '1px solid var(--border-hover)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: 'var(--surface-glass)',
-            borderBottom: '1px solid var(--border-glass)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            flexShrink: 0
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'rgba(212, 255, 0, 0.15)',
-                border: '1px solid var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent)'
-              }}
-            >
-              <Cpu size={18} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="type-eyebrow">FACILITY SENSOR GRID & IOT MESH</span>
-                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                  COLOMBO 07 HUB
-                </span>
-              </div>
-              <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, whiteSpace: 'nowrap' }}>
-                Real-Time Floor Load & Equipment Telemetry
-              </h3>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={handleCalibrateAll}
-              disabled={isCalibrating}
-              className="kinetic-btn-secondary"
-              style={{ padding: '8px 14px', fontSize: '0.78rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}
-            >
-              <RotateCcw size={13} className={isCalibrating ? 'animate-spin' : ''} />
-              <span>{isCalibrating ? 'Pinging Nodes...' : 'Calibrate Sensors'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                width: '34px',
-                height: '34px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0
-              }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Real-Time Live Load KPIs */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: 'var(--surface-input)',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '16px',
-            flexShrink: 0
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 255, 0, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Layers size={16} color="var(--accent)" />
-            </div>
-            <div>
-              <div className="type-caption">ON-PREMISES OCCUPANCY</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                {totalOccupancy} / {totalMaxCap} Athletes ({totalLoadPercent}%)
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Wifi size={16} color="#06b6d4" />
-            </div>
-            <div>
-              <div className="type-caption">CONNECTED SENSOR NODES</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#06b6d4' }}>56 Active Gateways</div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Wind size={16} color="var(--status-success)" />
-            </div>
-            <div>
-              <div className="type-caption">HVAC & AIR PURITY</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--status-success)' }}>99 AQI HEPA High Flow</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tab Navigation Pill Bar */}
-        <div
-          style={{
-            padding: '12px 24px',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            flexShrink: 0
-          }}
-        >
-          {[
-            { id: 'zones', label: 'Facility Zones (4)' },
-            { id: 'equipment', label: 'Smart Equipment Telemetry' },
-            { id: 'access', label: 'Live RFID Access Logs' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                background: activeTab === tab.id ? 'var(--accent)' : 'var(--surface-input)',
-                color: activeTab === tab.id ? '#111111' : 'var(--text-secondary)',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                border: `1px solid ${activeTab === tab.id ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                cursor: 'pointer'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content Space */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-          {/* TAB 1: FACILITY ZONES */}
-          {activeTab === 'zones' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-              {FACILITY_ZONES.map((zone) => {
-                const zoneLoad = Math.round((zone.occupancy / zone.maxCap) * 100);
-                return (
-                  <div
-                    key={zone.id}
-                    className="kinetic-card"
-                    style={{
-                      padding: '20px',
-                      background: 'var(--surface-input)',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                        {zone.name}
-                      </span>
-                      <span
-                        className="kinetic-badge"
-                        style={{
-                          fontSize: '0.66rem',
-                          padding: '1px 6px',
-                          background: zoneLoad >= 85 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                          color: zoneLoad >= 85 ? '#f59e0b' : 'var(--status-success)',
-                          border: `1px solid ${zoneLoad >= 85 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`
-                        }}
-                      >
-                        {zoneLoad}% CAPACITY
-                      </span>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div style={{ height: '8px', background: 'var(--surface-elevated)', borderRadius: '4px', overflow: 'hidden', marginBottom: '14px' }}>
-                      <div
-                        style={{
-                          height: '100%',
-                          width: `${zoneLoad}%`,
-                          background: zoneLoad >= 85 ? '#f59e0b' : 'var(--accent)'
-                        }}
-                      />
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.78rem' }}>
-                      <div style={{ color: 'var(--text-secondary)' }}>
-                        Active Athletes: <strong style={{ color: 'var(--text-primary)' }}>{zone.occupancy} / {zone.maxCap}</strong>
-                      </div>
-                      <div style={{ color: 'var(--text-secondary)' }}>
-                        Temperature: <strong style={{ color: 'var(--text-primary)' }}>{zone.temp}</strong>
-                      </div>
-                      <div style={{ color: 'var(--text-secondary)' }}>
-                        Air Quality: <strong style={{ color: 'var(--text-primary)' }}>{zone.airQuality}</strong>
-                      </div>
-                      <div style={{ color: 'var(--text-secondary)' }}>
-                        Sensor Gateways: <strong style={{ color: 'var(--accent)' }}>{zone.gateways}</strong>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* TAB 2: SMART EQUIPMENT TELEMETRY */}
-          {activeTab === 'equipment' && (
-            <div
-              style={{
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-subtle)',
-                overflow: 'hidden',
-                background: 'var(--surface-input)'
-              }}
-            >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.6fr 1.2fr 1fr 1.2fr 1fr 1fr',
-                  padding: '12px 18px',
-                  background: 'var(--surface-glass)',
-                  borderBottom: '1px solid var(--border-subtle)',
-                  fontSize: '0.74rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  color: 'var(--text-secondary)',
-                  letterSpacing: '0.05em'
-                }}
-              >
-                <div>Station Equipment</div>
-                <div>Location Zone</div>
-                <div>Integrity Score</div>
-                <div>Telemetry Signal</div>
-                <div>Last Ping</div>
-                <div style={{ textAlign: 'right' }}>Maintenance</div>
-              </div>
-
-              {equipmentList.map((eq) => (
-                <div
-                  key={eq.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1.6fr 1.2fr 1fr 1.2fr 1fr 1fr',
-                    alignItems: 'center',
-                    padding: '14px 18px',
-                    borderBottom: '1px solid var(--border-glass)',
-                    fontSize: '0.84rem'
-                  }}
-                >
-                  <div style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{eq.name}</div>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>{eq.zone}</div>
-                  <div style={{ fontWeight: 800, color: eq.wearLevel >= 90 ? 'var(--status-success)' : '#f59e0b' }}>
-                    {eq.wearLevel}% Integrity
-                  </div>
-                  <div style={{ color: 'var(--accent)', fontSize: '0.78rem', fontWeight: 700 }}>
-                    {eq.sensorHealth}
-                  </div>
-                  <div style={{ color: 'var(--text-tertiary)', fontSize: '0.76rem' }}>
-                    {eq.lastCalibration}
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      onClick={() => handleScheduleMaintenance(eq.name)}
-                      className="kinetic-btn-ghost"
-                      style={{ padding: '4px 8px', fontSize: '0.74rem' }}
-                      title="Dispatch Work Order"
-                    >
-                      <Wrench size={13} color="var(--accent)" />
-                      <span>Service</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* TAB 3: LIVE RFID ACCESS LOGS */}
-          {activeTab === 'access' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {[
-                { time: '10:14:22 AM', user: 'Alex Mercer', tier: 'Pro Athlete', gate: 'Turnstile 01 (Main Lobby)', pass: 'NFC Mobile Pass' },
-                { time: '10:08:15 AM', user: 'Sarah Tan', tier: 'Pro Athlete', gate: 'Turnstile 02 (Turf Zone)', pass: 'RFID Key Fob' },
-                { time: '09:55:40 AM', user: 'Coach Marcus Vance', tier: 'Coach Staff', gate: 'Turnstile 01 (Main Lobby)', pass: 'Staff Master Badge' },
-                { time: '09:42:10 AM', user: 'Kasun Fernando', tier: 'Elite Athlete', gate: 'Turnstile 03 (Thermal Recovery)', pass: 'Biometric Palm Scan' }
-              ].map((log, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '12px 16px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'var(--surface-input)',
-                    border: '1px solid var(--border-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <DoorClosed size={16} color="var(--accent)" />
-                    <div>
-                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                        {log.user}
-                      </span>
-                      <div className="type-caption">
-                        {log.gate} • {log.pass}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                      {log.tier}
-                    </span>
-                    <span style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>
-                      {log.time}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      {contentUI}
     </div>
   );
 };

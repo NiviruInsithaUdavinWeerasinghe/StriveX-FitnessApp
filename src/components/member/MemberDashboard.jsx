@@ -13,7 +13,6 @@ import {
   Droplets,
   Plus,
   Minus,
-  Bell,
   Sun,
   Moon,
   LogOut,
@@ -22,7 +21,15 @@ import {
   MessageSquare,
   Settings,
   CheckCircle2,
-  Apple
+  Apple,
+  LayoutDashboard,
+  ShoppingBag,
+  Award,
+  Zap,
+  ShieldCheck,
+  ArrowUpRight,
+  Filter,
+  Package
 } from 'lucide-react';
 
 const ROUTINES = [
@@ -67,1066 +74,782 @@ const ROUTINES = [
       { name: 'Bulgarian Split Squat', sets: '3×10', muscle: 'Glutes / Quads' },
       { name: 'Standing Calf Raises', sets: '4×15', muscle: 'Gastrocnemius' }
     ]
-  },
-  {
-    id: 'hiit_d',
-    title: 'Metabolic Athletic Conditioning D',
-    split: 'Full Body Aerobic & Core',
-    coach: 'Coach Sarah Jenkins',
-    duration: '40 mins',
-    description: 'High-intensity interval circuits to spike VO2 max and burn metabolic glycogen while retaining lean mass.',
-    exercises: [
-      { name: 'Kettlebell Swings', sets: '4×20', muscle: 'Posterior Chain' },
-      { name: 'Box Jump Overs', sets: '4×12', muscle: 'Plyometrics' },
-      { name: 'Assault Bike Sprint Intervals', sets: '6×30s', muscle: 'Cardio' },
-      { name: 'Hanging Leg Raises', sets: '4×15', muscle: 'Core' }
-    ]
   }
+];
+
+const MEAL_LOGS = [
+  { time: '07:30 AM', meal: 'Overnight Oats with Iso-Whey & Berries', kcal: 520, p: 42, c: 68, f: 10, type: 'Breakfast' },
+  { time: '11:45 AM', meal: 'Grilled Chicken Breast, Quinoa & Avocado', kcal: 640, p: 58, c: 55, f: 18, type: 'Lunch' },
+  { time: '03:15 PM', meal: 'Post-Workout Anabolic Whey Shake & Banana', kcal: 310, p: 35, c: 38, f: 4, type: 'Snack' },
+  { time: '07:00 PM', meal: 'Wild Grass-Fed Steak & Sweet Potato Puree', kcal: 680, p: 50, c: 45, f: 22, type: 'Dinner' }
+];
+
+const PERSONAL_RECORDS = [
+  { exercise: 'Barbell Bench Press', weight: '105 kg', reps: '3 reps', date: '2 days ago', rpe: 'RPE 9.5', icon: Dumbbell },
+  { exercise: 'Barbell Back Squat', weight: '145 kg', reps: '5 reps', date: 'Last Week', rpe: 'RPE 9', icon: Zap },
+  { exercise: 'Conventional Deadlift', weight: '180 kg', reps: '2 reps', date: '2 weeks ago', rpe: 'RPE 10', icon: Award },
+  { exercise: 'Weighted Pull-Up', weight: '+25 kg', reps: '6 reps', date: '3 days ago', rpe: 'RPE 8.5', icon: TrendingUp }
+];
+
+const STORE_PRODUCTS = [
+  { id: 'p1', name: 'StriveX Iso-Whey Protein Isolate (2kg)', price: '$64.99', orig: '$75.00', category: 'Supplements', tag: 'Best Seller', rating: '4.9 ★', desc: '100% Cold-filtered whey isolate with 27g protein per scoop.' },
+  { id: 'p2', name: 'Creatine Monohydrate Pure (500g)', price: '$29.99', orig: '$35.00', category: 'Supplements', tag: 'Essential', rating: '5.0 ★', desc: 'Micronized 200-mesh pure creatine monohydrate for ATP burst.' },
+  { id: 'p3', name: 'StriveX Pro Barbell Lifting Straps', price: '$19.99', orig: '$24.00', category: 'Gear', tag: 'Gear', rating: '4.8 ★', desc: 'Heavy-duty cotton webbing with neoprene wrist padding.' },
+  { id: 'p4', name: 'Pre-Workout Telemetry Matrix (400g)', price: '$44.99', orig: '$52.00', category: 'Supplements', tag: 'Energy', rating: '4.9 ★', desc: 'L-Citrulline Malate 8g + Beta-Alanine 3.2g explosive pump.' },
+  { id: 'p5', name: 'StriveX Seamless Compression Top', price: '$39.99', orig: '$48.00', category: 'Apparel', tag: 'New Release', rating: '4.7 ★', desc: 'Four-way stretch sweat-wicking athletic compression weave.' },
+  { id: 'p6', name: 'BCAA Electrolyte Intra-Hydration', price: '$34.99', orig: '$40.00', category: 'Supplements', tag: 'Recovery', rating: '4.9 ★', desc: '2:1:1 Instantiated BCAAs with Pink Himalayan Salt minerals.' }
 ];
 
 export const MemberDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
+  // Navigation tab
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'nutrition' | 'analytics' | 'store' | 'chat'
+  const [storeFilter, setStoreFilter] = useState('All');
+
   // Modals state
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Selected routine state (multi-routine switcher)
+  // Selected routine
   const [selectedRoutineId, setSelectedRoutineId] = useState('push_a');
   const activeRoutine = ROUTINES.find((r) => r.id === selectedRoutineId) || ROUTINES[0];
 
-  // Biometric state tracking
-  const [calories, setCalories] = useState(user?.todayCalories || 680);
-  const targetCalories = user?.targetCalories || 800;
+  // Biometrics tracking
+  const [calories, setCalories] = useState(user?.todayCalories || 1560);
+  const targetCalories = user?.targetCalories || 2150;
 
-  const [activeMins, setActiveMins] = useState(user?.activeMinutes || 54);
+  const [activeMins, setActiveMins] = useState(user?.activeMinutes || 64);
   const targetMins = user?.targetMinutes || 60;
-
-  const [standHours] = useState(10);
-  const targetStandHours = 12;
 
   const [waterMl, setWaterMl] = useState(2250);
   const targetWaterMl = 3000;
 
-  // Notification drawer state
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 'notif_1',
-      title: 'Routine Assigned by Coach Marcus',
-      message: 'New Hypertrophy Push Day A routine has been added to your schedule.',
-      time: '2 hours ago',
-      unread: true,
-      routeId: 'push_a'
-    },
-    {
-      id: 'notif_2',
-      title: '5-Day Streak Achieved!',
-      message: 'You have completed all scheduled workouts this week. Keep the momentum!',
-      time: 'Yesterday',
-      unread: false
-    }
-  ]);
+  const handleAddWater = (amount) => setWaterMl((prev) => Math.min(prev + amount, 5000));
+  const handleAddCalories = (amount) => setCalories((prev) => prev + amount);
 
-  // Selected past day inspection modal/tooltip
-  const [selectedDayLog, setSelectedDayLog] = useState(null);
-
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-  };
-
-  const handleDeleteNotification = (e, id) => {
-    e.stopPropagation();
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  const handleNotificationClick = (n) => {
-    if (n.unread) {
-      setNotifications((prev) => prev.map((notif) => notif.id === n.id ? { ...notif, unread: false } : notif));
-    }
-    if (n.routeId) {
-      setSelectedRoutineId(n.routeId);
-      setIsNotifOpen(false);
-    }
-  };
-
-  const unreadCount = notifications.filter((n) => n.unread).length;
-
-  // Hydration handlers
-  const handleAddWater = (amount) => {
-    setWaterMl((prev) => Math.min(prev + amount, 5000));
-  };
-  const handleRemoveWater = (amount) => {
-    setWaterMl((prev) => Math.max(prev - amount, 0));
-  };
-
-  // Quick calorie logger
-  const handleAddCalories = (amount) => {
-    setCalories((prev) => prev + amount);
-  };
-
-  // Workout completed synchronization callback
   const handleWorkoutCompleted = ({ addedCalories, addedMins }) => {
     setCalories((prev) => prev + addedCalories);
     setActiveMins((prev) => prev + addedMins);
   };
 
-  // Ring calculations
   const calPercent = Math.min((calories / targetCalories) * 100, 100);
   const minPercent = Math.min((activeMins / targetMins) * 100, 100);
-  const standPercent = Math.min((standHours / targetStandHours) * 100, 100);
 
-  const weekDays = [
-    { day: 'M', completed: true, label: 'Mon', routine: 'Hypertrophy Push Day A', volume: '14,250 kg', duration: '52 mins' },
-    { day: 'T', completed: true, label: 'Tue', routine: 'Hypertrophy Pull Day B', volume: '12,800 kg', duration: '48 mins' },
-    { day: 'W', completed: true, label: 'Wed', routine: 'Metabolic HIIT & Core', volume: '8,400 kg', duration: '38 mins' },
-    { day: 'T', completed: true, label: 'Thu', routine: 'Lower Body Strength C', volume: '18,600 kg', duration: '58 mins' },
-    { day: 'F', completed: true, label: 'Fri', routine: 'Upper Body Power Day', volume: '15,100 kg', duration: '50 mins' },
-    { day: 'S', completed: false, label: 'Sat (Today)', isToday: true, routine: activeRoutine.title, volume: 'In Progress', duration: 'Pending' },
-    { day: 'S', completed: false, label: 'Sun', routine: 'Active Mobility & Rest', volume: '0 kg', duration: 'Rest Day' }
+  const navItems = [
+    { id: 'overview', label: 'Workout & Check-in', icon: LayoutDashboard },
+    { id: 'nutrition', label: 'Nutrition & Daily Meals', icon: Apple },
+    { id: 'analytics', label: 'Progress & PR Metrics', icon: TrendingUp },
+    { id: 'store', label: 'Supplements & Gear Store', icon: ShoppingBag },
+    { id: 'chat', label: 'Chat with Coach', icon: MessageSquare }
   ];
 
+  const filteredProducts = storeFilter === 'All'
+    ? STORE_PRODUCTS
+    : STORE_PRODUCTS.filter((p) => p.category === storeFilter);
+
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingBottom: '60px' }}>
-      {/* Top Header Navigation */}
-      <header
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex' }}>
+      {/* LEFT NAVIGATION SIDEBAR */}
+      <aside
         style={{
+          width: '260px',
+          minWidth: '260px',
+          background: 'var(--surface-elevated)',
+          borderRight: '1px solid var(--border-glass)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '24px 16px',
           position: 'sticky',
           top: 0,
-          zIndex: 800,
-          background: 'var(--surface-glass)',
-          backdropFilter: 'var(--blur-glass)',
-          WebkitBackdropFilter: 'var(--blur-glass)',
-          borderBottom: '1px solid var(--border-glass)',
-          padding: '14px 24px'
+          height: '100vh',
+          zIndex: 900
         }}
       >
-        <div
+        <div>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '0 8px 24px 8px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '24px' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'var(--accent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#111',
+                fontWeight: 900
+              }}
+            >
+              <Dumbbell size={20} />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                STRIVEX
+              </div>
+              <span className="type-eyebrow" style={{ fontSize: '0.65rem', color: 'var(--accent)' }}>
+                ATHLETE HUB
+              </span>
+            </div>
+          </div>
+
+          {/* Nav Items */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveTab(item.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: isActive ? 'rgba(212, 255, 0, 0.12)' : 'transparent',
+                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                    border: isActive ? '1px solid rgba(212, 255, 0, 0.25)' : '1px solid transparent',
+                    fontWeight: isActive ? 800 : 600,
+                    fontSize: '0.86rem',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Icon size={18} color={isActive ? 'var(--accent)' : 'var(--text-tertiary)'} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Profile Card Footer */}
+        <div style={{ paddingTop: '20px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '0 4px' }}>
+            <img
+              src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'}
+              alt="Alex Mercer"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1.5px solid var(--accent)'
+              }}
+            />
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.name || 'Alex Mercer'}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>{user?.tier || 'Pro Athlete'}</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="kinetic-btn-ghost"
+              style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={16} color="var(--accent)" /> : <Moon size={16} color="var(--accent)" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSettingsOpen(true)}
+              className="kinetic-btn-ghost"
+              style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
+              title="Settings"
+            >
+              <Settings size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={logout}
+              className="kinetic-btn-ghost"
+              style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
+              title="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT SPACE */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+        {/* Top Header */}
+        <header
           style={{
-            maxWidth: '1360px',
-            margin: '0 auto',
+            position: 'sticky',
+            top: 0,
+            zIndex: 800,
+            background: 'var(--surface-glass)',
+            backdropFilter: 'var(--blur-glass)',
+            WebkitBackdropFilter: 'var(--blur-glass)',
+            borderBottom: '1px solid var(--border-glass)',
+            padding: '16px 32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px'
           }}
         >
-          {/* Athlete Profile Greeting */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ position: 'relative' }}>
-              <img
-                src={
-                  user?.avatar ||
-                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'
-                }
-                alt={user?.name || 'Athlete'}
-                style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '2px solid var(--accent)',
-                  boxShadow: '0 0 12px var(--accent-glow)'
-                }}
-              />
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  background: 'var(--status-success)',
-                  border: '2px solid var(--bg-primary)'
-                }}
-              />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>
-                ATHLETE HUB • {user?.tier || 'Pro Athlete'}
-              </div>
-              <div
-                style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 800,
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-display)'
-                }}
-              >
-                Welcome back, {user?.name ? user.name.split(' ')[0] : 'Athlete'}
-              </div>
-            </div>
+          <div>
+            <div className="type-eyebrow">ATHLETE PERFORMANCE HUB</div>
+            <h1 className="type-h3" style={{ fontSize: '1.25rem', margin: 0 }}>
+              {activeTab === 'overview' && 'Daily Check-in & Workout Tracker'}
+              {activeTab === 'nutrition' && 'Macronutrients & Daily Meal Log'}
+              {activeTab === 'analytics' && 'Body Composition & Personal Records'}
+              {activeTab === 'store' && 'StriveX Official Pro Gear & Store'}
+              {activeTab === 'chat' && '1-on-1 Direct Communication with Coach'}
+            </h1>
           </div>
 
-          {/* Right Header Utilities */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Streak Badge */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'rgba(212, 255, 0, 0.12)',
-                border: '1px solid rgba(212, 255, 0, 0.3)',
-                color: 'var(--accent)',
-                fontSize: '0.82rem',
-                fontWeight: 800
-              }}
-            >
-              <Flame size={15} fill="var(--accent)" color="var(--accent)" />
-              <span>{user?.streakDays || 5} DAY STREAK</span>
-            </div>
-
-            {/* Quick Chat Shortcut */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               type="button"
-              onClick={() => setIsChatOpen(true)}
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all var(--transition-fast)'
-              }}
-              title="Message Trainers (Multi-Staff Suite)"
+              onClick={() => setIsWorkoutModalOpen(true)}
+              className="kinetic-btn-primary"
+              style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
             >
-              <MessageSquare size={17} color="var(--accent)" />
+              <Dumbbell size={15} />
+              <span>Start Today's Workout</span>
             </button>
+          </div>
+        </header>
 
-            {/* Notification Bell */}
-            <div style={{ position: 'relative' }}>
-              <button
-                type="button"
-                onClick={() => setIsNotifOpen((prev) => !prev)}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative'
-                }}
-                title="Notifications"
-              >
-                <Bell size={17} />
-                {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-2px',
-                      right: '-2px',
-                      width: '16px',
-                      height: '16px',
-                      borderRadius: '50%',
-                      background: 'var(--accent)',
-                      color: 'var(--accent-contrast)',
-                      fontSize: '0.68rem',
-                      fontWeight: 900,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+        {/* Main Tab Content */}
+        <main style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px', flex: 1 }}>
+          {/* TAB 1: WORKOUT & CHECK-IN OVERVIEW */}
+          {activeTab === 'overview' && (
+            <>
+              {/* Daily Energy & Hydration KPI row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+                <div className="kinetic-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span className="type-caption">Active Calorie Burn</span>
+                    <Flame size={18} color="var(--accent)" />
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+                    {calories} <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>/ {targetCalories} kcal</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'var(--surface-input)', borderRadius: '10px', marginTop: '12px', overflow: 'hidden' }}>
+                    <div style={{ width: `${calPercent}%`, height: '100%', background: 'var(--accent)', borderRadius: '10px' }} />
+                  </div>
+                </div>
 
-              {/* Notification Dropdown Drawer */}
-              {isNotifOpen && (
-                <div
-                  className="kinetic-card animate-slide-up"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 8px)',
-                    right: 0,
-                    width: '320px',
-                    padding: '16px',
-                    background: 'var(--surface-elevated)',
-                    border: '1px solid var(--border-hover)',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-lg)',
-                    zIndex: 999
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: '12px',
-                      paddingBottom: '8px',
-                      borderBottom: '1px solid var(--border-subtle)'
-                    }}
+                <div className="kinetic-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span className="type-caption">Time in Motion</span>
+                    <Clock size={18} color="#06b6d4" />
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+                    {activeMins} <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>/ {targetMins} mins</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'var(--surface-input)', borderRadius: '10px', marginTop: '12px', overflow: 'hidden' }}>
+                    <div style={{ width: `${minPercent}%`, height: '100%', background: '#06b6d4', borderRadius: '10px' }} />
+                  </div>
+                </div>
+
+                <div className="kinetic-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span className="type-caption">Hydration Target</span>
+                    <Droplets size={18} color="#3b82f6" />
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+                    {waterMl} <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>/ {targetWaterMl} ml</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <button type="button" onClick={() => handleAddWater(250)} className="kinetic-btn-secondary" style={{ padding: '4px 10px', fontSize: '0.74rem' }}>
+                      +250ml
+                    </button>
+                    <button type="button" onClick={() => handleAddWater(500)} className="kinetic-btn-secondary" style={{ padding: '4px 10px', fontSize: '0.74rem' }}>
+                      +500ml
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Program Details Card */}
+              <div className="kinetic-card" style={{ padding: '28px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
+                    <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
+                    <p className="type-caption" style={{ margin: '4px 0 0' }}>Assigned by {activeRoutine.coach} • Est. {activeRoutine.duration}</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsWorkoutModalOpen(true)}
+                    className="kinetic-btn-primary"
+                    style={{ padding: '10px 20px', fontSize: '0.88rem' }}
                   >
-                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                      Notifications ({unreadCount})
-                    </span>
-                    <button
-                      type="button"
-                      onClick={markAllRead}
-                      style={{ fontSize: '0.74rem', color: 'var(--accent)', fontWeight: 700 }}
+                    <Dumbbell size={16} />
+                    <span>Launch Active Workout Tracker</span>
+                  </button>
+                </div>
+
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '20px', lineHeight: '1.5' }}>
+                  {activeRoutine.description}
+                </p>
+
+                {/* Exercises Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                  {activeRoutine.exercises.map((ex, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '14px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--surface-input)',
+                        border: '1px solid var(--border-subtle)'
+                      }}
                     >
-                      Mark all read
+                      <span className="type-caption" style={{ color: 'var(--accent)', fontWeight: 800, fontSize: '0.72rem' }}>
+                        EXERCISE #{idx + 1}
+                      </span>
+                      <h5 style={{ fontSize: '0.92rem', fontWeight: 800, margin: '2px 0 4px 0', color: 'var(--text-primary)' }}>
+                        {ex.name}
+                      </h5>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+                        <span>Target: <strong style={{ color: 'var(--text-secondary)' }}>{ex.sets}</strong></span>
+                        <span>{ex.muscle}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Weekly Streak & Recent Activity Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                {/* Weekly Check-in Calendar */}
+                <div className="kinetic-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>Weekly Workout Adherence</h4>
+                    <span className="kinetic-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--status-success)' }}>5-Day Streak 🔥</span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+                    {[
+                      { day: 'M', done: true, title: 'Push Day A' },
+                      { day: 'T', done: true, title: 'Pull Day B' },
+                      { day: 'W', done: true, title: 'HIIT Cardio' },
+                      { day: 'T', done: true, title: 'Legs Day C' },
+                      { day: 'F', done: true, title: 'Upper Power' },
+                      { day: 'S', done: false, isToday: true, title: 'Today' },
+                      { day: 'S', done: false, title: 'Rest Day' }
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '12px 6px',
+                          borderRadius: 'var(--radius-md)',
+                          background: item.isToday ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
+                          border: item.isToday ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: item.isToday ? 'var(--accent)' : 'var(--text-tertiary)' }}>{item.day}</span>
+                        {item.done ? (
+                          <CheckCircle2 size={16} color="var(--status-success)" />
+                        ) : (
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.isToday ? 'var(--accent)' : 'var(--border-subtle)' }} />
+                        )}
+                        <span style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
+                          {item.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rest & Recovery Telemetry */}
+                <div className="kinetic-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>Recovery & Readiness Score</h4>
+                    <span style={{ fontWeight: 900, color: 'var(--status-success)', fontSize: '1rem' }}>92% Optimal</span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="type-caption">WHOOP HRV Recovery</span>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem' }}>84 ms (Green Zone)</strong>
+                    </div>
+                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="type-caption">Sleep Efficiency</span>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem' }}>7h 48m (89% Deep Sleep)</strong>
+                    </div>
+                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="type-caption">Resting Heart Rate</span>
+                      <strong style={{ color: 'var(--status-success)', fontSize: '0.88rem' }}>52 bpm (Optimal)</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* TAB 2: NUTRITION & DAILY MEALS */}
+          {activeTab === 'nutrition' && (
+            <>
+              {/* Macro Summary Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                <div className="kinetic-card" style={{ padding: '20px' }}>
+                  <span className="type-caption" style={{ color: 'var(--accent)', fontWeight: 800 }}>Protein Intake</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '4px' }}>
+                    185g <span style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)' }}>/ 200g</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'var(--surface-input)', borderRadius: '10px', marginTop: '10px', overflow: 'hidden' }}>
+                    <div style={{ width: '92%', height: '100%', background: 'var(--accent)', borderRadius: '10px' }} />
+                  </div>
+                  <div className="type-caption" style={{ marginTop: '8px' }}>92.5% of target reached</div>
+                </div>
+
+                <div className="kinetic-card" style={{ padding: '20px' }}>
+                  <span className="type-caption" style={{ color: '#06b6d4', fontWeight: 800 }}>Carbohydrates Target</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '4px' }}>
+                    240g <span style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)' }}>/ 310g</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'var(--surface-input)', borderRadius: '10px', marginTop: '10px', overflow: 'hidden' }}>
+                    <div style={{ width: '77%', height: '100%', background: '#06b6d4', borderRadius: '10px' }} />
+                  </div>
+                  <div className="type-caption" style={{ marginTop: '8px' }}>77% of energy glycogen filled</div>
+                </div>
+
+                <div className="kinetic-card" style={{ padding: '20px' }}>
+                  <span className="type-caption" style={{ color: '#f59e0b', fontWeight: 800 }}>Essential Fats Target</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '4px' }}>
+                    62g <span style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)' }}>/ 75g</span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'var(--surface-input)', borderRadius: '10px', marginTop: '10px', overflow: 'hidden' }}>
+                    <div style={{ width: '82%', height: '100%', background: '#f59e0b', borderRadius: '10px' }} />
+                  </div>
+                  <div className="type-caption" style={{ marginTop: '8px' }}>Hormone & joint recovery target</div>
+                </div>
+              </div>
+
+              {/* Detailed Daily Meal Timeline & Macro Breakdown */}
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
+                {/* Meal Timeline */}
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <div>
+                      <h3 className="type-h3" style={{ margin: 0 }}>Today's Meal Timeline</h3>
+                      <p className="type-small" style={{ margin: '4px 0 0' }}>Prescribed by Coach Marcus Vance • Total {calories} kcal logged.</p>
+                    </div>
+
+                    <button type="button" onClick={() => handleAddCalories(250)} className="kinetic-btn-primary" style={{ padding: '8px 14px', fontSize: '0.8rem' }}>
+                      <Plus size={14} /> Log Meal (+250 kcal)
                     </button>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {notifications.length === 0 ? (
-                      <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', textAlign: 'center', padding: '12px 0' }}>
-                        No new notifications.
-                      </div>
-                    ) : (
-                      notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => handleNotificationClick(n)}
-                          style={{
-                            padding: '10px',
-                            borderRadius: 'var(--radius-md)',
-                            background: n.unread ? 'var(--accent-subtle)' : 'transparent',
-                            border: `1px solid ${n.unread ? 'var(--border-hover)' : 'transparent'}`,
-                            cursor: 'pointer',
-                            position: 'relative'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', paddingRight: '20px' }}>
-                              {n.title}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={(e) => handleDeleteNotification(e, n.id)}
-                              style={{
-                                position: 'absolute',
-                                top: '8px',
-                                right: '8px',
-                                color: 'var(--text-tertiary)',
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '2px'
-                              }}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                          <div
-                            style={{
-                              fontSize: '0.76rem',
-                              color: 'var(--text-secondary)',
-                              lineHeight: 1.4
-                            }}
-                          >
-                            {n.message}
-                          </div>
-                          <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-                            {n.time}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {MEAL_LOGS.map((m, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '16px',
+                          borderRadius: 'var(--radius-lg)',
+                          background: 'var(--surface-input)',
+                          border: '1px solid var(--border-subtle)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '16px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                          <span className="kinetic-badge" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>
+                            {m.type}
+                          </span>
+                          <div>
+                            <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)', display: 'block' }}>{m.meal}</strong>
+                            <span className="type-caption">{m.time} • {m.kcal} kcal</span>
                           </div>
                         </div>
-                      ))
-                    )}
+
+                        <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', fontWeight: 800 }}>
+                          <span style={{ color: 'var(--accent)' }}>P: {m.p}g</span>
+                          <span style={{ color: '#06b6d4' }}>C: {m.c}g</span>
+                          <span style={{ color: '#f59e0b' }}>F: {m.f}g</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Theme Toggle */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--text-primary)'
-              }}
-              title="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun size={17} color="var(--accent)" /> : <Moon size={17} color="var(--accent)" />}
-            </button>
-
-            {/* Settings Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsSettingsOpen(true)}
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--text-primary)'
-              }}
-              title="Member Settings"
-            >
-              <Settings size={17} />
-            </button>
-
-            {/* Sign Out */}
-            <button
-              type="button"
-              onClick={logout}
-              className="kinetic-btn-ghost"
-              style={{ padding: '8px 14px', fontSize: '0.82rem' }}
-              title="Sign Out"
-            >
-              <LogOut size={15} />
-              <span>Exit</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Dashboard Workspace */}
-      <main
-        style={{
-          maxWidth: '1360px',
-          margin: '32px auto 0',
-          padding: '0 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '32px'
-        }}
-      >
-        {/* Row 1: KPI Stat Cards Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '20px'
-          }}
-        >
-          {/* Card 1: Calories Burned */}
-          <div className="kinetic-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                Active Calories
-              </span>
-              <div
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Flame size={18} color="#ef4444" />
+                {/* Micronutrients & Hydration */}
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <h3 className="type-h3" style={{ margin: '0 0 16px 0' }}>Micronutrient Checklist</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {[
+                      { name: 'Vitamin D3 (5000 IU)', status: 'Optimal', ok: true },
+                      { name: 'Magnesium Glycinate (400mg)', status: 'Taken', ok: true },
+                      { name: 'Omega-3 Fish Oil (2000mg)', status: 'Taken', ok: true },
+                      { name: 'Zinc Picolinate (30mg)', status: 'Pending Evening', ok: false }
+                    ].map((micro, idx) => (
+                      <div key={idx} style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-primary)' }}>{micro.name}</span>
+                        <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: micro.ok ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-elevated)', color: micro.ok ? 'var(--status-success)' : 'var(--text-secondary)' }}>
+                          {micro.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                {calories}
-              </span>
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {targetCalories} kcal</span>
-            </div>
-            <div style={{ height: '6px', background: 'var(--surface-input)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${calPercent}%`,
-                  background: '#ef4444',
-                  boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)',
-                  transition: 'width var(--transition-normal)'
-                }}
-              />
-            </div>
-          </div>
+            </>
+          )}
 
-          {/* Card 2: Average Heart Rate */}
-          <div className="kinetic-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                Avg Training Heart Rate
-              </span>
-              <div
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Heart size={18} color="#f59e0b" />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                142
-              </span>
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>bpm (Zone 4)</span>
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--status-success)', fontWeight: 600 }}>
-              • Optimal anaerobic threshold
-            </div>
-          </div>
-
-          {/* Card 3: Active Training Time */}
-          <div className="kinetic-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                Active Training Mins
-              </span>
-              <div
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'rgba(212, 255, 0, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Clock size={18} color="var(--accent)" />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                {activeMins}
-              </span>
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>/ {targetMins} mins</span>
-            </div>
-            <div style={{ height: '6px', background: 'var(--surface-input)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${minPercent}%`,
-                  background: 'var(--accent)',
-                  boxShadow: '0 0 10px var(--accent-glow)',
-                  transition: 'width var(--transition-normal)'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Card 4: Weekly Consistency */}
-          <div className="kinetic-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                Consistency Score
-              </span>
-              <div
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <TrendingUp size={18} color="var(--status-success)" />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--status-success)' }}>
-                94%
-              </span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Target Adherence</span>
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              Top 5% of StriveX athletes
-            </div>
-          </div>
-        </div>
-
-        {/* Row 2: Today's Routine Hero & Concentric SVG Goal Rings */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-            gap: '24px'
-          }}
-        >
-          {/* Today's Routine Card (With multi-day routine picker!) */}
-          <div
-            className="kinetic-card"
-            style={{
-              padding: '32px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative',
-              overflow: 'hidden',
-              background: `
-                radial-gradient(circle at 90% 10%, rgba(212, 255, 0, 0.08) 0%, transparent 60%),
-                var(--surface-card)
-              `
-            }}
-          >
-            <div>
-              {/* Routine selector header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-                <div className="kinetic-badge">
-                  <Sparkles size={13} />
-                  <span>Assigned Program</span>
+          {/* TAB 3: PROGRESS & METRICS */}
+          {activeTab === 'analytics' && (
+            <>
+              {/* Top Analytics Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <span className="type-caption">Monthly Tonnage Volume</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: 'var(--accent)', marginTop: '6px' }}>
+                    180,800 kg
+                  </div>
+                  <p className="type-caption" style={{ marginTop: '6px', color: 'var(--status-success)', fontWeight: 700 }}>
+                    +14.2% load progression over last 30 days
+                  </p>
                 </div>
 
-                {/* Day Switcher Dropdown */}
-                <div style={{ display: 'flex', gap: '6px', overflowX: 'auto' }}>
-                  {ROUTINES.map((r) => (
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <span className="type-caption">Body Weight Trend</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: '#06b6d4', marginTop: '6px' }}>
+                    78.4 kg
+                  </div>
+                  <p className="type-caption" style={{ marginTop: '6px', color: 'var(--text-secondary)' }}>
+                    Lean muscle accretion trajectory locked
+                  </p>
+                </div>
+
+                <div className="kinetic-card" style={{ padding: '28px' }}>
+                  <span className="type-caption">Estimated Body Fat %</span>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 900, color: '#f59e0b', marginTop: '6px' }}>
+                    12.8%
+                  </div>
+                  <p className="type-caption" style={{ marginTop: '6px', color: 'var(--status-success)', fontWeight: 700 }}>
+                    -1.2% reduction in fat mass
+                  </p>
+                </div>
+              </div>
+
+              {/* Volume Load Trajectory Visual Bar Chart & Body Metrics Timeline */}
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
+                {/* Visual Bar Graph Widget */}
+                <div className="kinetic-card" style={{ padding: '32px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <div>
+                      <h3 className="type-h3" style={{ margin: 0, fontSize: '1.2rem' }}>Weekly Tonnage Load Trajectory</h3>
+                      <p className="type-small" style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>Calculated across compound sets (Bench, Squat, RDL, Press).</p>
+                    </div>
+                    <span className="kinetic-badge" style={{ padding: '4px 10px' }}>4-Week Telemetry</span>
+                  </div>
+
+                  {/* Visual Graph Bars */}
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '200px', padding: '0 20px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
+                    {[
+                      { label: 'Week 1', volume: '38.4k kg', height: '55%', color: 'linear-gradient(180deg, #06b6d4 0%, rgba(6, 182, 212, 0.2) 100%)', border: '#06b6d4' },
+                      { label: 'Week 2', volume: '41.2k kg', height: '68%', color: 'linear-gradient(180deg, #3b82f6 0%, rgba(59, 130, 246, 0.2) 100%)', border: '#3b82f6' },
+                      { label: 'Week 3', volume: '44.8k kg', height: '82%', color: 'linear-gradient(180deg, #f59e0b 0%, rgba(245, 158, 11, 0.2) 100%)', border: '#f59e0b' },
+                      { label: 'Week 4 (Current)', volume: '45.2k kg', height: '98%', color: 'linear-gradient(180deg, var(--accent) 0%, rgba(212, 255, 0, 0.25) 100%)', border: 'var(--accent)', glow: true }
+                    ].map((bar, idx) => (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flex: 1, height: '100%', justifyContent: 'flex-end' }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: bar.border }}>{bar.volume}</span>
+                        <div
+                          style={{
+                            width: '48px',
+                            height: bar.height,
+                            borderRadius: '8px 8px 0 0',
+                            background: bar.color,
+                            border: `1.5px solid ${bar.border}`,
+                            boxShadow: bar.glow ? '0 0 16px var(--accent-glow)' : `0 0 10px ${bar.border}40`,
+                            transition: 'all 0.3s ease'
+                          }}
+                        />
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{bar.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Body Composition Milestone Checkpoint */}
+                <div className="kinetic-card" style={{ padding: '32px' }}>
+                  <h3 className="type-h3" style={{ margin: '0 0 16px 0', fontSize: '1.1rem' }}>Body Scan History</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    {[
+                      { date: 'Sep 01 (InBody Scan)', weight: '78.4 kg', fat: '12.8%', muscle: '38.2 kg' },
+                      { date: 'Aug 15 (InBody Scan)', weight: '79.1 kg', fat: '13.4%', muscle: '37.8 kg' },
+                      { date: 'Aug 01 (Baseline Scan)', weight: '80.0 kg', fat: '14.0%', muscle: '37.4 kg' }
+                    ].map((scan, idx) => (
+                      <div key={idx} style={{ padding: '14px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                        <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '4px' }}>{scan.date}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--text-primary)', fontWeight: 700 }}>
+                          <span>{scan.weight}</span>
+                          <span style={{ color: '#06b6d4' }}>{scan.muscle} Muscle</span>
+                          <span style={{ color: '#f59e0b' }}>{scan.fat} Fat</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal Record (PR) Hall of Fame */}
+              <div className="kinetic-card" style={{ padding: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <div>
+                    <h3 className="type-h3" style={{ margin: 0, fontSize: '1.2rem' }}>Personal Record (PR) Hall of Fame</h3>
+                    <p className="type-small" style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>Verified 1RM estimations and top strength milestones.</p>
+                  </div>
+                  <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>STRIVEX VERIFIED</span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                  {PERSONAL_RECORDS.map((pr, idx) => {
+                    const Icon = pr.icon;
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '22px',
+                          borderRadius: 'var(--radius-lg)',
+                          background: 'var(--surface-input)',
+                          border: '1px solid var(--border-subtle)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          gap: '16px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="type-caption" style={{ color: 'var(--accent)', fontWeight: 800 }}>{pr.rpe}</span>
+                          <Icon size={20} color="var(--accent)" />
+                        </div>
+                        <div>
+                          <h5 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>{pr.exercise}</h5>
+                          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+                            {pr.weight}
+                          </div>
+                          <span className="type-caption" style={{ fontSize: '0.78rem' }}>{pr.reps} • Logged {pr.date}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* TAB 4: STORE */}
+          {activeTab === 'store' && (
+            <div className="kinetic-card" style={{ padding: '36px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <h3 className="type-h3" style={{ margin: 0, fontSize: '1.3rem' }}>StriveX Official Pro Store</h3>
+                  <p className="type-small" style={{ margin: '6px 0 0', color: 'var(--text-secondary)' }}>15% Member Tier Discount automatically applied at checkout.</p>
+                </div>
+
+                {/* Filter Pills */}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['All', 'Supplements', 'Gear', 'Apparel'].map((cat) => (
                     <button
-                      key={r.id}
+                      key={cat}
                       type="button"
-                      onClick={() => setSelectedRoutineId(r.id)}
+                      onClick={() => setStoreFilter(cat)}
                       style={{
-                        padding: '4px 10px',
+                        padding: '8px 16px',
                         borderRadius: 'var(--radius-pill)',
-                        background: selectedRoutineId === r.id ? 'var(--accent)' : 'var(--surface-input)',
-                        color: selectedRoutineId === r.id ? '#111111' : 'var(--text-secondary)',
-                        fontSize: '0.74rem',
+                        background: storeFilter === cat ? 'var(--accent)' : 'var(--surface-input)',
+                        color: storeFilter === cat ? '#111' : 'var(--text-secondary)',
+                        fontSize: '0.82rem',
                         fontWeight: 800,
-                        border: `1px solid ${selectedRoutineId === r.id ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                        cursor: 'pointer',
-                        transition: 'all var(--transition-fast)'
+                        border: `1px solid ${storeFilter === cat ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                        cursor: 'pointer'
                       }}
                     >
-                      {r.title.split(' ')[1]} {r.title.split(' ')[2] || ''}
+                      {cat}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginBottom: '4px' }}>
-                Coach: <strong style={{ color: 'var(--text-secondary)' }}>{activeRoutine.coach}</strong> • {activeRoutine.split}
-              </div>
-
-              <h3
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.8rem',
-                  fontWeight: 900,
-                  color: 'var(--text-primary)',
-                  marginBottom: '8px'
-                }}
-              >
-                {activeRoutine.title}
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '20px' }}>
-                {activeRoutine.description}
-              </p>
-
-              {/* Routine Exercises Mini-Pills */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
-                {activeRoutine.exercises.map((ex, idx) => (
-                  <span
-                    key={idx}
+              {/* Product Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                {filteredProducts.map((p) => (
+                  <div
+                    key={p.id}
                     style={{
-                      fontSize: '0.78rem',
-                      fontWeight: 600,
-                      padding: '5px 12px',
-                      borderRadius: 'var(--radius-sm)',
+                      padding: '24px',
+                      borderRadius: 'var(--radius-lg)',
                       background: 'var(--surface-input)',
                       border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '18px'
                     }}
                   >
-                    <span style={{ color: 'var(--accent)', fontWeight: 800 }}>{ex.sets}</span>
-                    <span>{ex.name}</span>
-                  </span>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <span className="kinetic-badge" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>{p.tag}</span>
+                        <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 800 }}>{p.rating}</span>
+                      </div>
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 8px 0', color: 'var(--text-primary)', lineHeight: '1.3' }}>{p.name}</h4>
+                      <p className="type-caption" style={{ lineHeight: '1.5', fontSize: '0.82rem' }}>{p.desc}</p>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
+                      <div>
+                        <span style={{ fontWeight: 900, fontSize: '1.35rem', color: 'var(--accent)' }}>{p.price}</span>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', textDecoration: 'line-through', marginLeft: '8px' }}>{p.orig}</span>
+                      </div>
+
+                      <button type="button" className="kinetic-btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
+                        <ShoppingBag size={14} /> Add to Cart
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
+          )}
 
-            {/* Launch Workout Logger Action */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-              <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
-                ⏱ Target Duration: <strong style={{ color: 'var(--text-primary)' }}>{activeRoutine.duration}</strong>
-              </div>
+          {/* TAB 5: CHAT */}
+          {activeTab === 'chat' && (
+            <MemberChatModal isOpen={true} isInline={true} />
+          )}
+        </main>
+      </div>
 
-              <button
-                type="button"
-                onClick={() => setIsWorkoutModalOpen(true)}
-                className="kinetic-btn-primary"
-                style={{ padding: '14px 28px', fontSize: '1rem', fontWeight: 800 }}
-              >
-                <Dumbbell size={18} />
-                Start {activeRoutine.title.split(' ')[1]} Session
-              </button>
-            </div>
-          </div>
-
-          {/* Animated Concentric SVG Goal Rings */}
-          <div
-            className="kinetic-card"
-            style={{
-              padding: '32px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              textAlign: 'center'
-            }}
-          >
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                Daily Goal Rings
-              </span>
-              <span style={{ fontSize: '0.78rem', color: 'var(--accent)', fontWeight: 700 }}>LIVE SYNC</span>
-            </div>
-
-            {/* SVG Triple Concentric Rings */}
-            <div style={{ position: 'relative', width: '200px', height: '200px', margin: '12px auto' }}>
-              <svg width="200" height="200" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(239, 68, 68, 0.15)" strokeWidth="12" />
-                <circle cx="100" cy="100" r="65" fill="none" stroke="rgba(212, 255, 0, 0.15)" strokeWidth="12" />
-                <circle cx="100" cy="100" r="45" fill="none" stroke="rgba(6, 182, 212, 0.15)" strokeWidth="12" />
-
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="85"
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="12"
-                  strokeDasharray={2 * Math.PI * 85}
-                  strokeDashoffset={2 * Math.PI * 85 * (1 - calPercent / 100)}
-                  strokeLinecap="round"
-                  transform="rotate(-90 100 100)"
-                  style={{ transition: 'stroke-dashoffset 1s ease' }}
-                />
-
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="65"
-                  fill="none"
-                  stroke="var(--accent)"
-                  strokeWidth="12"
-                  strokeDasharray={2 * Math.PI * 65}
-                  strokeDashoffset={2 * Math.PI * 65 * (1 - minPercent / 100)}
-                  strokeLinecap="round"
-                  transform="rotate(-90 100 100)"
-                  style={{ transition: 'stroke-dashoffset 1s ease' }}
-                />
-
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="45"
-                  fill="none"
-                  stroke="#06b6d4"
-                  strokeWidth="12"
-                  strokeDasharray={2 * Math.PI * 45}
-                  strokeDashoffset={2 * Math.PI * 45 * (1 - standPercent / 100)}
-                  strokeLinecap="round"
-                  transform="rotate(-90 100 100)"
-                  style={{ transition: 'stroke-dashoffset 1s ease' }}
-                />
-              </svg>
-
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <span style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                  {Math.round((calPercent + minPercent + standPercent) / 3)}%
-                </span>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                  Complete
-                </span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%', marginTop: '16px' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.74rem', color: '#ef4444', fontWeight: 700 }}>• MOVE</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {calories} kcal
-                </div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.74rem', color: 'var(--accent)', fontWeight: 700 }}>• EXERCISE</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {activeMins} mins
-                </div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.74rem', color: '#06b6d4', fontWeight: 700 }}>• STAND</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {standHours} hrs
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Multi-Track Quick Loggers & Interactive Weekly Adherence */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px'
-          }}
-        >
-          {/* Quick Intake Loggers (Hydration & Nutrition) */}
-          <div className="kinetic-card" style={{ padding: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Droplets size={20} color="#06b6d4" />
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Daily Intake Telemetry
-                </h4>
-              </div>
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                Water: {targetWaterMl}ml
-              </span>
-            </div>
-
-            {/* Hydration Bar */}
-            <div style={{ marginBottom: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px' }}>
-                <span style={{ color: '#06b6d4', fontWeight: 700 }}>Hydration Fluid Level</span>
-                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{waterMl} / {targetWaterMl} ml</span>
-              </div>
-              <div style={{ height: '8px', background: 'var(--surface-input)', borderRadius: '4px', overflow: 'hidden', marginBottom: '10px' }}>
-                <div
-                  style={{
-                    height: '100%',
-                    width: `${Math.min((waterMl / targetWaterMl) * 100, 100)}%`,
-                    background: '#06b6d4',
-                    boxShadow: '0 0 12px rgba(6, 182, 212, 0.5)',
-                    transition: 'width var(--transition-fast)'
-                  }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => handleAddWater(250)}
-                  className="kinetic-btn-secondary"
-                  style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem', fontWeight: 700 }}
-                >
-                  <Plus size={13} /> +250ml
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddWater(500)}
-                  className="kinetic-btn-secondary"
-                  style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem', fontWeight: 700 }}
-                >
-                  <Plus size={13} /> +500ml
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveWater(250)}
-                  className="kinetic-btn-ghost"
-                  style={{ padding: '6px 10px', fontSize: '0.78rem' }}
-                  title="Undo water"
-                >
-                  <Minus size={13} />
-                </button>
-              </div>
-            </div>
-
-            {/* Energy Quick Add Bar */}
-            <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px' }}>
-                <span style={{ color: '#ef4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Apple size={14} /> Nutrition Energy Intake
-                </span>
-                <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{calories} kcal logged</span>
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => handleAddCalories(150)}
-                  className="kinetic-btn-secondary"
-                  style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem', fontWeight: 700 }}
-                >
-                  <Plus size={13} /> +150 kcal Snack
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddCalories(350)}
-                  className="kinetic-btn-secondary"
-                  style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem', fontWeight: 700 }}
-                >
-                  <Plus size={13} /> +350 kcal Meal
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Weekly Adherence with Past Session Inspector */}
-          <div className="kinetic-card" style={{ padding: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={18} color="var(--accent)" />
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Weekly Schedule & Logs
-                </h4>
-              </div>
-              <span style={{ fontSize: '0.78rem', color: 'var(--status-success)', fontWeight: 700 }}>
-                5/7 Days Logged
-              </span>
-            </div>
-
-            {/* Day Bubble Tracker (Clickable to inspect!) */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '20px 0' }}>
-              {weekDays.map((wd, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSelectedDayLog(wd)}
-                  style={{
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '6px',
-                    cursor: 'pointer'
-                  }}
-                  title={`Click to view ${wd.label} log details`}
-                >
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: wd.completed
-                        ? 'var(--accent)'
-                        : wd.isToday
-                        ? 'var(--surface-elevated)'
-                        : 'var(--surface-input)',
-                      border: wd.isToday ? '2px solid var(--accent)' : '1px solid var(--border-subtle)',
-                      color: wd.completed ? '#111111' : 'var(--text-secondary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 800,
-                      fontSize: '0.85rem',
-                      boxShadow: wd.completed ? '0 0 12px var(--accent-glow)' : 'none',
-                      transition: 'transform var(--transition-fast)'
-                    }}
-                  >
-                    {wd.completed ? <CheckCircle2 size={18} /> : wd.day}
-                  </div>
-                  <span style={{ fontSize: '0.72rem', color: wd.isToday ? 'var(--accent)' : 'var(--text-tertiary)', fontWeight: wd.isToday ? 700 : 500 }}>
-                    {wd.label.split(' ')[0]}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Inspected Day Detail Strip */}
-            {selectedDayLog ? (
-              <div
-                className="animate-fade-in"
-                style={{
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-hover)',
-                  marginBottom: '12px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--accent)' }}>
-                    {selectedDayLog.label}: {selectedDayLog.routine}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDayLog(null)}
-                    style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}
-                  >
-                    ✕ Close
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Volume Hit: <strong>{selectedDayLog.volume}</strong> • Time: <strong>{selectedDayLog.duration}</strong>
-                </div>
-              </div>
-            ) : (
-              <div
-                style={{
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-input)',
-                  border: '1px solid var(--border-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                  Next Coach Assessment: <strong style={{ color: 'var(--text-primary)' }}>Monday 9:00 AM</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsChatOpen(true)}
-                  style={{
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    color: 'var(--accent)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Chat Coach →
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
-      {/* Active Workout Session Modal */}
+      {/* Active Workout Tracker Modal */}
       <ActiveWorkoutModal
         isOpen={isWorkoutModalOpen}
         onClose={() => setIsWorkoutModalOpen(false)}
+        routine={activeRoutine}
         onWorkoutCompleted={handleWorkoutCompleted}
-        activeRoutine={activeRoutine}
       />
 
-      {/* Member Settings & Preferences Modal */}
+      {/* Settings Modal */}
       <MemberSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-      />
-
-      {/* Member - Trainer Direct Chat Modal */}
-      <MemberChatModal
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
       />
     </div>
   );

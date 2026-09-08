@@ -88,7 +88,7 @@ const SPECIALTY_OPTIONS = [
   { value: 'Corrective Exercise & Joint Mobility', label: 'Corrective Exercise & Joint Mobility' }
 ];
 
-export const StaffManagerModal = ({ isOpen, onClose }) => {
+export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) => {
   const { addToast } = useToast();
 
   const [staffList, setStaffList] = useState(INITIAL_STAFF);
@@ -121,7 +121,7 @@ export const StaffManagerModal = ({ isOpen, onClose }) => {
     });
   }, [staffList, searchQuery, statusFilter]);
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
   // Real-time phone validation (Sri Lankan + Foreign formats)
   const validatePhone = (phone) => {
@@ -223,6 +223,462 @@ export const StaffManagerModal = ({ isOpen, onClose }) => {
     });
   };
 
+  const cardContent = (
+    <div
+      className="kinetic-card"
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--surface-elevated)',
+        border: '1px solid var(--border-hover)',
+        borderRadius: 'var(--radius-xl)',
+        overflow: 'hidden',
+        boxShadow: isInline ? 'none' : 'var(--shadow-lg)'
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: '20px 28px',
+          background: 'var(--surface-glass)',
+          borderBottom: '1px solid var(--border-glass)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexShrink: 0
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div
+            style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '1px solid #f59e0b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#f59e0b'
+            }}
+          >
+            <Users size={22} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="type-eyebrow">COACHING STAFF & CAPACITY MANAGER</span>
+              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                {staffList.length} TRAINERS
+              </span>
+            </div>
+            <h3 className="type-h3" style={{ fontSize: '1.3rem', margin: 0, whiteSpace: 'nowrap' }}>
+              Trainer Roster & Utilization Grid
+            </h3>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={() => setIsOnboardingOpen(true)}
+            className="kinetic-btn-primary"
+            style={{ padding: '8px 18px', fontSize: '0.82rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}
+          >
+            <UserPlus size={15} />
+            <span>Onboard New Coach</span>
+          </button>
+
+          {!isInline && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="kinetic-btn-ghost"
+              style={{ width: '36px', height: '36px', borderRadius: '50%', padding: 0 }}
+              title="Close"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Staff Utilization KPIs */}
+      <div
+        style={{
+          padding: '20px 28px',
+          background: 'var(--surface-input)',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '20px',
+          flexShrink: 0
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212, 255, 0, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <UserCheck size={18} color="var(--accent)" />
+          </div>
+          <div>
+            <div className="type-caption">TOTAL ROSTER</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>{staffList.length} Coaches</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(6, 182, 212, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <TrendingUp size={18} color="#06b6d4" />
+          </div>
+          <div>
+            <div className="type-caption">AVERAGE CAPACITY LOAD</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#06b6d4' }}>88.5% Optimal</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Award size={18} color="var(--status-success)" />
+          </div>
+          <div>
+            <div className="type-caption">COHORT SATISFACTION</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--status-success)' }}>4.96 / 5.00 Rating</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search & Filter Bar */}
+      <div
+        style={{
+          padding: '18px 28px',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+          flexWrap: 'wrap',
+          flexShrink: 0
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 16px',
+            borderRadius: 'var(--radius-pill)',
+            background: 'var(--surface-input)',
+            border: '1px solid var(--border-subtle)',
+            minWidth: '320px',
+            flex: 1
+          }}
+        >
+          <Search size={16} color="var(--text-tertiary)" />
+          <input
+            type="text"
+            placeholder="Search coach by name, specialty, or certification..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: 'var(--text-primary)',
+              fontSize: '0.88rem',
+              width: '100%'
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {[
+            { id: 'all', label: 'All Coaches' },
+            { id: 'on_duty', label: 'On Duty' },
+            { id: 'in_session', label: 'In 1-on-1' },
+            { id: 'off_shift', label: 'Off Shift' }
+          ].map((st) => (
+            <button
+              key={st.id}
+              type="button"
+              onClick={() => setStatusFilter(st.id)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-pill)',
+                background: statusFilter === st.id ? 'var(--accent)' : 'var(--surface-input)',
+                color: statusFilter === st.id ? '#111111' : 'var(--text-secondary)',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                border: `1px solid ${statusFilter === st.id ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                whiteSpace: 'nowrap',
+                cursor: 'pointer'
+              }}
+            >
+              {st.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Staff Table Body */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+        <div
+          style={{
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-subtle)',
+            overflow: 'hidden',
+            background: 'var(--surface-input)'
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1.6fr 1.4fr 1.4fr 1fr 1fr 1fr',
+              padding: '14px 20px',
+              background: 'var(--surface-glass)',
+              borderBottom: '1px solid var(--border-subtle)',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              color: 'var(--text-secondary)',
+              letterSpacing: '0.05em'
+            }}
+          >
+            <div>Coach Name / Cert</div>
+            <div>Primary Specialty</div>
+            <div>Athlete Load & Cap</div>
+            <div>Monthly Sessions</div>
+            <div>Live Status</div>
+            <div style={{ textAlign: 'right' }}>Actions</div>
+          </div>
+
+          {filteredStaff.map((coach) => (
+            <div
+              key={coach.id}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1.6fr 1.4fr 1.4fr 1fr 1fr 1fr',
+                alignItems: 'center',
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--border-glass)',
+                fontSize: '0.86rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <img
+                  src={coach.avatar}
+                  alt={coach.name}
+                  style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent)' }}
+                />
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{coach.name}</span>
+                    <span className="kinetic-badge" style={{ fontSize: '0.64rem', padding: '2px 6px' }}>
+                      {coach.cert}
+                    </span>
+                  </div>
+                  <div className="type-caption">★ {coach.rating.toFixed(2)} Rating</div>
+                </div>
+              </div>
+              <div style={{ color: 'var(--text-secondary)' }}>{coach.specialty}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ flex: 1, height: '8px', background: 'var(--border-subtle)', borderRadius: '4px', overflow: 'hidden', maxWidth: '100px' }}>
+                  <div style={{ height: '100%', width: `${Math.round((coach.assignedAthletes / coach.maxCapacity) * 100)}%`, background: 'var(--accent)' }} />
+                </div>
+                <span style={{ fontWeight: 700 }}>{coach.assignedAthletes}/{coach.maxCapacity}</span>
+              </div>
+              <div style={{ fontWeight: 700 }}>{coach.monthlySessions} calls</div>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => handleToggleStatus(coach.id)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-pill)',
+                    background: coach.status === 'on_duty' ? 'rgba(16, 185, 129, 0.15)' : coach.status === 'in_session' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                    color: coach.status === 'on_duty' ? 'var(--status-success)' : coach.status === 'in_session' ? '#06b6d4' : 'var(--text-secondary)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '0.74rem',
+                    fontWeight: 800
+                  }}
+                >
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} />
+                  {coach.status.replace('_', ' ').toUpperCase()}
+                </button>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCoachForCap(coach);
+                    setAdjustedCap(coach.maxCapacity);
+                  }}
+                  className="kinetic-btn-ghost"
+                  style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                >
+                  <Sliders size={14} color="var(--accent)" />
+                  <span style={{ marginLeft: '4px' }}>Edit Cap</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isInline) {
+    return (
+      <div style={{ width: '100%' }}>
+        {cardContent}
+
+        {/* Onboard Coach Modal */}
+        {isOnboardingOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9998,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(0, 0, 0, 0.88)',
+              padding: '16px'
+            }}
+            onClick={() => setIsOnboardingOpen(false)}
+          >
+            <div
+              className="kinetic-card animate-scale-up"
+              style={{
+                width: '100%',
+                maxWidth: '520px',
+                padding: '28px',
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border-hover)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <UserPlus size={20} color="var(--accent)" />
+                  <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
+                    Register Certified Trainer
+                  </h3>
+                </div>
+                <button type="button" onClick={() => setIsOnboardingOpen(false)} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateCoach} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Full Name *</label>
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="e.g. Marcus Vance"
+                    className="kinetic-input"
+                  />
+                  {formErrors.name && <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>{formErrors.name}</span>}
+                </div>
+
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Corporate Email *</label>
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="m.vance@strivex.com"
+                    className="kinetic-input"
+                  />
+                  {formErrors.email && <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>{formErrors.email}</span>}
+                </div>
+
+                <div className="kinetic-input-group" style={{ margin: 0 }}>
+                  <label className="kinetic-label">Contact Phone *</label>
+                  <input
+                    type="text"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="+94 77 123 4567"
+                    className="kinetic-input"
+                  />
+                  {formErrors.phone && <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>{formErrors.phone}</span>}
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                  <button type="button" onClick={() => setIsOnboardingOpen(false)} className="kinetic-btn-ghost" style={{ flex: 1 }}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="kinetic-btn-primary" style={{ flex: 2 }}>
+                    <UserPlus size={15} />
+                    <span>Complete Registration</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Capacity Modal */}
+        {selectedCoachForCap && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9998,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(0, 0, 0, 0.88)',
+              padding: '16px'
+            }}
+            onClick={() => setSelectedCoachForCap(null)}
+          >
+            <div
+              className="kinetic-card animate-scale-up"
+              style={{
+                width: '100%',
+                maxWidth: '420px',
+                padding: '24px',
+                background: 'var(--surface-elevated)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="type-h3" style={{ marginTop: 0 }}>
+                Adjust Athlete Ceiling: {selectedCoachForCap.name}
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '20px 0' }}>
+                <input
+                  type="range"
+                  min="10"
+                  max="50"
+                  value={adjustedCap}
+                  onChange={(e) => setAdjustedCap(parseInt(e.target.value, 10))}
+                  style={{ flex: 1 }}
+                />
+                <span style={{ fontWeight: 900, fontSize: '1.4rem', color: 'var(--accent)' }}>{adjustedCap}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="button" onClick={() => setSelectedCoachForCap(null)} className="kinetic-btn-ghost" style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="button" onClick={handleSaveCap} className="kinetic-btn-primary" style={{ flex: 1 }}>
+                  Save Capacity
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -239,603 +695,9 @@ export const StaffManagerModal = ({ isOpen, onClose }) => {
       }}
       onClick={onClose}
     >
-      <div
-        className="kinetic-card animate-scale-up"
-        style={{
-          width: '100%',
-          maxWidth: '1080px',
-          height: '88vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--surface-elevated)',
-          border: '1px solid var(--border-hover)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: 'var(--surface-glass)',
-            borderBottom: '1px solid var(--border-glass)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            flexShrink: 0
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'rgba(212, 255, 0, 0.15)',
-                border: '1px solid var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent)'
-              }}
-            >
-              <Users size={18} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="type-eyebrow">COACHING STAFF & CAPACITY MANAGER</span>
-                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                  24 TRAINERS
-                </span>
-              </div>
-              <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, whiteSpace: 'nowrap' }}>
-                Trainer Roster & Utilization Grid
-              </h3>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={() => setIsOnboardingOpen(true)}
-              className="kinetic-btn-primary"
-              style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: 800, whiteSpace: 'nowrap', flexShrink: 0 }}
-            >
-              <UserPlus size={14} />
-              <span>Onboard New Coach</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                width: '34px',
-                height: '34px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                flexShrink: 0
-              }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Staff Utilization KPIs */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: 'var(--surface-input)',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '16px',
-            flexShrink: 0
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 255, 0, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <UserCheck size={16} color="var(--accent)" />
-            </div>
-            <div>
-              <div className="type-caption">TOTAL ROSTER</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)' }}>24 Coaches</div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={16} color="#06b6d4" />
-            </div>
-            <div>
-              <div className="type-caption">AVERAGE CAPACITY LOAD</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#06b6d4' }}>88.5% Optimal</div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Award size={16} color="var(--status-success)" />
-            </div>
-            <div>
-              <div className="type-caption">COHORT SATISFACTION</div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--status-success)' }}>4.96 / 5.00 Rating</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Search & Filter Bar */}
-        <div
-          style={{
-            padding: '14px 24px',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            flexWrap: 'wrap',
-            flexShrink: 0
-          }}
-        >
-          {/* Search Input */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 14px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--surface-input)',
-              border: '1px solid var(--border-subtle)',
-              minWidth: '280px',
-              flex: 1
-            }}
-          >
-            <Search size={15} color="var(--text-tertiary)" />
-            <input
-              type="text"
-              placeholder="Search coach by name, specialty, or certification..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: 'var(--text-primary)',
-                fontSize: '0.84rem',
-                width: '100%'
-              }}
-            />
-          </div>
-
-          {/* Status Filter Pills */}
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {[
-              { id: 'all', label: 'All Coaches' },
-              { id: 'on_duty', label: 'On Duty' },
-              { id: 'in_session', label: 'In 1-on-1' },
-              { id: 'off_shift', label: 'Off Shift' }
-            ].map((st) => (
-              <button
-                key={st.id}
-                type="button"
-                onClick={() => setStatusFilter(st.id)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: statusFilter === st.id ? 'var(--accent)' : 'var(--surface-input)',
-                  color: statusFilter === st.id ? '#111111' : 'var(--text-secondary)',
-                  fontSize: '0.74rem',
-                  fontWeight: 800,
-                  border: `1px solid ${statusFilter === st.id ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  cursor: 'pointer'
-                }}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Staff Table Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px' }}>
-          <div
-            style={{
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--border-subtle)',
-              overflow: 'hidden',
-              background: 'var(--surface-input)'
-            }}
-          >
-            {/* Table Header */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.6fr 1.4fr 1.4fr 1fr 1fr 1fr',
-                padding: '12px 18px',
-                background: 'var(--surface-glass)',
-                borderBottom: '1px solid var(--border-subtle)',
-                fontSize: '0.74rem',
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
-                letterSpacing: '0.05em'
-              }}
-            >
-              <div>Coach Name / Cert</div>
-              <div>Primary Specialty</div>
-              <div>Athlete Load & Cap</div>
-              <div>Monthly Sessions</div>
-              <div>Live Status</div>
-              <div style={{ textAlign: 'right' }}>Actions</div>
-            </div>
-
-            {/* Table Rows */}
-            {filteredStaff.map((coach) => {
-              const utilPercent = Math.round((coach.assignedAthletes / coach.maxCapacity) * 100);
-              return (
-                <div
-                  key={coach.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1.6fr 1.4fr 1.4fr 1fr 1fr 1fr',
-                    alignItems: 'center',
-                    padding: '14px 18px',
-                    borderBottom: '1px solid var(--border-glass)',
-                    fontSize: '0.84rem'
-                  }}
-                >
-                  {/* Coach Avatar & Name */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img
-                      src={coach.avatar}
-                      alt={coach.name}
-                      style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent)' }}
-                    />
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{coach.name}</span>
-                        <span className="kinetic-badge" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>
-                          {coach.cert}
-                        </span>
-                      </div>
-                      <div className="type-caption">★ {coach.rating.toFixed(2)} Rating</div>
-                    </div>
-                  </div>
-
-                  {/* Specialty */}
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                    {coach.specialty}
-                  </div>
-
-                  {/* Utilization Bar */}
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '4px' }}>
-                      <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>
-                        {coach.assignedAthletes} / {coach.maxCapacity} Athletes
-                      </span>
-                      <span
-                        style={{
-                          fontWeight: 800,
-                          color: utilPercent >= 90 ? 'var(--status-warning)' : 'var(--status-success)'
-                        }}
-                      >
-                        {utilPercent}%
-                      </span>
-                    </div>
-                    <div style={{ height: '6px', background: 'var(--surface-elevated)', borderRadius: '3px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          height: '100%',
-                          width: `${Math.min(utilPercent, 100)}%`,
-                          background: utilPercent >= 90 ? 'var(--status-warning)' : 'var(--accent)'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Monthly Sessions */}
-                  <div style={{ fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {coach.monthlySessions} calls
-                  </div>
-
-                  {/* Status Toggle */}
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStatus(coach.id)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 'var(--radius-pill)',
-                        fontSize: '0.72rem',
-                        fontWeight: 800,
-                        background:
-                          coach.status === 'on_duty'
-                            ? 'rgba(16, 185, 129, 0.15)'
-                            : coach.status === 'in_session'
-                            ? 'rgba(6, 182, 212, 0.15)'
-                            : 'var(--surface-elevated)',
-                        color:
-                          coach.status === 'on_duty'
-                            ? 'var(--status-success)'
-                            : coach.status === 'in_session'
-                            ? '#06b6d4'
-                            : 'var(--text-tertiary)',
-                        border: `1px solid ${
-                          coach.status === 'on_duty'
-                            ? 'rgba(16, 185, 129, 0.3)'
-                            : coach.status === 'in_session'
-                            ? 'rgba(6, 182, 212, 0.3)'
-                            : 'var(--border-subtle)'
-                        }`,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {coach.status === 'on_duty'
-                        ? 'ON DUTY'
-                        : coach.status === 'in_session'
-                        ? 'IN SESSION'
-                        : 'OFF SHIFT'}
-                    </button>
-                  </div>
-
-                  {/* Adjust Capacity Button */}
-                  <div style={{ textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCoachForCap(coach);
-                        setAdjustedCap(coach.maxCapacity);
-                      }}
-                      className="kinetic-btn-ghost"
-                      style={{ padding: '6px 10px', fontSize: '0.74rem' }}
-                      title="Adjust Max Athlete Ceiling"
-                    >
-                      <Sliders size={13} color="var(--accent)" />
-                      <span>Edit Cap</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      <div style={{ width: '100%', maxWidth: '1080px' }}>
+        {cardContent}
       </div>
-
-      {/* Onboard New Trainer Modal */}
-      {isOnboardingOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9998,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.92)',
-            padding: '16px'
-          }}
-          onClick={() => setIsOnboardingOpen(false)}
-        >
-          <div
-            className="kinetic-card animate-scale-up"
-            style={{
-              width: '100%',
-              maxWidth: '520px',
-              padding: '28px',
-              background: 'var(--surface-elevated)',
-              border: '1px solid var(--border-hover)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <UserPlus size={18} color="var(--accent)" />
-                <h4 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
-                  Onboard Certified Trainer
-                </h4>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsOnboardingOpen(false)}
-                style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateCoach} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Coach Full Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Marcus Vance"
-                  value={newName}
-                  onChange={(e) => {
-                    setNewName(e.target.value);
-                    if (formErrors.name) setFormErrors((p) => ({ ...p, name: null }));
-                  }}
-                  className={`kinetic-input ${formErrors.name ? 'input-error' : ''}`}
-                />
-                {formErrors.name && (
-                  <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>
-                    {formErrors.name}
-                  </span>
-                )}
-              </div>
-
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Corporate Email Address *</label>
-                <input
-                  type="email"
-                  placeholder="e.g. marcus.vance@strivex.fit"
-                  value={newEmail}
-                  onChange={(e) => {
-                    setNewEmail(e.target.value);
-                    if (formErrors.email) setFormErrors((p) => ({ ...p, email: null }));
-                  }}
-                  className={`kinetic-input ${formErrors.email ? 'input-error' : ''}`}
-                />
-                {formErrors.email && (
-                  <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>
-                    {formErrors.email}
-                  </span>
-                )}
-              </div>
-
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Phone Hotline (SL / Foreign) *</label>
-                <input
-                  type="tel"
-                  placeholder="e.g. +94 77 123 4567"
-                  value={newPhone}
-                  onChange={(e) => {
-                    setNewPhone(e.target.value);
-                    if (formErrors.phone) setFormErrors((p) => ({ ...p, phone: null }));
-                  }}
-                  className={`kinetic-input ${formErrors.phone ? 'input-error' : ''}`}
-                />
-                {formErrors.phone && (
-                  <span style={{ fontSize: '0.74rem', color: 'var(--status-error)', marginTop: '4px' }}>
-                    {formErrors.phone}
-                  </span>
-                )}
-              </div>
-
-              <div className="kinetic-input-group" style={{ margin: 0 }}>
-                <label className="kinetic-label">Primary Coaching Specialty *</label>
-                <CustomDropdown
-                  options={SPECIALTY_OPTIONS}
-                  value={newSpecialty}
-                  onChange={setNewSpecialty}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="kinetic-input-group" style={{ margin: 0 }}>
-                  <label className="kinetic-label">Certification</label>
-                  <input
-                    type="text"
-                    value={newCert}
-                    onChange={(e) => setNewCert(e.target.value)}
-                    className="kinetic-input"
-                  />
-                </div>
-                <div className="kinetic-input-group" style={{ margin: 0 }}>
-                  <label className="kinetic-label">Max Athlete Cap</label>
-                  <input
-                    type="number"
-                    min="10"
-                    max="50"
-                    value={newCap}
-                    onChange={(e) => setNewCap(e.target.value)}
-                    className="kinetic-input"
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsOnboardingOpen(false)}
-                  className="kinetic-btn-ghost"
-                  style={{ flex: 1 }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="kinetic-btn-primary"
-                  style={{ flex: 2 }}
-                >
-                  <UserPlus size={14} />
-                  <span>Register Coach</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Adjust Capacity Modal */}
-      {selectedCoachForCap && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9998,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.92)',
-            padding: '16px'
-          }}
-          onClick={() => setSelectedCoachForCap(null)}
-        >
-          <div
-            className="kinetic-card animate-scale-up"
-            style={{
-              width: '100%',
-              maxWidth: '440px',
-              padding: '24px',
-              background: 'var(--surface-elevated)',
-              border: '1px solid var(--border-hover)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4 className="type-h3" style={{ fontSize: '1.15rem', margin: '0 0 12px' }}>
-              Adjust Client Capacity Cap
-            </h4>
-            <p className="type-small" style={{ margin: '0 0 18px' }}>
-              Set maximum active athlete allowance for <strong>{selectedCoachForCap.name}</strong>.
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-              <input
-                type="range"
-                min="10"
-                max="45"
-                value={adjustedCap}
-                onChange={(e) => setAdjustedCap(parseInt(e.target.value, 10))}
-                style={{ flex: 1, accentColor: 'var(--accent)' }}
-              />
-              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--accent)', minWidth: '60px', textAlign: 'right' }}>
-                {adjustedCap} Max
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                type="button"
-                onClick={() => setSelectedCoachForCap(null)}
-                className="kinetic-btn-ghost"
-                style={{ flex: 1 }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveCap}
-                className="kinetic-btn-primary"
-                style={{ flex: 2 }}
-              >
-                Save Capacity
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

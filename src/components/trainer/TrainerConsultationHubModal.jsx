@@ -96,7 +96,7 @@ const CLIENT_TELEMETRY_DATA = {
   }
 };
 
-export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) => {
+export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, isInline = false }) => {
   const { addToast } = useToast();
 
   const [activeClientId, setActiveClientId] = useState(defaultClient?.id || 'cli_1');
@@ -113,25 +113,24 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
   const activeClient = CLIENT_TELEMETRY_DATA[activeClientId] || CLIENT_TELEMETRY_DATA.cli_1;
   const activeVideo = activeClient.formVideos[0] || null;
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
   const handleAddAnnotation = (e) => {
     e.preventDefault();
     if (!newAnnotationText.trim()) return;
 
-    if (activeVideo) {
-      activeVideo.annotations.push({
-        time: newAnnotationTime,
-        note: newAnnotationText.trim()
-      });
-    }
+    activeVideo?.annotations.push({
+      time: newAnnotationTime,
+      note: newAnnotationText
+    });
 
-    setNewAnnotationText('');
     addToast({
       type: 'success',
-      title: 'Biomechanics Cue Added',
-      message: `Timestamped cue logged at ${newAnnotationTime} for ${activeClient.name}`
+      title: 'Telemetry Note Added',
+      message: `Annotated video at timestamp ${newAnnotationTime}`
     });
+
+    setNewAnnotationText('');
   };
 
   const handleApproveForm = () => {
@@ -165,6 +164,491 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
     });
   };
 
+  const contentUI = (
+    <div
+      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      style={{
+        width: '100%',
+        maxWidth: isInline ? '100%' : '1080px',
+        height: isInline ? '100%' : '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--surface-elevated)',
+        border: '1px solid var(--border-hover)',
+        borderRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+        overflow: 'hidden',
+        boxShadow: isInline ? 'none' : 'var(--shadow-lg)'
+      }}
+      onClick={(e) => isInline ? null : e.stopPropagation()}
+    >
+      {/* Modal Header */}
+      <div
+        style={{
+          padding: '16px 24px',
+          background: 'var(--surface-glass)',
+          borderBottom: '1px solid var(--border-glass)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexShrink: 0
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'rgba(212, 255, 0, 0.15)',
+              border: '1px solid var(--accent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent)'
+            }}
+          >
+            <Video size={18} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="type-eyebrow">HIGH PERFORMANCE CONSULTATION HUB</span>
+              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                LIVE MESH
+              </span>
+            </div>
+            <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, whiteSpace: 'nowrap' }}>
+              Athlete Telemetry & Video Review Suite
+            </h3>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          {!isInCall ? (
+            <button
+              type="button"
+              onClick={handleStartCall}
+              className="kinetic-btn-primary"
+              style={{ padding: '8px 14px', fontSize: '0.8rem' }}
+            >
+              <Video size={14} />
+              <span>Launch 1-on-1 HD Call</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleEndCall}
+              style={{
+                padding: '8px 14px',
+                borderRadius: 'var(--radius-pill)',
+                background: '#ef4444',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.8rem',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <PhoneOff size={14} />
+              <span>Disconnect Call</span>
+            </button>
+          )}
+
+          {!isInline && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Sub Header Selector: Select Client */}
+      <div
+        style={{
+          padding: '12px 24px',
+          background: 'rgba(0,0,0,0.2)',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexWrap: 'wrap'
+        }}
+      >
+        {/* Client Roster Pills */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+            Active Roster:
+          </span>
+          {Object.values(CLIENT_TELEMETRY_DATA).map((client) => {
+            const isSel = activeClientId === client.id;
+            return (
+              <button
+                key={client.id}
+                type="button"
+                onClick={() => {
+                  setActiveClientId(client.id);
+                  if (isInCall) handleEndCall();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 10px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: isSel ? 'var(--accent)' : 'var(--surface-input)',
+                  color: isSel ? '#111111' : 'var(--text-secondary)',
+                  border: `1px solid ${isSel ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                <img
+                  src={client.avatar}
+                  alt={client.name}
+                  style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+                <span>{client.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Controls */}
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[
+            { id: 'telemetry', label: 'Biometric Telemetry' },
+            { id: 'form_check', label: `Video Form Check (${activeClient.formVideos.length})` },
+            { id: 'live_call', label: isInCall ? 'Live Call (Active)' : 'Video Consultation' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={activeTab === tab.id ? 'kinetic-btn-primary' : 'kinetic-btn-ghost'}
+              style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Body */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+        {/* TAB 1: TELEMETRY */}
+        {activeTab === 'telemetry' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Header info */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <img
+                src={activeClient.avatar}
+                alt={activeClient.name}
+                style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+              />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0 }}>
+                    {activeClient.name}
+                  </h3>
+                  <span className="kinetic-badge" style={{ fontSize: '0.68rem' }}>
+                    {activeClient.tier}
+                  </span>
+                </div>
+                <div className="type-caption">
+                  Active Routine: <strong style={{ color: 'var(--text-primary)' }}>{activeClient.routine}</strong> • Adherence {activeClient.adherence}%
+                </div>
+              </div>
+            </div>
+
+            {/* Metrics Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+              <div className="kinetic-card" style={{ padding: '24px', background: 'var(--surface-input)' }}>
+                <span className="type-caption">Weekly Tonnage Volume</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--accent)', marginTop: '6px' }}>
+                  {activeClient.weeklyVolumeKg} kg
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--status-success)', marginTop: '6px', fontWeight: 700 }}>
+                  +12.4% vs last week average
+                </div>
+              </div>
+
+              <div className="kinetic-card" style={{ padding: '24px', background: 'var(--surface-input)' }}>
+                <span className="type-caption">Bench Press 1RM Projection</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: '#06b6d4', marginTop: '6px' }}>
+                  {activeClient.estimatedBench1RM}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '6px' }}>
+                  Calculated from 5-rep RPE 8 set
+                </div>
+              </div>
+
+              <div className="kinetic-card" style={{ padding: '24px', background: 'var(--surface-input)' }}>
+                <span className="type-caption">Live Telemetry Heart Rate</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--status-success)', marginTop: '6px' }}>
+                  {activeClient.avgHeartRate}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '6px' }}>
+                  WHOOP BLE Transceiver Sync
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Workout History & Set Progression Log */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start', marginTop: '12px' }}>
+              {/* Recent Set Performance Logs */}
+              <div className="kinetic-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <div>
+                    <h4 className="type-h3" style={{ fontSize: '1.1rem', margin: 0 }}>Recent Workout Telemetry & Set Logs</h4>
+                    <p className="type-caption" style={{ margin: '4px 0 0' }}>Real-time sensor data uploaded from athlete smart watch / WHOOP.</p>
+                  </div>
+                  <span className="kinetic-badge" style={{ padding: '4px 10px' }}>Live Sync</span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {[
+                    { exercise: 'Barbell Bench Press', set: 'Set 1', load: '80 kg × 8 reps', rpe: 'RPE 7.5', tempo: '3-0-1-0' },
+                    { exercise: 'Barbell Bench Press', set: 'Set 2', load: '85 kg × 8 reps', rpe: 'RPE 8.0', tempo: '3-0-1-0' },
+                    { exercise: 'Barbell Bench Press', set: 'Set 3 (Top Set)', load: '85 kg × 8 reps', rpe: 'RPE 8.5', tempo: '3-0-1-0' },
+                    { exercise: 'Incline Dumbbell Press', set: 'Set 1', load: '32 kg × 10 reps', rpe: 'RPE 8.0', tempo: '2-1-1-0' }
+                  ].map((log, idx) => (
+                    <div key={idx} style={{ padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>{log.exercise} ({log.set})</strong>
+                        <span className="type-caption">Tempo: {log.tempo}</span>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontWeight: 900, color: 'var(--accent)', fontSize: '0.95rem', display: 'block' }}>{log.load}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 800 }}>{log.rpe}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Biomechanical Readiness & Fatigue Index */}
+              <div className="kinetic-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
+                <h4 className="type-h3" style={{ fontSize: '1.1rem', margin: '0 0 16px 0' }}>Biomechanics & Fatigue Index</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="type-caption">Neuromuscular Fatigue</span>
+                    <strong style={{ color: 'var(--status-success)', fontSize: '0.86rem' }}>Low (Optimal)</strong>
+                  </div>
+                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="type-caption">Barbell Velocity Drop</span>
+                    <strong style={{ color: 'var(--accent)', fontSize: '0.86rem' }}>-4.2% (Target &lt;10%)</strong>
+                  </div>
+                  <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="type-caption">Scapular Symmetry</span>
+                    <strong style={{ color: '#06b6d4', fontSize: '0.86rem' }}>98% Balance</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: VIDEO FORM CHECK */}
+        {activeTab === 'form_check' && activeVideo && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
+            <div>
+              <div style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-subtle)', background: '#000' }}>
+                <img
+                  src={activeVideo.thumbnail}
+                  alt={activeVideo.title}
+                  style={{ width: '100%', height: '360px', objectFit: 'cover', opacity: isPlayingVideo ? 0.9 : 0.7 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsPlayingVideo(!isPlayingVideo)}
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
+                    color: '#111',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    border: 'none',
+                    boxShadow: '0 0 20px rgba(212, 255, 0, 0.4)'
+                  }}
+                >
+                  {isPlayingVideo ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: '3px' }} />}
+                </button>
+              </div>
+
+              <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                    {activeVideo.title}
+                  </h4>
+                  <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>
+                    Uploaded {activeVideo.uploadedAt} • Duration {activeVideo.duration}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleApproveForm}
+                  className="kinetic-btn-primary"
+                  style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                >
+                  <CheckCircle2 size={14} />
+                  <span>Approve Technique</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Annotations sidebar */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h4 className="type-h3" style={{ fontSize: '1rem', margin: 0 }}>
+                Biomechanical Annotations
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {activeVideo.annotations.map((ann, idx) => (
+                  <div key={idx} style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                    <span className="kinetic-badge" style={{ fontSize: '0.68rem', marginBottom: '4px', display: 'inline-block' }}>
+                      Timestamp {ann.time}
+                    </span>
+                    <p style={{ fontSize: '0.82rem', margin: 0, color: 'var(--text-secondary)' }}>
+                      {ann.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <form onSubmit={handleAddAnnotation} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={newAnnotationTime}
+                    onChange={(e) => setNewAnnotationTime(e.target.value)}
+                    className="kinetic-input"
+                    style={{ width: '80px', padding: '6px 10px', fontSize: '0.78rem' }}
+                  />
+                  <input
+                    type="text"
+                    value={newAnnotationText}
+                    onChange={(e) => setNewAnnotationText(e.target.value)}
+                    placeholder="Add biomechanics note..."
+                    className="kinetic-input"
+                    style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem' }}
+                  />
+                </div>
+                <button type="submit" className="kinetic-btn-secondary" style={{ padding: '6px', fontSize: '0.76rem', justifyContent: 'center' }}>
+                  <Plus size={13} />
+                  <span>Add Timestamp Annotation</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: LIVE CALL */}
+        {activeTab === 'live_call' && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '20px' }}>
+            <div style={{ width: '100%', maxWidth: '720px', height: '400px', borderRadius: 'var(--radius-xl)', background: '#000', border: '1px solid var(--border-hover)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img
+                src={activeClient.avatar}
+                alt={activeClient.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isCamOn ? 0.85 : 0.2 }}
+              />
+              <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.6)', padding: '6px 12px', borderRadius: 'var(--radius-pill)', color: '#fff', fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--status-success)' }} />
+                <span>{activeClient.name} (HD 1080p Telemetry Stream)</span>
+              </div>
+            </div>
+
+            {/* Call Controls */}
+            <div style={{ display: 'flex', gap: '14px' }}>
+              <button
+                type="button"
+                onClick={() => setIsMicOn(!isMicOn)}
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '50%',
+                  background: isMicOn ? 'var(--surface-input)' : '#ef4444',
+                  color: '#fff',
+                  border: '1px solid var(--border-glass)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCamOn(!isCamOn)}
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '50%',
+                  background: isCamOn ? 'var(--surface-input)' : '#ef4444',
+                  color: '#fff',
+                  border: '1px solid var(--border-glass)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                {isCamOn ? <Camera size={20} /> : <CameraOff size={20} />}
+              </button>
+              <button
+                type="button"
+                onClick={handleEndCall}
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <PhoneOff size={20} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isInline) return contentUI;
+
   return (
     <div
       style={{
@@ -181,608 +665,7 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient }) 
       }}
       onClick={onClose}
     >
-      <div
-        className="kinetic-card animate-scale-up"
-        style={{
-          width: '100%',
-          maxWidth: '1080px',
-          height: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--surface-elevated)',
-          border: '1px solid var(--border-hover)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: 'var(--surface-glass)',
-            borderBottom: '1px solid var(--border-glass)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'rgba(212, 255, 0, 0.15)',
-                border: '1px solid var(--accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent)'
-              }}
-            >
-              <Activity size={18} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="type-eyebrow">COACH TELEMETRY & CONSULTATION HUB</span>
-                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                  {activeClient.tier}
-                </span>
-              </div>
-              <h3 className="type-h3" style={{ fontSize: '1.15rem', margin: 0, whiteSpace: 'nowrap' }}>
-                {activeClient.name} • Biometrics Hub
-              </h3>
-            </div>
-          </div>
-
-          {/* Tab Navigation Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={() => setActiveTab('telemetry')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                background: activeTab === 'telemetry' ? 'var(--accent)' : 'var(--surface-input)',
-                color: activeTab === 'telemetry' ? '#111111' : 'var(--text-secondary)',
-                fontSize: '0.8rem',
-                fontWeight: 800,
-                border: '1px solid var(--border-subtle)',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                cursor: 'pointer'
-              }}
-            >
-              Telemetry
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('form_check')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                background: activeTab === 'form_check' ? 'var(--accent)' : 'var(--surface-input)',
-                color: activeTab === 'form_check' ? '#111111' : 'var(--text-secondary)',
-                fontSize: '0.8rem',
-                fontWeight: 800,
-                border: '1px solid var(--border-subtle)',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                cursor: 'pointer'
-              }}
-            >
-              Video Checks ({activeClient.formVideos.length})
-            </button>
-
-            <button
-              type="button"
-              onClick={handleStartCall}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                background: isInCall ? 'var(--status-error)' : 'rgba(6, 182, 212, 0.2)',
-                color: isInCall ? '#ffffff' : '#06b6d4',
-                fontSize: '0.8rem',
-                fontWeight: 800,
-                border: '1px solid rgba(6, 182, 212, 0.4)',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <Video size={13} />
-              <span>{isInCall ? 'In HD Call (Live)' : '1-on-1 HD Call'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '6px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-glass)',
-                color: 'var(--text-secondary)',
-                marginLeft: '6px',
-                flexShrink: 0
-              }}
-            >
-              <X size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* Modal 2-Column Body */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '260px 1fr', overflow: 'hidden' }}>
-          {/* Left Athlete Client Selector Sidebar */}
-          <div
-            style={{
-              borderRight: '1px solid var(--border-subtle)',
-              background: 'var(--bg-secondary)',
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-              overflowY: 'auto'
-            }}
-          >
-            <div className="type-caption" style={{ fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>
-              Assigned Athletes
-            </div>
-
-            {Object.values(CLIENT_TELEMETRY_DATA).map((cli) => (
-              <button
-                key={cli.id}
-                type="button"
-                onClick={() => {
-                  setActiveClientId(cli.id);
-                  if (isInCall) setIsInCall(false);
-                }}
-                style={{
-                  padding: '10px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: activeClientId === cli.id ? 'var(--surface-elevated)' : 'transparent',
-                  border: `1px solid ${activeClientId === cli.id ? 'var(--accent)' : 'transparent'}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-fast)'
-                }}
-              >
-                <img
-                  src={cli.avatar}
-                  alt={cli.name}
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: `1.5px solid ${activeClientId === cli.id ? 'var(--accent)' : 'var(--border-subtle)'}`
-                  }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    {cli.name}
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-                    {cli.goal} • {cli.adherence}% Adherence
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Right Workspace Main Content */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-            {/* TAB 1: TELEMETRY ANALYTICS */}
-            {activeTab === 'telemetry' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {/* 4 Stat Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
-                  <div className="kinetic-card" style={{ padding: '16px' }}>
-                    <div className="type-caption">WEEKLY VOLUME</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 900, color: 'var(--accent)', marginTop: '4px' }}>
-                      {activeClient.weeklyVolumeKg} kg
-                    </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--status-success)', marginTop: '2px' }}>
-                      +8.4% progressive overload
-                    </div>
-                  </div>
-
-                  <div className="kinetic-card" style={{ padding: '16px' }}>
-                    <div className="type-caption">ESTIMATED 1RM BENCH</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: '4px' }}>
-                      {activeClient.estimatedBench1RM}
-                    </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      Linear trend line
-                    </div>
-                  </div>
-
-                  <div className="kinetic-card" style={{ padding: '16px' }}>
-                    <div className="type-caption">TRAINING HR PEAK</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 900, color: '#f59e0b', marginTop: '4px' }}>
-                      {activeClient.avgHeartRate.split(' ')[0]}
-                    </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      {activeClient.avgHeartRate.split('(')[1]?.replace(')', '') || 'Zone 4'}
-                    </div>
-                  </div>
-
-                  <div className="kinetic-card" style={{ padding: '16px' }}>
-                    <div className="type-caption">ADHERENCE RATE</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 900, color: 'var(--status-success)', marginTop: '4px' }}>
-                      {activeClient.adherence}%
-                    </div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      Top quartile compliance
-                    </div>
-                  </div>
-                </div>
-
-                {/* Program Card */}
-                <div className="kinetic-card" style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <h4 className="type-h4" style={{ margin: 0 }}>
-                      Active Training Protocol: {activeClient.routine}
-                    </h4>
-                    <span className="type-caption" style={{ color: 'var(--accent)', fontWeight: 800 }}>
-                      OVERLOAD PHASE 2
-                    </span>
-                  </div>
-                  <p className="type-body" style={{ margin: 0 }}>
-                    Targeting 4-day mechanical tension split with progressive resistance micro-cycles. Current phase focus is clavicular chest density and bar deceleration control.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: VIDEO FORM-CHECK ASSESSMENT & ANNOTATION */}
-            {activeTab === 'form_check' && activeVideo && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
-                  {/* Left Simulated Video Player */}
-                  <div
-                    style={{
-                      borderRadius: 'var(--radius-lg)',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      background: '#000000',
-                      border: '1px solid var(--border-subtle)',
-                      aspectRatio: '16/10',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <img
-                      src={activeVideo.thumbnail}
-                      alt={activeVideo.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isPlayingVideo ? 0.9 : 0.6 }}
-                    />
-
-                    {/* Play/Pause Overlay */}
-                    <button
-                      type="button"
-                      onClick={() => setIsPlayingVideo((prev) => !prev)}
-                      style={{
-                        position: 'absolute',
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '50%',
-                        background: 'var(--accent)',
-                        color: '#111111',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 0 24px var(--accent-glow)',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isPlayingVideo ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: '3px' }} />}
-                    </button>
-
-                    {/* Video Duration & Status Pill */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        left: '12px',
-                        right: '12px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '6px 12px',
-                        background: 'rgba(0, 0, 0, 0.75)',
-                        borderRadius: 'var(--radius-pill)',
-                        fontSize: '0.76rem',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      <span>⏱ {activeVideo.duration} • Uploaded {activeVideo.uploadedAt}</span>
-                      <span
-                        style={{
-                          fontWeight: 800,
-                          color: activeVideo.status === 'approved' ? 'var(--status-success)' : 'var(--accent)'
-                        }}
-                      >
-                        {activeVideo.status === 'approved' ? 'FORM APPROVED' : 'NEEDS COACH AUDIT'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Right Annotations & Cues List */}
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                        <h4 className="type-h4" style={{ margin: 0 }}>
-                          Biomechanics Cues ({activeVideo.annotations.length})
-                        </h4>
-                        {activeVideo.status !== 'approved' && (
-                          <button
-                            type="button"
-                            onClick={handleApproveForm}
-                            className="kinetic-btn-primary"
-                            style={{ padding: '4px 10px', fontSize: '0.74rem' }}
-                          >
-                            <CheckCircle2 size={13} /> Approve Form
-                          </button>
-                        )}
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto' }}>
-                        {activeVideo.annotations.map((ann, idx) => (
-                          <div
-                            key={idx}
-                            style={{
-                              padding: '10px 12px',
-                              borderRadius: 'var(--radius-md)',
-                              background: 'var(--surface-input)',
-                              border: '1px solid var(--border-subtle)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                              <Clock size={12} color="var(--accent)" />
-                              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--accent)' }}>
-                                Timestamp {ann.time}
-                              </span>
-                            </div>
-                            <div className="type-small" style={{ color: 'var(--text-primary)', margin: 0 }}>
-                              {ann.note}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Add Annotation Input */}
-                    <form onSubmit={handleAddAnnotation} style={{ marginTop: '12px' }}>
-                      <div style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
-                        <input
-                          type="text"
-                          value={newAnnotationTime}
-                          onChange={(e) => setNewAnnotationTime(e.target.value)}
-                          placeholder="0:15"
-                          style={{
-                            width: '60px',
-                            padding: '6px',
-                            borderRadius: '6px',
-                            background: 'var(--surface-input)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--accent)',
-                            fontWeight: 800,
-                            fontSize: '0.8rem',
-                            textAlign: 'center'
-                          }}
-                        />
-                        <input
-                          type="text"
-                          value={newAnnotationText}
-                          onChange={(e) => setNewAnnotationText(e.target.value)}
-                          placeholder="Add technique cue at this timestamp..."
-                          style={{
-                            flex: 1,
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            background: 'var(--surface-input)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--text-primary)',
-                            fontSize: '0.8rem'
-                          }}
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="kinetic-btn-secondary"
-                        style={{ width: '100%', padding: '6px 12px', fontSize: '0.78rem', justifyContent: 'center' }}
-                      >
-                        <Plus size={13} /> Log Biomechanics Note
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: LIVE 1-ON-1 HD VIDEO CONSULTATION ROOM */}
-            {activeTab === 'live_call' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '16px',
-                    height: '320px',
-                    borderRadius: 'var(--radius-lg)',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {/* Athlete Video Feed */}
-                  <div
-                    style={{
-                      position: 'relative',
-                      background: '#0a0a0a',
-                      borderRadius: 'var(--radius-md)',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                  >
-                    <img
-                      src={activeClient.avatar}
-                      alt={activeClient.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '10px',
-                        left: '10px',
-                        padding: '4px 10px',
-                        background: 'rgba(0, 0, 0, 0.75)',
-                        borderRadius: 'var(--radius-pill)',
-                        fontSize: '0.74rem',
-                        fontWeight: 700,
-                        color: '#ffffff'
-                      }}
-                    >
-                      {activeClient.name} (Remote Athlete)
-                    </div>
-                  </div>
-
-                  {/* Coach Marcus Video Feed */}
-                  <div
-                    style={{
-                      position: 'relative',
-                      background: '#0a0a0a',
-                      borderRadius: 'var(--radius-md)',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '2px solid var(--accent)'
-                    }}
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=400&auto=format&fit=crop"
-                      alt="Coach Marcus"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '10px',
-                        left: '10px',
-                        padding: '4px 10px',
-                        background: 'rgba(212, 255, 0, 0.9)',
-                        color: '#111111',
-                        borderRadius: 'var(--radius-pill)',
-                        fontSize: '0.74rem',
-                        fontWeight: 900
-                      }}
-                    >
-                      Coach Marcus Vance (You)
-                    </div>
-                  </div>
-                </div>
-
-                {/* Call Controls Bar */}
-                <div
-                  style={{
-                    padding: '12px 20px',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'var(--surface-input)',
-                    border: '1px solid var(--border-glass)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--status-error)' }} />
-                    <span className="type-caption" style={{ fontWeight: 800, color: 'var(--text-primary)' }}>
-                      HD 1080p ENCRYPTED SESSION • 02:25
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setIsMicOn((prev) => !prev)}
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: isMicOn ? 'var(--surface-elevated)' : 'var(--status-error)',
-                        border: '1px solid var(--border-glass)',
-                        color: '#ffffff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer'
-                      }}
-                      title={isMicOn ? 'Mute Mic' : 'Unmute Mic'}
-                    >
-                      {isMicOn ? <Mic size={16} /> : <MicOff size={16} />}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsCamOn((prev) => !prev)}
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: isCamOn ? 'var(--surface-elevated)' : 'var(--status-error)',
-                        border: '1px solid var(--border-glass)',
-                        color: '#ffffff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer'
-                      }}
-                      title={isCamOn ? 'Turn Off Camera' : 'Turn On Camera'}
-                    >
-                      {isCamOn ? <Camera size={16} /> : <CameraOff size={16} />}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleEndCall}
-                      style={{
-                        padding: '0 16px',
-                        borderRadius: 'var(--radius-pill)',
-                        background: 'var(--status-error)',
-                        color: '#ffffff',
-                        fontSize: '0.8rem',
-                        fontWeight: 800,
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <PhoneOff size={15} />
-                      <span>End Consultation</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {contentUI}
     </div>
   );
 };
