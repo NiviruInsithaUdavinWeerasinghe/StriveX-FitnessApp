@@ -179,6 +179,17 @@ input, textarea {
   color: var(--text-primary);
 }
 
+/* Remove native input number arrows/spinners to fix text alignment */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
