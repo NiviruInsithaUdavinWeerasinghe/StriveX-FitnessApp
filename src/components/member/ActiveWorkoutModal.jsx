@@ -243,7 +243,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
               <span
                 style={{
                   fontSize: '0.74rem',
@@ -255,16 +255,14 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
               >
                 LIVE WORKOUT LOGGER
               </span>
-              <span style={{ fontSize: '0.74rem', color: 'var(--text-tertiary)' }}>
-                • {activeRoutine?.title || 'Hypertrophy Program'}
-              </span>
             </div>
             <h3
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: '1.4rem',
                 fontWeight: 900,
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                margin: 0
               }}
             >
               {activeRoutine?.title || 'Hypertrophy Routine'}

@@ -494,14 +494,11 @@ export const MemberDashboard = () => {
               {isCoachedMode ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
-                        <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: 'rgba(212, 255, 0, 0.15)', color: 'var(--accent)' }}>
-                          ASSIGNED BY {user.assignedTrainer.toUpperCase()}
-                        </span>
-                      </div>
-                      <h3 className="type-h3" style={{ fontSize: '1.4rem', margin: '2px 0 0 0' }}>{activeRoutine.title}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
+                      <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: 'rgba(212, 255, 0, 0.15)', color: 'var(--accent)' }}>
+                        ASSIGNED BY {user.assignedTrainer.toUpperCase()}
+                      </span>
                     </div>
 
                     {availableRoutines.length > 1 && (
