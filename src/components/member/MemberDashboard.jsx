@@ -8,6 +8,7 @@ import { MemberSettingsModal } from './MemberSettingsModal';
 import { MemberChatModal } from './MemberChatModal';
 import { LiveBroadcastBanner } from '../ui/LiveBroadcastBanner';
 import { NotificationDrawerModal } from '../ui/NotificationDrawerModal';
+import { CustomDropdown } from '../ui/CustomDropdown';
 import {
   Flame,
   Heart,
@@ -494,26 +495,29 @@ export const MemberDashboard = () => {
               {isCoachedMode ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <span className="type-eyebrow" style={{ color: 'var(--accent)' }}>PROGRAMMED FOR TODAY</span>
                       <span className="kinetic-badge" style={{ fontSize: '0.66rem', background: 'rgba(212, 255, 0, 0.15)', color: 'var(--accent)' }}>
                         ASSIGNED BY {user.assignedTrainer.toUpperCase()}
                       </span>
+                      <span className="kinetic-badge-subtle" style={{ fontSize: '0.72rem', background: 'var(--surface-input)' }}>
+                        {activeRoutine.split}
+                      </span>
+                      <span className="kinetic-badge-subtle" style={{ fontSize: '0.72rem', background: 'var(--surface-input)', color: '#06b6d4' }}>
+                        Est. {activeRoutine.duration}
+                      </span>
                     </div>
 
                     {availableRoutines.length > 1 && (
-                      <select
-                        value={selectedRoutineId}
-                        onChange={(e) => setSelectedRoutineId(e.target.value)}
-                        className="kinetic-input"
-                        style={{ padding: '8px 12px', fontSize: '0.82rem', background: 'var(--surface-input)', minWidth: '180px' }}
-                      >
-                        {availableRoutines.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.title}
-                          </option>
-                        ))}
-                      </select>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '220px' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 600, whiteSpace: 'nowrap' }}>Switch Split:</span>
+                        <CustomDropdown
+                          options={availableRoutines.map((r) => ({ label: r.title, value: r.id }))}
+                          value={selectedRoutineId}
+                          onChange={(val) => setSelectedRoutineId(val)}
+                          placeholder="Select Routine..."
+                        />
+                      </div>
                     )}
                   </div>
 
@@ -536,18 +540,14 @@ export const MemberDashboard = () => {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {availableRoutines.length > 1 && (
-                        <select
-                          value={selectedRoutineId}
-                          onChange={(e) => setSelectedRoutineId(e.target.value)}
-                          className="kinetic-input"
-                          style={{ padding: '8px 12px', fontSize: '0.82rem', background: 'var(--surface-input)', minWidth: '180px' }}
-                        >
-                          {availableRoutines.map((r) => (
-                            <option key={r.id} value={r.id}>
-                              {r.title}
-                            </option>
-                          ))}
-                        </select>
+                        <div style={{ minWidth: '200px' }}>
+                          <CustomDropdown
+                            options={availableRoutines.map((r) => ({ label: r.title, value: r.id }))}
+                            value={selectedRoutineId}
+                            onChange={(val) => setSelectedRoutineId(val)}
+                            placeholder="Select Routine..."
+                          />
+                        </div>
                       )}
 
                       <button
