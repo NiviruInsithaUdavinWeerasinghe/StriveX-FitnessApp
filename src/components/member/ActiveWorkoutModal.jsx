@@ -46,6 +46,15 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
   // Active routine exercises and logged sets
   const [exercises, setExercises] = useState([]);
 
+  // High-quality exercise image map matching workout types
+  const EXERCISE_IMAGE_MAP = [
+    'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=250&auto=format&fit=crop', // Bench Press / Chest
+    'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=250&auto=format&fit=crop', // Incline DB Press
+    'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=250&auto=format&fit=crop', // Lateral Raises / Delts
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=250&auto=format&fit=crop', // Dips / Pull-ups
+    'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=250&auto=format&fit=crop'  // Squats / Deadlifts
+  ];
+
   // Reset or load exercises whenever activeRoutine changes
   useEffect(() => {
     if (activeRoutine?.exercises) {
@@ -54,7 +63,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
           id: `ex_${idx + 1}`,
           name: ex.name,
           targetMuscle: ex.muscle || 'Target Muscle Group',
-          image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=250&auto=format&fit=crop',
+          image: ex.image || EXERCISE_IMAGE_MAP[idx % EXERCISE_IMAGE_MAP.length],
           sets: [
             { setNumber: 1, prevWeight: 75, prevReps: 10, weight: 75, reps: 10, completed: false },
             { setNumber: 2, prevWeight: 80, prevReps: 8, weight: 80, reps: 8, completed: false },
