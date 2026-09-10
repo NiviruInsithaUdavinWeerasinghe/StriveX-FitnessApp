@@ -17,7 +17,7 @@ export const LiveBroadcastBanner = ({ userRole = 'all' }) => {
 
   return (
     <div
-      className="animate-slide-down"
+      className="animate-slide-down live-broadcast-banner"
       style={{
         width: '100%',
         background: 'linear-gradient(90deg, rgba(212, 255, 0, 0.18) 0%, rgba(6, 182, 212, 0.18) 100%)',

@@ -1,0 +1,1030 @@
+/* ==========================================================================
+   STRIVEX - MEMBER DASHBOARD MOBILE RESPONSIVE STYLES
+   Strictly scoped to max-width: 900px to ensure 100% desktop preservation
+   ========================================================================== */
+
+/* By default on desktop (> 900px), hide all mobile-specific elements */
+.member-mobile-header,
+.member-mobile-drawer,
+.member-mobile-bottom-nav,
+.member-chat-back-btn,
+.active-workout-mobile-sets,
+.member-adherence-day-full,
+.member-adherence-title-full,
+.member-adherence-mobile-summary,
+.member-meal-meta-mobile,
+.member-pr-eyebrow-mobile {
+  display: none !important;
+}
+
+.member-adherence-day-short,
+.member-adherence-title-short {
+  display: inline !important;
+}
+
+/* By default on desktop (> 900px), ensure desktop elements display properly */
+.active-workout-desktop-table {
+  display: block !important;
+}
+
+/* ==========================================================================
+   TABLET & MOBILE BREAKPOINT (<= 900px)
+   ========================================================================== */
+@media (max-width: 900px) {
+  /* 0. Root Flex Layout Protection (Never allow horizontal overflow or shift) */
+  .member-layout-root {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    min-height: 100vh !important;
+  }
+
+  /* 1. Hide Desktop Sidebar */
+  .member-desktop-sidebar {
+    display: none !important;
+  }
+
+  /* 2. Show Mobile Top Sticky Header */
+  .member-mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 14px !important;
+    background: var(--surface-glass) !important;
+    backdrop-filter: var(--blur-glass) !important;
+    -webkit-backdrop-filter: var(--blur-glass) !important;
+    border-bottom: 1px solid var(--border-glass) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 850 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. Adjust Main Content Space */
+  .member-main-container {
+    padding-bottom: 96px !important; /* Extra room for Mobile Bottom Bar */
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Live Broadcast Banner on Mobile */
+  .live-broadcast-banner {
+    padding: 10px 14px !important;
+    font-size: 0.76rem !important;
+    gap: 10px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .live-broadcast-banner > div:first-child {
+    align-items: flex-start !important;
+    gap: 10px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .live-broadcast-banner > div:first-child > div:last-child {
+    flex: 1 !important;
+    min-width: 0 !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+  }
+
+  .live-broadcast-banner button {
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Desktop Header on Mobile: In-flow section title, NO duplicate sticky header */
+  .member-desktop-header {
+    position: relative !important;
+    top: auto !important;
+    z-index: 1 !important;
+    padding: 14px 14px 4px 14px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .member-desktop-header h1 {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Hide duplicate bell & start buttons that already exist in mobile top bar */
+  .member-header-actions {
+    width: auto !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  .member-header-btn-desktop-only {
+    display: none !important;
+  }
+
+  .member-header-mode-toggle {
+    padding: 5px 12px !important;
+    font-size: 0.72rem !important;
+    border-radius: var(--radius-pill) !important;
+  }
+
+  /* Main Tab Content Padding */
+  .member-main-content {
+    padding: 12px 14px 28px 14px !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 4. Energy & Hydration KPI Row */
+  .member-kpi-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .member-kpi-card {
+    padding: 14px 16px !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .member-kpi-val {
+    font-size: 1.7rem !important;
+  }
+
+  /* Weekly Adherence 2-Row Mobile Adaptation */
+  .member-adherence-card {
+    padding: 16px 14px !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .member-adherence-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Row 1: Mon, Tue, Wed, Thu (4 cards across) */
+  .member-adherence-grid > div:nth-child(-n+4) {
+    flex: 1 1 calc(25% - 8px) !important;
+    min-width: 0 !important;
+  }
+
+  /* Row 2: Fri, Sat, Sun (3 cards across) */
+  .member-adherence-grid > div:nth-child(n+5) {
+    flex: 1 1 calc(33.333% - 8px) !important;
+    min-width: 0 !important;
+  }
+
+  .member-adherence-day-cell {
+    padding: 10px 4px !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    transition: all var(--transition-fast) !important;
+  }
+
+  .member-adherence-day-cell.completed {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+
+  .member-adherence-day-cell.today {
+    background: rgba(212, 255, 0, 0.12) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 12px rgba(212, 255, 0, 0.18) !important;
+  }
+
+  .member-adherence-day-short,
+  .member-adherence-title-short {
+    display: none !important;
+  }
+
+  .member-adherence-day-full {
+    display: inline !important;
+    font-size: 0.8rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .member-adherence-day-cell.today .member-adherence-day-full {
+    color: var(--accent) !important;
+  }
+
+  .member-adherence-title-full {
+    display: block !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: center !important;
+    width: 100% !important;
+    padding: 0 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  .member-adherence-mobile-summary {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: 10px !important;
+    padding: 10px 12px !important;
+    background: var(--surface-input) !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-subtle) !important;
+    font-size: 0.74rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  /* Program Details Header */
+  .member-program-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .member-program-badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .member-split-dropdown-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+  }
+
+  .member-split-dropdown-container > div {
+    width: 100% !important;
+  }
+
+  /* 5. Active Workout Logger Mobile Adaptation */
+  .active-workout-modal-backdrop {
+    padding: 10px 8px !important;
+    align-items: flex-end !important;
+    box-sizing: border-box !important;
+  }
+
+  .active-workout-modal-container {
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .active-workout-modal-container:not(.active-workout-inline) {
+    max-height: 94vh !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    border-bottom: none !important;
+  }
+
+  /* In-page inline execution expands naturally without nested scroll trap */
+  .active-workout-inline {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .active-workout-inline .active-workout-scroll-body {
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 14px 10px !important;
+  }
+
+  .active-workout-scroll-body {
+    padding: 14px 10px !important;
+    overflow-x: hidden !important;
+  }
+
+  .active-workout-header {
+    padding: 14px 14px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .active-workout-header-actions {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .active-workout-header-actions > button.kinetic-btn-primary {
+    flex: 1 1 auto !important;
+    min-width: 160px !important;
+    justify-content: center !important;
+    padding: 8px 12px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .active-workout-rest-presets {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Rest Interval Countdown Banner on Mobile */
+  .active-workout-rest-banner {
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .active-workout-rest-banner > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 140px !important;
+  }
+
+  .active-workout-rest-banner > div:last-child {
+    flex-shrink: 0 !important;
+  }
+
+  .active-workout-exercise-card {
+    padding: 12px 8px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .active-workout-exercise-header {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  /* Hide the 7-column desktop table on mobile */
+  .active-workout-desktop-table {
+    display: none !important;
+  }
+
+  /* Show dedicated mobile set cards on mobile */
+  .active-workout-mobile-sets {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .active-workout-mobile-set-card {
+    background: var(--surface-glass) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 8px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    transition: all var(--transition-fast) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .active-workout-mobile-set-card.completed {
+    background: rgba(212, 255, 0, 0.08) !important;
+    border-color: rgba(212, 255, 0, 0.35) !important;
+  }
+
+  .active-workout-mobile-set-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .active-workout-mobile-set-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    background: var(--surface-input) !important;
+    color: var(--text-primary) !important;
+    font-weight: 900 !important;
+    font-size: 0.76rem !important;
+  }
+
+  .active-workout-mobile-check-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 8px !important;
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-glass) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--text-tertiary) !important;
+    cursor: pointer !important;
+    transition: all var(--transition-fast) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .active-workout-mobile-check-btn.completed {
+    background: var(--accent) !important;
+    color: #111111 !important;
+    box-shadow: 0 0 12px var(--accent-glow) !important;
+    border-color: var(--accent) !important;
+  }
+
+  .active-workout-mobile-set-inputs {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    align-items: end !important;
+    width: 100% !important;
+  }
+
+  .active-workout-mobile-input-field {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+  }
+
+  .active-workout-mobile-input-field label {
+    font-size: 0.62rem !important;
+    font-weight: 800 !important;
+    color: var(--text-tertiary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .active-workout-mobile-num-input {
+    width: 100% !important;
+    min-width: 0 !important;
+    text-align: center !important;
+    padding: 7px 2px !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-hover) !important;
+    color: var(--accent) !important;
+    font-weight: 900 !important;
+    font-size: 0.88rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .active-workout-mobile-volume-box {
+    height: 34px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: var(--font-mono) !important;
+    font-size: 0.74rem !important;
+    font-weight: 800 !important;
+    color: var(--text-secondary) !important;
+    background: var(--surface-input) !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-subtle) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+    padding: 0 4px !important;
+  }
+
+  /* Workout Logger Footer on Mobile */
+  .active-workout-footer {
+    padding: 12px 14px !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .active-workout-footer > div:first-child {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    background: var(--surface-input) !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-subtle) !important;
+    font-size: 0.78rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .active-workout-footer > div:last-child {
+    display: flex !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .active-workout-footer > div:last-child button {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 10px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .active-workout-footer > div:last-child button.kinetic-btn-ghost {
+    background: var(--surface-input) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* 6. Nutrition Tab Mobile Adaptation */
+  .member-macro-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .member-nutrition-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .member-meal-card {
+    padding: 18px 14px !important;
+  }
+
+  .member-meal-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .member-meal-header button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .member-meal-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 14px 16px !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .member-meal-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .member-meal-top-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  .member-meal-badge {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 3px 10px !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: var(--radius-pill) !important;
+    margin-top: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .member-meal-meta-desktop {
+    display: none !important;
+  }
+
+  .member-meal-meta-mobile {
+    display: inline-block !important;
+    font-size: 0.74rem !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+  }
+
+  .member-meal-details {
+    width: 100% !important;
+  }
+
+  .member-meal-name {
+    font-size: 0.94rem !important;
+    line-height: 1.35 !important;
+    color: var(--text-primary) !important;
+    font-weight: 800 !important;
+    word-break: break-word !important;
+  }
+
+  .member-meal-item-macros {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    box-sizing: border-box !important;
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* 7. Progress & Metrics Tab Mobile Adaptation */
+  .member-progress-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .member-volume-chart-card {
+    padding: 20px 14px !important;
+  }
+
+  .member-volume-bars-container {
+    height: 200px !important;
+    padding: 0 4px 8px 4px !important;
+  }
+
+  .member-volume-bar-col > div {
+    width: 36px !important;
+  }
+
+  .member-volume-footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .member-pr-card {
+    padding: 20px 14px !important;
+  }
+
+  .member-pr-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    margin-bottom: 18px !important;
+    gap: 6px !important;
+  }
+
+  .member-pr-eyebrow-desktop {
+    display: none !important;
+  }
+
+  .member-pr-eyebrow-mobile {
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  .member-pr-header h3 {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .member-pr-header p {
+    font-size: 0.78rem !important;
+  }
+
+  .member-pr-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .member-pr-item {
+    padding: 16px 14px !important;
+    border-radius: var(--radius-md) !important;
+    gap: 12px !important;
+  }
+
+  /* 8. Store Tab Mobile Adaptation */
+  .member-store-container {
+    padding: 18px 14px !important;
+  }
+
+  .member-store-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+
+  .member-store-filter-pills {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 4px !important;
+  }
+
+  .member-product-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* 9. Chat Tab Mobile Adaptation */
+  .member-chat-wrapper {
+    height: calc(100dvh - 190px) !important;
+    min-height: 480px !important;
+    max-height: calc(100dvh - 180px) !important;
+    flex-direction: column !important;
+  }
+
+  .member-chat-sidebar-mobile-hidden {
+    display: none !important;
+  }
+
+  .member-chat-main-mobile-hidden {
+    display: none !important;
+  }
+
+  .member-chat-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none !important;
+    height: 100% !important;
+  }
+
+  .member-chat-main {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .member-chat-header {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .member-chat-header-left {
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
+  .member-chat-back-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: var(--surface-input) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-subtle) !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+  }
+
+  .member-chat-back-text {
+    display: none !important;
+  }
+
+  .member-chat-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .member-chat-header-info {
+    min-width: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .member-chat-header-title-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+    width: 100% !important;
+  }
+
+  .member-chat-coach-name {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    color: var(--text-primary) !important;
+    margin: 0 !important;
+    line-height: 1.25 !important;
+  }
+
+  .member-chat-role-badge {
+    font-size: 0.6rem !important;
+    padding: 2px 7px !important;
+    border-radius: var(--radius-pill) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .member-chat-program {
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    color: var(--text-tertiary) !important;
+  }
+
+  .member-chat-messages {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .member-chat-bubble {
+    max-width: 84% !important;
+    padding: 10px 14px !important;
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .member-chat-input-bar {
+    padding: 8px 10px !important;
+    flex-shrink: 0 !important;
+    background: var(--surface-glass) !important;
+  }
+
+  .member-chat-input-bar form {
+    gap: 8px !important;
+  }
+
+  .member-chat-input-bar input {
+    padding: 8px 12px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .member-chat-input-bar button[type="submit"] {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* 10. Modals Mobile Sheet Adaptation */
+  .member-modal-content {
+    padding: 20px 16px !important;
+    max-height: 92vh !important;
+  }
+
+  .member-settings-tab-nav {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 12px !important;
+  }
+
+  .member-settings-tab-nav button {
+    white-space: nowrap !important;
+    padding: 12px 14px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .member-settings-body {
+    padding: 18px 14px !important;
+  }
+
+  .member-settings-grid-2col {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .member-settings-footer {
+    padding: 14px 16px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .member-settings-footer button {
+    width: 100% !important;
+  }
+
+  /* 11. Mobile Drawer Navigation Overlay */
+  .member-mobile-drawer {
+    display: flex !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+
+  .member-mobile-drawer-sheet {
+    width: 82% !important;
+    max-width: 310px !important;
+    height: 100% !important;
+    background: var(--surface-elevated) !important;
+    border-right: 1px solid var(--border-glass) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justifyContent: space-between !important;
+    padding: 20px 16px !important;
+    animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes drawerSlideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  /* 12. Sticky Mobile Bottom Navigation Bar */
+  .member-mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 64px !important;
+    background: rgba(14, 14, 14, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid var(--border-glass) !important;
+    z-index: 850 !important;
+    padding: 0 4px !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-theme='light'] .member-mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.96) !important;
+  }
+
+  .member-mobile-bottom-tab {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    padding: 6px 2px !important;
+    color: var(--text-tertiary) !important;
+    font-size: 0.62rem !important;
+    font-weight: 700 !important;
+    transition: all var(--transition-fast) !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+  }
+
+  .member-mobile-bottom-tab.active {
+    color: var(--accent) !important;
+  }
+
+  .member-mobile-bottom-tab.active svg {
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+}

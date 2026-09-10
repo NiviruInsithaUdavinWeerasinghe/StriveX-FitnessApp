@@ -222,7 +222,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
 
   const contentUI = (
     <div
-      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      className={`${isInline ? 'kinetic-card active-workout-inline' : 'kinetic-card animate-scale-up'} active-workout-modal-container`}
       style={{
         width: '100%',
         maxWidth: isInline ? '100%' : '880px',
@@ -240,6 +240,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
     >
         {/* Modal Sticky Header */}
         <div
+          className="active-workout-header"
           style={{
             padding: '20px 28px',
             background: 'var(--surface-glass)',
@@ -279,7 +280,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
           </div>
 
           {/* Right Side: Live Timer or Start Button & Rest Presets */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="active-workout-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {!hasStarted ? (
               <button
                 type="button"
@@ -336,7 +337,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
               </div>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div className="active-workout-rest-presets" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {[45, 60, 90].map((sec) => (
                 <button
                   key={sec}
@@ -358,26 +359,28 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '6px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-glass)',
-                color: 'var(--text-secondary)'
-              }}
-              title="Minimize Logger"
-            >
-              <X size={18} />
-            </button>
+            {!isInline && onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  padding: '6px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'var(--surface-glass)',
+                  color: 'var(--text-secondary)'
+                }}
+                title="Minimize Logger"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Floating / Docked Rest Interval Banner */}
         {isRestActive && (
           <div
-            className="animate-slide-up"
+            className="animate-slide-up active-workout-rest-banner"
             style={{
               padding: '12px 24px',
               background: 'rgba(212, 255, 0, 0.15)',
@@ -434,11 +437,12 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
         )}
 
         {/* Scrollable Exercise Logger List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+        <div className="active-workout-scroll-body" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {exercises.map((ex, exIndex) => (
               <div
                 key={ex.id}
+                className="active-workout-exercise-card"
                 style={{
                   borderRadius: 'var(--radius-lg)',
                   background: 'var(--surface-input)',
@@ -447,6 +451,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                 }}
               >
                 <div
+                  className="active-workout-exercise-header"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -480,193 +485,281 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
                   </span>
                 </div>
 
-                {/* Set Header Columns */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '60px 110px 120px 110px 110px 1fr 70px',
-                    gap: '12px',
-                    fontSize: '0.74rem',
-                    fontWeight: 800,
-                    color: 'var(--text-tertiary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    padding: '0 12px 10px',
-                    alignItems: 'center'
-                  }}
-                >
-                  <div style={{ textAlign: 'center' }}>SET</div>
-                  <div>PREVIOUS</div>
-                  <div style={{ textAlign: 'center' }}>WEIGHT (KG)</div>
-                  <div style={{ textAlign: 'center' }}>TARGET REPS</div>
-                  <div style={{ textAlign: 'center' }}>EST. VOLUME</div>
-                  <div>INTENSITY / TEMPO</div>
-                  <div style={{ textAlign: 'center' }}>ACTION</div>
+                {/* Desktop 7-Column Table View (> 900px) */}
+                <div className="active-workout-table-wrapper active-workout-desktop-table">
+                  <div className="active-workout-table-content">
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '60px 110px 120px 110px 110px 1fr 70px',
+                        gap: '12px',
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        color: 'var(--text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        padding: '0 12px 10px',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div style={{ textAlign: 'center' }}>SET</div>
+                      <div>PREVIOUS</div>
+                      <div style={{ textAlign: 'center' }}>WEIGHT (KG)</div>
+                      <div style={{ textAlign: 'center' }}>TARGET REPS</div>
+                      <div style={{ textAlign: 'center' }}>EST. VOLUME</div>
+                      <div>INTENSITY / TEMPO</div>
+                      <div style={{ textAlign: 'center' }}>ACTION</div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {ex.sets.map((set, setIndex) => {
+                        const setVolume = (set.weight || 0) * (set.reps || 0);
+                        const rpeTarget = setIndex === 0 ? 'RPE 7 (Warm-up)' : setIndex === ex.sets.length - 1 ? 'RPE 9.5 (Top Set)' : 'RPE 8.5 (Working)';
+                        const rpeColor = setIndex === ex.sets.length - 1 ? '#ef4444' : setIndex === 0 ? '#3b82f6' : '#d4ff00';
+
+                        return (
+                          <div
+                            key={setIndex}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '60px 110px 120px 110px 110px 1fr 70px',
+                              gap: '12px',
+                              alignItems: 'center',
+                              padding: '10px 12px',
+                              borderRadius: 'var(--radius-md)',
+                              background: set.completed ? 'rgba(212, 255, 0, 0.08)' : 'var(--surface-glass)',
+                              border: `1px solid ${set.completed ? 'rgba(212, 255, 0, 0.3)' : 'var(--border-subtle)'}`,
+                              transition: 'all var(--transition-fast)'
+                            }}
+                          >
+                            {/* SET NUMBER */}
+                            <div style={{ textAlign: 'center' }}>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '50%',
+                                  background: set.completed ? 'var(--accent)' : 'var(--surface-input)',
+                                  color: set.completed ? '#111' : 'var(--text-primary)',
+                                  fontWeight: 900,
+                                  fontSize: '0.82rem'
+                                }}
+                              >
+                                {set.setNumber}
+                              </span>
+                            </div>
+
+                            {/* PREVIOUS RECORD */}
+                            <div
+                              style={{
+                                fontSize: '0.8rem',
+                                color: 'var(--text-tertiary)',
+                                fontFamily: 'var(--font-mono)'
+                              }}
+                            >
+                              {set.prevWeight}kg × {set.prevReps}
+                            </div>
+
+                            {/* WEIGHT INPUT */}
+                            <div>
+                              <input
+                                type="number"
+                                value={set.weight}
+                                onChange={(e) => handleSetChange(exIndex, setIndex, 'weight', e.target.value)}
+                                readOnly={isCoachPrescribed}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'center',
+                                  padding: '8px 10px',
+                                  borderRadius: 'var(--radius-md)',
+                                  background: isCoachPrescribed ? 'rgba(255, 255, 255, 0.04)' : 'var(--surface-elevated)',
+                                  border: `1px solid ${isCoachPrescribed ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-hover)'}`,
+                                  color: 'var(--accent)',
+                                  fontWeight: 900,
+                                  fontSize: '0.95rem',
+                                  cursor: isCoachPrescribed ? 'default' : 'text'
+                                }}
+                              />
+                            </div>
+
+                            {/* REPS INPUT */}
+                            <div>
+                              <input
+                                type="number"
+                                value={set.reps}
+                                onChange={(e) => handleSetChange(exIndex, setIndex, 'reps', e.target.value)}
+                                readOnly={isCoachPrescribed}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'center',
+                                  padding: '8px 10px',
+                                  borderRadius: 'var(--radius-md)',
+                                  background: isCoachPrescribed ? 'rgba(255, 255, 255, 0.04)' : 'var(--surface-elevated)',
+                                  border: `1px solid ${isCoachPrescribed ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-hover)'}`,
+                                  color: 'var(--text-primary)',
+                                  fontWeight: 900,
+                                  fontSize: '0.95rem',
+                                  cursor: isCoachPrescribed ? 'default' : 'text'
+                                }}
+                              />
+                            </div>
+
+                            {/* EST VOLUME LOAD */}
+                            <div style={{ textAlign: 'center' }}>
+                              <span
+                                style={{
+                                  fontFamily: 'var(--font-mono)',
+                                  fontSize: '0.85rem',
+                                  fontWeight: 800,
+                                  color: set.completed ? 'var(--accent)' : 'var(--text-secondary)'
+                                }}
+                              >
+                                {setVolume > 0 ? `${setVolume.toLocaleString()} kg` : '—'}
+                              </span>
+                            </div>
+
+                            {/* INTENSITY & TEMPO BADGE */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                              <span
+                                style={{
+                                  fontSize: '0.68rem',
+                                  padding: '3px 8px',
+                                  borderRadius: 'var(--radius-pill)',
+                                  background: 'var(--surface-input)',
+                                  color: rpeColor,
+                                  border: `1px solid ${rpeColor}30`,
+                                  fontWeight: 800,
+                                  letterSpacing: '0.02em',
+                                  whiteSpace: 'nowrap',
+                                  display: 'inline-block'
+                                }}
+                              >
+                                {rpeTarget}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '0.7rem',
+                                  color: 'var(--text-tertiary)',
+                                  whiteSpace: 'nowrap',
+                                  fontWeight: 600
+                                }}
+                              >
+                                Tempo 3-1-X-1
+                              </span>
+                            </div>
+
+                            {/* CHECKMARK COMPLETION BUTTON */}
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleSet(exIndex, setIndex)}
+                                style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  borderRadius: '10px',
+                                  background: set.completed ? 'var(--accent)' : 'var(--surface-elevated)',
+                                  border: `1px solid ${set.completed ? 'var(--accent)' : 'var(--border-glass)'}`,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: set.completed ? '#111111' : 'var(--text-tertiary)',
+                                  cursor: 'pointer',
+                                  boxShadow: set.completed ? '0 0 14px var(--accent-glow)' : 'none',
+                                  transition: 'all var(--transition-fast)'
+                                }}
+                                title={set.completed ? 'Mark incomplete' : 'Complete set'}
+                              >
+                                <CheckCircle2 size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Mobile Set Cards (≤ 900px) */}
+                <div className="active-workout-mobile-sets">
                   {ex.sets.map((set, setIndex) => {
                     const setVolume = (set.weight || 0) * (set.reps || 0);
-                    const rpeTarget = setIndex === 0 ? 'RPE 7 (Warm-up)' : setIndex === ex.sets.length - 1 ? 'RPE 9.5 (Top Set)' : 'RPE 8.5 (Working)';
-                    const rpeColor = setIndex === ex.sets.length - 1 ? '#ef4444' : setIndex === 0 ? '#3b82f6' : '#d4ff00';
+                    const rpeTarget = setIndex === 0 ? 'RPE 7' : setIndex === ex.sets.length - 1 ? 'RPE 9.5 (Top)' : 'RPE 8.5';
+                    const rpeColor = setIndex === ex.sets.length - 1 ? '#ef4444' : setIndex === 0 ? '#3b82f6' : 'var(--accent)';
 
                     return (
                       <div
                         key={setIndex}
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '60px 110px 120px 110px 110px 1fr 70px',
-                          gap: '12px',
-                          alignItems: 'center',
-                          padding: '10px 12px',
-                          borderRadius: 'var(--radius-md)',
-                          background: set.completed ? 'rgba(212, 255, 0, 0.08)' : 'var(--surface-glass)',
-                          border: `1px solid ${set.completed ? 'rgba(212, 255, 0, 0.3)' : 'var(--border-subtle)'}`,
-                          transition: 'all var(--transition-fast)'
-                        }}
+                        className={`active-workout-mobile-set-card ${set.completed ? 'completed' : ''}`}
                       >
-                        {/* SET NUMBER */}
-                        <div style={{ textAlign: 'center' }}>
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '28px',
-                              height: '28px',
-                              borderRadius: '50%',
-                              background: set.completed ? 'var(--accent)' : 'var(--surface-input)',
-                              color: set.completed ? '#111' : 'var(--text-primary)',
-                              fontWeight: 900,
-                              fontSize: '0.82rem'
-                            }}
-                          >
-                            {set.setNumber}
-                          </span>
-                        </div>
+                        {/* Top line: Set Number, RPE badge, and Check Button */}
+                        <div className="active-workout-mobile-set-header">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span className="active-workout-mobile-set-badge">
+                              Set {set.setNumber}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '0.66rem',
+                                padding: '2px 8px',
+                                borderRadius: 'var(--radius-pill)',
+                                background: 'var(--surface-input)',
+                                color: rpeColor,
+                                border: `1px solid ${rpeColor}30`,
+                                fontWeight: 800
+                              }}
+                            >
+                              {rpeTarget}
+                            </span>
+                          </div>
 
-                        {/* PREVIOUS RECORD */}
-                        <div
-                          style={{
-                            fontSize: '0.8rem',
-                            color: 'var(--text-tertiary)',
-                            fontFamily: 'var(--font-mono)'
-                          }}
-                        >
-                          {set.prevWeight}kg × {set.prevReps}
-                        </div>
-
-                        {/* WEIGHT INPUT */}
-                        <div>
-                          <input
-                            type="number"
-                            value={set.weight}
-                            onChange={(e) => handleSetChange(exIndex, setIndex, 'weight', e.target.value)}
-                            readOnly={isCoachPrescribed}
-                            style={{
-                              width: '100%',
-                              textAlign: 'center',
-                              padding: '8px 10px',
-                              borderRadius: 'var(--radius-md)',
-                              background: isCoachPrescribed ? 'rgba(255, 255, 255, 0.04)' : 'var(--surface-elevated)',
-                              border: `1px solid ${isCoachPrescribed ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-hover)'}`,
-                              color: 'var(--accent)',
-                              fontWeight: 900,
-                              fontSize: '0.95rem',
-                              cursor: isCoachPrescribed ? 'default' : 'text'
-                            }}
-                          />
-                        </div>
-
-                        {/* REPS INPUT */}
-                        <div>
-                          <input
-                            type="number"
-                            value={set.reps}
-                            onChange={(e) => handleSetChange(exIndex, setIndex, 'reps', e.target.value)}
-                            readOnly={isCoachPrescribed}
-                            style={{
-                              width: '100%',
-                              textAlign: 'center',
-                              padding: '8px 10px',
-                              borderRadius: 'var(--radius-md)',
-                              background: isCoachPrescribed ? 'rgba(255, 255, 255, 0.04)' : 'var(--surface-elevated)',
-                              border: `1px solid ${isCoachPrescribed ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-hover)'}`,
-                              color: 'var(--text-primary)',
-                              fontWeight: 900,
-                              fontSize: '0.95rem',
-                              cursor: isCoachPrescribed ? 'default' : 'text'
-                            }}
-                          />
-                        </div>
-
-                        {/* EST VOLUME LOAD */}
-                        <div style={{ textAlign: 'center' }}>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: '0.85rem',
-                              fontWeight: 800,
-                              color: set.completed ? 'var(--accent)' : 'var(--text-secondary)'
-                            }}
-                          >
-                            {setVolume > 0 ? `${setVolume.toLocaleString()} kg` : '—'}
-                          </span>
-                        </div>
-
-                        {/* INTENSITY & TEMPO BADGE */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                          <span
-                            style={{
-                              fontSize: '0.68rem',
-                              padding: '3px 8px',
-                              borderRadius: 'var(--radius-pill)',
-                              background: 'var(--surface-input)',
-                              color: rpeColor,
-                              border: `1px solid ${rpeColor}30`,
-                              fontWeight: 800,
-                              letterSpacing: '0.02em',
-                              whiteSpace: 'nowrap',
-                              display: 'inline-block'
-                            }}
-                          >
-                            {rpeTarget}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '0.7rem',
-                              color: 'var(--text-tertiary)',
-                              whiteSpace: 'nowrap',
-                              fontWeight: 600
-                            }}
-                          >
-                            Tempo 3-1-X-1
-                          </span>
-                        </div>
-
-                        {/* CHECKMARK COMPLETION BUTTON */}
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
                           <button
                             type="button"
                             onClick={() => handleToggleSet(exIndex, setIndex)}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '10px',
-                              background: set.completed ? 'var(--accent)' : 'var(--surface-elevated)',
-                              border: `1px solid ${set.completed ? 'var(--accent)' : 'var(--border-glass)'}`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: set.completed ? '#111111' : 'var(--text-tertiary)',
-                              cursor: 'pointer',
-                              boxShadow: set.completed ? '0 0 14px var(--accent-glow)' : 'none',
-                              transition: 'all var(--transition-fast)'
-                            }}
+                            className={`active-workout-mobile-check-btn ${set.completed ? 'completed' : ''}`}
                             title={set.completed ? 'Mark incomplete' : 'Complete set'}
                           >
-                            <CheckCircle2 size={20} />
+                            <CheckCircle2 size={18} />
                           </button>
+                        </div>
+
+                        {/* Previous Benchmark Line */}
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)', margin: '-2px 0 2px 0' }}>
+                          Prev: {set.prevWeight}kg × {set.prevReps}
+                        </div>
+
+                        {/* Inputs row: Weight (kg), Reps, Est Volume */}
+                        <div className="active-workout-mobile-set-inputs">
+                          <div className="active-workout-mobile-input-field">
+                            <label>WEIGHT (KG)</label>
+                            <input
+                              type="number"
+                              value={set.weight}
+                              onChange={(e) => handleSetChange(exIndex, setIndex, 'weight', e.target.value)}
+                              readOnly={isCoachPrescribed}
+                              className="active-workout-mobile-num-input"
+                            />
+                          </div>
+
+                          <div className="active-workout-mobile-input-field">
+                            <label>TARGET REPS</label>
+                            <input
+                              type="number"
+                              value={set.reps}
+                              onChange={(e) => handleSetChange(exIndex, setIndex, 'reps', e.target.value)}
+                              readOnly={isCoachPrescribed}
+                              className="active-workout-mobile-num-input"
+                            />
+                          </div>
+
+                          <div className="active-workout-mobile-input-field">
+                            <label>EST. VOLUME</label>
+                            <div className="active-workout-mobile-volume-box">
+                              {setVolume > 0 ? `${setVolume.toLocaleString()} kg` : '—'}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -717,6 +810,7 @@ export const ActiveWorkoutModal = ({ isOpen, onClose, onWorkoutCompleted, active
 
         {/* Modal Footer Controls */}
         <div
+          className="active-workout-footer"
           style={{
             padding: '16px 28px',
             background: 'var(--surface-glass)',

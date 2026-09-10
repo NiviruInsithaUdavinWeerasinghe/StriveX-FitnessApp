@@ -9,7 +9,8 @@ import {
   CheckCheck,
   Sparkles,
   Search,
-  Users
+  Users,
+  ArrowLeft
 } from 'lucide-react';
 
 const CONTACTS = [
@@ -117,6 +118,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
   const messagesEndRef = useRef(null);
 
   const [activeContactId, setActiveContactId] = useState('trn_1');
+  const [mobileView, setMobileView] = useState('chat'); // 'contacts' | 'chat'
   const [searchQuery, setSearchQuery] = useState('');
   const [conversations, setConversations] = useState(() => {
     const map = {};
@@ -232,7 +234,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
 
   const contentUI = (
     <div
-      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      className={`${isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'} member-chat-wrapper`}
       style={{
         width: '100%',
         maxWidth: isInline ? '100%' : '1080px',
@@ -248,6 +250,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
     >
       {/* Left Contacts Sidebar */}
       <div
+        className={`member-chat-sidebar ${mobileView === 'chat' ? 'member-chat-sidebar-mobile-hidden' : ''}`}
         style={{
           width: '320px',
           minWidth: '320px',
@@ -305,7 +308,10 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
             return (
               <div
                 key={contact.id}
-                onClick={() => setActiveContactId(contact.id)}
+                onClick={() => {
+                  setActiveContactId(contact.id);
+                  setMobileView('chat');
+                }}
                 style={{
                   padding: '14px 16px',
                   borderBottom: '1px solid var(--border-glass)',
@@ -367,9 +373,13 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
       </div>
 
       {/* Right Chat Column */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div
+        className={`member-chat-main ${mobileView === 'contacts' ? 'member-chat-main-mobile-hidden' : ''}`}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}
+      >
         {/* Header */}
         <div
+          className="member-chat-header"
           style={{
             padding: '14px 20px',
             background: 'var(--surface-glass)',
@@ -380,22 +390,32 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
             gap: '16px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="member-chat-header-left" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              type="button"
+              className="member-chat-back-btn"
+              onClick={() => setMobileView('contacts')}
+              title="Back to Coaches List"
+            >
+              <ArrowLeft size={16} />
+              <span className="member-chat-back-text">Coaches</span>
+            </button>
             <img
               src={activeContact.avatar}
               alt={activeContact.name}
+              className="member-chat-avatar"
               style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent)' }}
             />
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+            <div className="member-chat-header-info">
+              <div className="member-chat-header-title-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h4 className="member-chat-coach-name" style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
                   {activeContact.name}
                 </h4>
-                <span className="kinetic-badge" style={{ fontSize: '0.64rem', padding: '1px 6px' }}>
+                <span className="kinetic-badge member-chat-role-badge" style={{ fontSize: '0.64rem', padding: '1px 6px' }}>
                   {activeContact.role}
                 </span>
               </div>
-              <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>
+              <span className="type-caption member-chat-program" style={{ color: 'var(--text-tertiary)' }}>
                 Program: <strong style={{ color: 'var(--text-secondary)' }}>{activeContact.program}</strong>
               </span>
             </div>
@@ -426,7 +446,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
         </div>
 
         {/* Message Thread */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="member-chat-messages" style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {activeMessages.map((msg) => {
             const isMember = msg.sender === 'member';
             return (
@@ -443,6 +463,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
                 </div>
 
                 <div
+                  className="member-chat-bubble"
                   style={{
                     maxWidth: '75%',
                     padding: '12px 16px',
@@ -476,7 +497,7 @@ export const MemberChatModal = ({ isOpen, onClose, isInline = false }) => {
         </div>
 
         {/* Input Bar */}
-        <div style={{ padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="member-chat-input-bar" style={{ padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid var(--border-subtle)' }}>
           <form onSubmit={handleSendMessage} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               type="button"

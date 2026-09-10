@@ -139,7 +139,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="kinetic-card animate-scale-up"
+        className="kinetic-card animate-scale-up member-modal-content"
         style={{
           width: '100%',
           maxWidth: '780px',
@@ -197,6 +197,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
 
         {/* Tab Selection Navigation */}
         <div
+          className="member-settings-tab-nav"
           style={{
             display: 'flex',
             background: 'var(--surface-input)',
@@ -237,7 +238,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tab Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
+        <div className="member-settings-body" style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
           {/* TAB 1: Profile */}
           {activeTab === 'profile' && (
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -359,7 +360,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="member-settings-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="kinetic-input-group">
                   <label className="kinetic-label">Body Weight (kg)</label>
                   <input
@@ -653,6 +654,7 @@ export const MemberSettingsModal = ({ isOpen, onClose }) => {
 
         {/* Footer Save Action */}
         <div
+          className="member-settings-footer"
           style={{
             padding: '16px 28px',
             background: 'var(--surface-glass)',
