@@ -356,30 +356,11 @@ export const MemberDashboard = () => {
       <div className="member-main-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
         {/* MOBILE TOP BAR (<= 900px) */}
         <div className="member-mobile-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              type="button"
-              onClick={() => setIsMobileNavOpen(true)}
-              style={{
-                padding: '8px',
-                borderRadius: '8px',
-                background: 'var(--surface-input)',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1px solid var(--border-subtle)'
-              }}
-              title="Open Navigation Menu"
-            >
-              <Menu size={20} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111', fontWeight: 900 }}>
-                <Dumbbell size={16} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem', color: 'var(--text-primary)' }}>STRIVEX</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111', fontWeight: 900 }}>
+              <Dumbbell size={16} />
             </div>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem', color: 'var(--text-primary)' }}>STRIVEX</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -415,8 +396,102 @@ export const MemberDashboard = () => {
               <Dumbbell size={13} />
               <span>Start</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                background: isMobileNavOpen ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
+                border: isMobileNavOpen ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                color: isMobileNavOpen ? 'var(--accent)' : 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Toggle Menu"
+            >
+              {isMobileNavOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
           </div>
         </div>
+
+        {/* MOBILE SLIDE-DOWN MENU (TOP RIGHT DRAWER/DROPDOWN) */}
+        {isMobileNavOpen && (
+          <>
+            <div className="mobile-menu-backdrop" onClick={() => setIsMobileNavOpen(false)} />
+            <div className="mobile-menu-dropdown">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <img
+                  src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'}
+                  alt="Profile"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {user?.name || 'Alex Mercer'}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 700 }}>
+                    {user?.tier || 'Pro Athlete'} • {isCoachedMode ? 'Coached' : 'Autonomous'}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileNavOpen(false);
+                    setIsSettingsOpen(true);
+                  }}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '10px 14px', justifyContent: 'center', fontSize: '0.82rem', gap: '8px' }}
+                >
+                  <Settings size={16} />
+                  <span>Settings</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '10px 14px', justifyContent: 'center', fontSize: '0.82rem', gap: '8px' }}
+                >
+                  {theme === 'dark' ? <Sun size={16} color="var(--accent)" /> : <Moon size={16} color="var(--accent)" />}
+                  <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileNavOpen(false);
+                  logout();
+                }}
+                className="kinetic-btn-ghost"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  gap: '8px',
+                  color: '#ef4444',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  marginTop: '4px'
+                }}
+              >
+                <LogOut size={16} />
+                <span>Log Out of StriveX</span>
+              </button>
+            </div>
+          </>
+        )}
 
         {/* LIVE BROADCAST BANNER AT TOP */}
         <LiveBroadcastBanner userRole="member" />
@@ -1456,136 +1531,6 @@ export const MemberDashboard = () => {
         onClose={() => setIsNotificationDrawerOpen(false)}
         userRole="member"
       />
-
-      {/* MOBILE DRAWER NAVIGATION OVERLAY */}
-      {isMobileNavOpen && (
-        <div className="member-mobile-drawer" onClick={() => setIsMobileNavOpen(false)}>
-          <div className="member-mobile-drawer-sheet" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {/* Drawer Brand Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111', fontWeight: 900 }}>
-                    <Dumbbell size={18} />
-                  </div>
-                  <div>
-                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1.05rem', color: 'var(--text-primary)', letterSpacing: '0.04em' }}>STRIVEX</span>
-                    <span style={{ display: 'block', fontSize: '0.62rem', color: 'var(--text-tertiary)', letterSpacing: '0.08em' }}>ATHLETE SUITE</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileNavOpen(false)}
-                  style={{
-                    background: 'var(--surface-input)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              {/* Navigation Links */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {[
-                  { id: 'overview', label: 'Workout Tracker', icon: Dumbbell },
-                  { id: 'nutrition', label: 'Nutrition & Meals', icon: Apple },
-                  { id: 'analytics', label: 'Progress & PRs', icon: TrendingUp },
-                  { id: 'store', label: 'StriveX Store', icon: ShoppingBag },
-                  { id: 'chat', label: 'Coach Messages', icon: MessageSquare }
-                ].map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsMobileNavOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 14px',
-                        borderRadius: 'var(--radius-md)',
-                        background: isActive ? 'rgba(212, 255, 0, 0.12)' : 'transparent',
-                        color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                        border: isActive ? '1px solid rgba(212, 255, 0, 0.25)' : '1px solid transparent',
-                        fontWeight: isActive ? 800 : 600,
-                        fontSize: '0.88rem',
-                        textAlign: 'left',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <Icon size={18} color={isActive ? 'var(--accent)' : 'var(--text-tertiary)'} />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Profile & Footer in Drawer */}
-            <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <img
-                  src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop'}
-                  alt={user?.name || 'Athlete'}
-                  style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent)' }}
-                />
-                <div style={{ overflow: 'hidden' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {user?.name || 'Alex Mercer'}
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{user?.tier || 'Pro Athlete'}</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  className="kinetic-btn-ghost"
-                  style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
-                  title="Toggle Theme"
-                >
-                  {theme === 'dark' ? <Sun size={16} color="var(--accent)" /> : <Moon size={16} color="var(--accent)" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    setIsSettingsOpen(true);
-                  }}
-                  className="kinetic-btn-ghost"
-                  style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
-                  title="Settings"
-                >
-                  <Settings size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="kinetic-btn-ghost"
-                  style={{ flex: 1, padding: '8px', justifyContent: 'center' }}
-                  title="Sign Out"
-                >
-                  <LogOut size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* STICKY MOBILE BOTTOM NAVIGATION BAR */}
       <nav className="member-mobile-bottom-nav">

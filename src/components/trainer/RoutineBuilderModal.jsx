@@ -171,7 +171,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
 
   const contentUI = (
     <div
-      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      className={`${isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'} trainer-builder-card`}
       style={{
         width: '100%',
         maxWidth: isInline ? '100%' : '920px',
@@ -188,10 +188,13 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
     >
       {/* Header */}
       <div
+        className="trainer-builder-header"
         style={{
           padding: '20px 24px',
-          background: 'var(--surface-glass)',
+          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)',
           borderBottom: '1px solid var(--border-glass)',
+          borderTopLeftRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+          borderTopRightRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -199,49 +202,42 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
           flexShrink: 0
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              background: 'rgba(212, 255, 0, 0.15)',
-              border: '1px solid var(--accent)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent)'
-            }}
-          >
-            <Dumbbell size={20} />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="type-eyebrow">PROGRAM TELEMETRY ARCHITECT</span>
-              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                EXERCISE SEQUENCE
-              </span>
+        <div className="trainer-builder-top-row" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', width: '100%' }}>
+          <div className="trainer-builder-title-block" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                background: 'rgba(212, 255, 0, 0.15)',
+                border: '1px solid var(--accent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--accent)',
+                flexShrink: 0
+              }}
+            >
+              <Dumbbell size={20} />
             </div>
-            <h3 className="type-h3" style={{ fontSize: '1.25rem', margin: 0 }}>
-              Hypertrophy & Strength Program Builder
-            </h3>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="type-eyebrow">PROGRAM TELEMETRY ARCHITECT</span>
+                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                  EXERCISE SEQUENCE
+                </span>
+              </div>
+              <h3 className="type-h3" style={{ fontSize: '1.25rem', margin: 0, wordBreak: 'break-word' }}>
+                Hypertrophy & Strength Program Builder
+              </h3>
+            </div>
           </div>
-        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button
-            type="button"
-            onClick={handlePublish}
-            className="kinetic-btn-primary"
-            style={{ padding: '8px 16px', fontSize: '0.84rem' }}
-          >
-            <Save size={15} />
-            <span>Publish Program</span>
-          </button>
           {!isInline && onClose && (
             <button
               type="button"
               onClick={onClose}
+              className="trainer-builder-close-btn"
               style={{
                 width: '34px',
                 height: '34px',
@@ -252,19 +248,33 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
+              title="Close modal"
             >
               <X size={18} />
             </button>
           )}
         </div>
+
+        <div className="trainer-builder-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={handlePublish}
+            className="kinetic-btn-primary"
+            style={{ padding: '8px 16px', fontSize: '0.84rem' }}
+          >
+            <Save size={15} />
+            <span>Publish Program</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="trainer-builder-body" style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Metadata Controls */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        <div className="trainer-builder-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <div className="kinetic-input-group" style={{ margin: 0 }}>
             <label className="kinetic-label">Program Title *</label>
             <input
@@ -305,7 +315,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
         </div>
 
         {/* Exercises List Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="trainer-builder-sequence-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h4 className="type-h3" style={{ fontSize: '1.05rem', margin: 0 }}>
               Movement Sequence ({exercises.length} Drills)
@@ -329,6 +339,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
           {exercises.map((ex, idx) => (
             <div
               key={ex.id}
+              className="trainer-builder-exercise-card"
               style={{
                 padding: '16px',
                 borderRadius: 'var(--radius-lg)',
@@ -339,9 +350,9 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
                 gap: '12px'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div className="trainer-builder-exercise-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                <div className="trainer-builder-exercise-info-col" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1, minWidth: 0 }}>
+                  <div className="trainer-builder-order-buttons" style={{ display: 'flex', flexDirection: 'column', gap: '2px', flexShrink: 0, marginTop: '2px' }}>
                     <button
                       type="button"
                       onClick={() => handleMoveUp(idx)}
@@ -359,27 +370,29 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
                       <ArrowDown size={14} />
                     </button>
                   </div>
-                  <div>
-                    <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '0.82rem', marginRight: '6px' }}>
-                      #{idx + 1}
+                  <div className="trainer-builder-exercise-title-wrap" style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '0.85rem', marginRight: '6px' }}>
+                       #{idx + 1}
                     </span>
-                    <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>{ex.name}</strong>
-                    <span className="type-caption" style={{ marginLeft: '8px', color: 'var(--text-tertiary)' }}>
-                      • {ex.muscle}
-                    </span>
+                    <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)', wordBreak: 'break-word' }}>{ex.name}</strong>
+                    <div className="type-caption" style={{ color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                      {ex.muscle}
+                    </div>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => handleRemoveExercise(ex.id)}
-                  style={{ background: 'none', border: 'none', color: 'var(--status-danger)', cursor: 'pointer', opacity: 0.8 }}
+                  className="trainer-builder-delete-btn"
+                  style={{ background: 'none', border: 'none', color: 'var(--status-danger)', cursor: 'pointer', opacity: 0.8, padding: '4px', flexShrink: 0 }}
+                  title="Remove drill"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+              <div className="trainer-builder-exercise-inputs" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
                 <div>
                   <label className="type-caption" style={{ display: 'block', marginBottom: '2px' }}>Sets</label>
                   <input
@@ -502,7 +515,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleAddAddFromLibrary(item)}
+                  onClick={() => handleAddFromLibrary(item)}
                   className="kinetic-btn-secondary"
                   style={{ padding: '6px 12px', fontSize: '0.76rem' }}
                 >
@@ -521,6 +534,7 @@ export const RoutineBuilderModal = ({ isOpen, onClose, targetClient, onSaveRouti
 
   return (
     <div
+      className="trainer-builder-overlay"
       style={{
         position: 'fixed',
         inset: 0,

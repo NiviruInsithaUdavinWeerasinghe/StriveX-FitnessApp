@@ -240,6 +240,7 @@ export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) 
     >
       {/* Header */}
       <div
+        className="admin-staff-header"
         style={{
           padding: '20px 28px',
           background: 'var(--surface-glass)',
@@ -307,6 +308,7 @@ export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) 
 
       {/* Staff Utilization KPIs */}
       <div
+        className="admin-staff-kpis"
         style={{
           padding: '20px 28px',
           background: 'var(--surface-input)',
@@ -350,6 +352,7 @@ export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) 
 
       {/* Search & Filter Bar */}
       <div
+        className="admin-staff-filters"
         style={{
           padding: '18px 28px',
           borderBottom: '1px solid var(--border-subtle)',
@@ -391,7 +394,7 @@ export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) 
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="admin-staff-filters-pills" style={{ display: 'flex', gap: '8px' }}>
           {[
             { id: 'all', label: 'All Coaches' },
             { id: 'on_duty', label: 'On Duty' },
@@ -421,8 +424,9 @@ export const StaffManagerModal = ({ isOpen = true, onClose, isInline = false }) 
       </div>
 
       {/* Staff Table Body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+      <div className="admin-staff-table-container" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
         <div
+          className="admin-staff-table-wrap"
           style={{
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--border-subtle)',

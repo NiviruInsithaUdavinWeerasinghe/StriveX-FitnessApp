@@ -21,8 +21,11 @@ import {
   Activity,
   LayoutDashboard,
   Dumbbell,
-  Zap
+  Zap,
+  Menu,
+  X
 } from 'lucide-react';
+import './CoachMobile.css';
 
 const INITIAL_CLIENTS = [
   {
@@ -136,9 +139,11 @@ export const TrainerDashboard = () => {
 
   // Modals / Selected targets
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
+  const [isRoutineModalOpen, setIsRoutineModalOpen] = useState(false);
   const [builderTargetClient, setBuilderTargetClient] = useState(null);
   const [chatTargetClientId, setChatTargetClientId] = useState('cli_1');
   const [consultHubTargetClient, setConsultHubTargetClient] = useState(null);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const filteredClients = INITIAL_CLIENTS.filter((cli) => {
     const matchesSearch =
@@ -156,9 +161,10 @@ export const TrainerDashboard = () => {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex' }}>
+    <div className="trainer-layout-root" style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex' }}>
       {/* LEFT NAVIGATION SIDEBAR */}
       <aside
+        className="trainer-desktop-sidebar"
         style={{
           width: '260px',
           minWidth: '260px',
@@ -283,12 +289,142 @@ export const TrainerDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+      <div className="trainer-main-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+        {/* MOBILE TOP BAR (<= 900px) */}
+        <div className="trainer-mobile-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111', fontWeight: 900 }}>
+              <Activity size={16} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem', color: 'var(--text-primary)' }}>STRIVEX</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setIsNotificationDrawerOpen(true)}
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-subtle)',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Notifications"
+            >
+              <Zap size={16} color="var(--accent)" />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: '-2px', right: '-2px', background: '#ff3b30', color: '#fff', borderRadius: '50%', width: '15px', height: '15px', fontSize: '0.6rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setBuilderTargetClient(null);
+                setIsRoutineModalOpen(true);
+              }}
+              className="kinetic-btn-primary"
+              style={{ padding: '6px 12px', fontSize: '0.74rem' }}
+            >
+              <Edit3 size={13} />
+              <span>Program</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                background: isMobileNavOpen ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
+                border: isMobileNavOpen ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                color: isMobileNavOpen ? 'var(--accent)' : 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Toggle Menu"
+            >
+              {isMobileNavOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          </div>
+        </div>
+
+        {/* MOBILE SLIDE-DOWN MENU (TOP RIGHT DROPDOWN) */}
+        {isMobileNavOpen && (
+          <>
+            <div className="trainer-mobile-menu-backdrop" onClick={() => setIsMobileNavOpen(false)} />
+            <div className="trainer-mobile-menu-dropdown">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <img
+                  src={user?.avatar || 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=150&auto=format&fit=crop'}
+                  alt="Coach Marcus"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Coach Marcus
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 700 }}>
+                    NSCA-CSCS Head Coach • Trainer Portal
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', marginTop: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '10px 14px', justifyContent: 'center', fontSize: '0.82rem', gap: '8px' }}
+                >
+                  {theme === 'dark' ? <Sun size={16} color="var(--accent)" /> : <Moon size={16} color="var(--accent)" />}
+                  <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileNavOpen(false);
+                  logout();
+                }}
+                className="kinetic-btn-ghost"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  gap: '8px',
+                  color: '#ef4444',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  marginTop: '4px'
+                }}
+              >
+                <LogOut size={16} />
+                <span>Log Out of Trainer Portal</span>
+              </button>
+            </div>
+          </>
+        )}
+
         {/* LIVE BROADCAST BANNER AT TOP */}
         <LiveBroadcastBanner userRole="trainer" />
 
         {/* Top Header */}
         <header
+          className="trainer-desktop-header"
           style={{
             position: 'sticky',
             top: 0,
@@ -314,7 +450,7 @@ export const TrainerDashboard = () => {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="trainer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Notification Bell Button */}
             <button
               type="button"
@@ -350,7 +486,10 @@ export const TrainerDashboard = () => {
 
             <button
               type="button"
-              onClick={() => setActiveTab('builder')}
+              onClick={() => {
+                setBuilderTargetClient(null);
+                setIsRoutineModalOpen(true);
+              }}
               className="kinetic-btn-primary"
               style={{ padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800 }}
             >
@@ -361,12 +500,12 @@ export const TrainerDashboard = () => {
         </header>
 
         {/* Content Tabs */}
-        <main style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1 }}>
+        <main className="trainer-main-content" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1 }}>
           {/* TAB 1: ROSTER OVERVIEW */}
           {activeTab === 'overview' && (
             <>
               {/* Row 1: KPI Stats Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+              <div className="trainer-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
                 <div className="kinetic-card" style={{ padding: '24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <span className="type-caption">Active Roster</span>
@@ -408,24 +547,24 @@ export const TrainerDashboard = () => {
               </div>
 
               {/* Row 2: Roster Table & Consultations Schedule */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '28px', alignItems: 'start' }}>
+              <div className="trainer-overview-columns" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '28px', alignItems: 'start' }}>
                 {/* Roster Table */}
-                <div className="kinetic-card" style={{ padding: '28px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                <div className="kinetic-card trainer-roster-card" style={{ padding: '28px' }}>
+                  <div className="trainer-roster-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
                       <h3 className="type-h3" style={{ margin: 0 }}>Assigned Athlete Roster</h3>
                       <p className="type-small" style={{ margin: '4px 0 0' }}>Real-time telemetry, volume load, and program adherence.</p>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: 'var(--radius-pill)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)' }}>
+                    <div className="trainer-roster-header-search" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', borderRadius: 'var(--radius-pill)', background: 'var(--surface-input)', border: '1px solid var(--border-subtle)', width: '100%' }}>
                         <Search size={14} color="var(--text-tertiary)" />
                         <input
                           type="text"
                           placeholder="Filter roster..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '0.8rem', width: '120px' }}
+                          style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: '0.8rem', width: '100%' }}
                         />
                       </div>
                     </div>
@@ -435,6 +574,7 @@ export const TrainerDashboard = () => {
                     {filteredClients.map((client) => (
                       <div
                         key={client.id}
+                        className="trainer-athlete-row"
                         style={{
                           padding: '16px',
                           borderRadius: 'var(--radius-lg)',
@@ -463,7 +603,7 @@ export const TrainerDashboard = () => {
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                        <div className="trainer-athlete-meta" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                           <div>
                             <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', display: 'block' }}>Adherence</span>
                             <span style={{ fontWeight: 800, color: client.adherence > 90 ? 'var(--status-success)' : '#f59e0b', fontSize: '0.9rem' }}>
@@ -580,12 +720,46 @@ export const TrainerDashboard = () => {
         </main>
       </div>
 
+      {/* PROGRAM BUILDER MODAL OVERLAY */}
+      {isRoutineModalOpen && (
+        <RoutineBuilderModal
+          isOpen={true}
+          isInline={false}
+          targetClient={builderTargetClient}
+          onClose={() => setIsRoutineModalOpen(false)}
+        />
+      )}
+
       {/* NOTIFICATION DRAWER MODAL */}
       <NotificationDrawerModal
         isOpen={isNotificationDrawerOpen}
         onClose={() => setIsNotificationDrawerOpen(false)}
         userRole="trainer"
       />
+
+      {/* STICKY MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="trainer-mobile-bottom-nav">
+        {[
+          { id: 'overview', label: 'Roster', icon: LayoutDashboard },
+          { id: 'builder', label: 'Builder', icon: Dumbbell },
+          { id: 'consultations', label: 'Consults', icon: Video },
+          { id: 'chat', label: 'Chat', icon: MessageSquare }
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveTab(item.id)}
+              className={`trainer-mobile-bottom-tab ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={19} color={isActive ? 'var(--accent)' : 'var(--text-tertiary)'} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 };

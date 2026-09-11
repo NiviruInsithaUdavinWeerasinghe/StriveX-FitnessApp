@@ -181,12 +181,15 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
       }}
       onClick={(e) => isInline ? null : e.stopPropagation()}
     >
-      {/* Modal Header */}
+      {/* Header */}
       <div
+        className="trainer-consult-header"
         style={{
-          padding: '16px 24px',
-          background: 'var(--surface-glass)',
+          padding: '20px 24px',
+          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)',
           borderBottom: '1px solid var(--border-glass)',
+          borderTopLeftRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
+          borderTopRightRadius: isInline ? 'var(--radius-lg)' : 'var(--radius-xl)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -194,36 +197,63 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
           flexShrink: 0
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'rgba(212, 255, 0, 0.15)',
-              border: '1px solid var(--accent)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent)'
-            }}
-          >
-            <Video size={18} />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="type-eyebrow">HIGH PERFORMANCE CONSULTATION HUB</span>
-              <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
-                LIVE MESH
-              </span>
+        <div className="trainer-consult-top-row" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', width: '100%' }}>
+          <div className="trainer-consult-title-block" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'rgba(212, 255, 0, 0.15)',
+                border: '1px solid var(--accent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--accent)',
+                flexShrink: 0
+              }}
+            >
+              <Video size={18} />
             </div>
-            <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, whiteSpace: 'nowrap' }}>
-              Athlete Telemetry & Video Review Suite
-            </h3>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="type-eyebrow">HIGH PERFORMANCE CONSULTATION HUB</span>
+                <span className="kinetic-badge" style={{ fontSize: '0.66rem', padding: '1px 6px' }}>
+                  LIVE MESH
+                </span>
+              </div>
+              <h3 className="type-h3" style={{ fontSize: '1.2rem', margin: 0, wordBreak: 'break-word' }}>
+                Athlete Telemetry & Video Review Suite
+              </h3>
+            </div>
           </div>
+
+          {!isInline && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="trainer-consult-close-btn"
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'var(--surface-input)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0
+              }}
+              title="Close modal"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        <div className="trainer-consult-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           {!isInCall ? (
             <button
               type="button"
@@ -256,32 +286,12 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
               <span>Disconnect Call</span>
             </button>
           )}
-
-          {!isInline && onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                width: '34px',
-                height: '34px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'var(--surface-input)',
-                border: '1px solid var(--border-glass)',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <X size={18} />
-            </button>
-          )}
         </div>
       </div>
 
       {/* Sub Header Selector: Select Client */}
       <div
+        className="trainer-consult-subheader"
         style={{
           padding: '12px 24px',
           background: 'rgba(0,0,0,0.2)',
@@ -294,47 +304,51 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
         }}
       >
         {/* Client Roster Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+        <div className="trainer-consult-roster-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+          <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-tertiary)', textTransform: 'uppercase', flexShrink: 0 }}>
             Active Roster:
           </span>
-          {Object.values(CLIENT_TELEMETRY_DATA).map((client) => {
-            const isSel = activeClientId === client.id;
-            return (
-              <button
-                key={client.id}
-                type="button"
-                onClick={() => {
-                  setActiveClientId(client.id);
-                  if (isInCall) handleEndCall();
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '4px 10px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: isSel ? 'var(--accent)' : 'var(--surface-input)',
-                  color: isSel ? '#111111' : 'var(--text-secondary)',
-                  border: `1px solid ${isSel ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                  fontSize: '0.78rem',
-                  fontWeight: 800,
-                  cursor: 'pointer'
-                }}
-              >
-                <img
-                  src={client.avatar}
-                  alt={client.name}
-                  style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-                <span>{client.name}</span>
-              </button>
-            );
-          })}
+          <div className="trainer-consult-roster-pills" style={{ display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto' }}>
+            {Object.values(CLIENT_TELEMETRY_DATA).map((client) => {
+              const isSel = activeClientId === client.id;
+              return (
+                <button
+                  key={client.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveClientId(client.id);
+                    if (isInCall) handleEndCall();
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-pill)',
+                    background: isSel ? 'var(--accent)' : 'var(--surface-input)',
+                    color: isSel ? '#111111' : 'var(--text-secondary)',
+                    border: `1px solid ${isSel ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                >
+                  <img
+                    src={client.avatar}
+                    alt={client.name}
+                    style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                  <span>{client.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Tab Controls */}
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div className="trainer-consult-tabs" style={{ display: 'flex', gap: '6px' }}>
           {[
             { id: 'telemetry', label: 'Biometric Telemetry' },
             { id: 'form_check', label: `Video Form Check (${activeClient.formVideos.length})` },
@@ -345,7 +359,7 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={activeTab === tab.id ? 'kinetic-btn-primary' : 'kinetic-btn-ghost'}
-              style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+              style={{ padding: '6px 12px', fontSize: '0.78rem', whiteSpace: 'nowrap' }}
             >
               {tab.label}
             </button>
@@ -354,7 +368,7 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
       </div>
 
       {/* Main Body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <div className="trainer-consult-body" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {/* TAB 1: TELEMETRY */}
         {activeTab === 'telemetry' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -406,13 +420,13 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
             {/* Detailed Workout History & Set Progression Log */}
             <div style={{ marginTop: '12px' }}>
               {/* Recent Set Performance Logs */}
-              <div className="kinetic-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div className="kinetic-card trainer-consult-set-card" style={{ padding: '28px', background: 'var(--surface-input)' }}>
+                <div className="trainer-consult-set-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <h4 className="type-h3" style={{ fontSize: '1.1rem', margin: 0 }}>Recent Workout Telemetry & Set Logs</h4>
                     <p className="type-caption" style={{ margin: '4px 0 0' }}>Real-time sensor data uploaded from athlete smart watch / WHOOP.</p>
                   </div>
-                  <span className="kinetic-badge" style={{ padding: '4px 10px' }}>Live Sync</span>
+                  <span className="kinetic-badge" style={{ padding: '4px 10px', flexShrink: 0 }}>Live Sync</span>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -422,13 +436,28 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
                     { exercise: 'Barbell Bench Press', set: 'Set 3 (Top Set)', load: '85 kg × 8 reps', rpe: 'RPE 8.5', tempo: '3-0-1-0' },
                     { exercise: 'Incline Dumbbell Press', set: 'Set 1', load: '32 kg × 10 reps', rpe: 'RPE 8.0', tempo: '2-1-1-0' }
                   ].map((log, idx) => (
-                    <div key={idx} style={{ padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>{log.exercise} ({log.set})</strong>
+                    <div
+                      key={idx}
+                      className="trainer-consult-log-row"
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--surface-elevated)',
+                        border: '1px solid var(--border-subtle)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block', wordBreak: 'break-word' }}>
+                          {log.exercise} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>({log.set})</span>
+                        </strong>
                         <span className="type-caption">Tempo: {log.tempo}</span>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontWeight: 900, color: 'var(--accent)', fontSize: '0.95rem', display: 'block' }}>{log.load}</span>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <span style={{ fontWeight: 900, color: 'var(--accent)', fontSize: '0.95rem', display: 'block', whiteSpace: 'nowrap' }}>{log.load}</span>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 800 }}>{log.rpe}</span>
                       </div>
                     </div>
@@ -441,7 +470,7 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
 
         {/* TAB 2: VIDEO FORM CHECK */}
         {activeTab === 'form_check' && activeVideo && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
+          <div className="trainer-consult-video-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
             <div>
               <div style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-subtle)', background: '#000' }}>
                 <img
@@ -474,20 +503,20 @@ export const TrainerConsultationHubModal = ({ isOpen, onClose, defaultClient, is
                 </button>
               </div>
 
-              <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+              <div className="trainer-consult-video-meta-row" style={{ marginTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)', wordBreak: 'break-word' }}>
                     {activeVideo.title}
                   </h4>
-                  <span className="type-caption" style={{ color: 'var(--text-tertiary)' }}>
+                  <span className="type-caption" style={{ color: 'var(--text-tertiary)', marginTop: '2px', display: 'block' }}>
                     Uploaded {activeVideo.uploadedAt} • Duration {activeVideo.duration}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={handleApproveForm}
-                  className="kinetic-btn-primary"
-                  style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                  className="kinetic-btn-primary trainer-consult-approve-btn"
+                  style={{ padding: '8px 14px', fontSize: '0.78rem', flexShrink: 0, whiteSpace: 'nowrap' }}
                 >
                   <CheckCircle2 size={14} />
                   <span>Approve Technique</span>

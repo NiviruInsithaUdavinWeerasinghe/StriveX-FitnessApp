@@ -221,7 +221,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
 
   const cardContent = (
     <div
-      className="kinetic-card"
+      className="kinetic-card admin-ledger-card"
       style={{
         width: '100%',
         display: 'flex',
@@ -236,6 +236,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
     >
       {/* Header */}
       <div
+        className="admin-ledger-header"
         style={{
           padding: '20px 28px',
           background: 'var(--surface-glass)',
@@ -276,7 +277,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+        <div className="admin-ledger-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
@@ -313,6 +314,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
 
       {/* Financial KPI Highlights */}
       <div
+        className="admin-ledger-kpis"
         style={{
           padding: '20px 28px',
           background: 'var(--surface-input)',
@@ -358,6 +360,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
 
       {/* Filter and Search Bar */}
       <div
+        className="admin-ledger-filters"
         style={{
           padding: '18px 28px',
           borderBottom: '1px solid var(--border-subtle)',
@@ -371,6 +374,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
       >
         {/* Search Input */}
         <div
+          className="admin-ledger-filters-search"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -401,7 +405,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
         </div>
 
         {/* Custom Dropdown Filters */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        <div className="admin-ledger-dropdowns" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           <div style={{ minWidth: '150px' }}>
             <CustomDropdown
               options={STATUS_FILTER_OPTIONS}
@@ -421,8 +425,9 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
       </div>
 
       {/* Transactions Table Body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
+      <div className="admin-ledger-table-container" style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
         <div
+          className="admin-ledger-table-wrap"
           style={{
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--border-subtle)',
@@ -560,6 +565,7 @@ export const FinancialLedgerModal = ({ isOpen = true, onClose, isInline = false 
 
       {/* Table Pagination Footer */}
       <div
+        className="admin-ledger-pagination"
         style={{
           padding: '16px 28px',
           background: 'var(--surface-glass)',

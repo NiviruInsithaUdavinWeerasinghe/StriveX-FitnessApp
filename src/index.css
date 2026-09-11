@@ -565,3 +565,15 @@ input[type='number'] {
   color: var(--text-tertiary);
 }
 
+/* ==========================================================================
+   GLOBAL MOBILE MODAL & VIEWPORT POLISH (<= 900px)
+   ========================================================================== */
+@media (max-width: 900px) {
+  /* Prevent modals from clipping screen or overflowing */
+  .kinetic-card.animate-scale-up {
+    max-width: 95vw !important;
+    padding: 20px 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+

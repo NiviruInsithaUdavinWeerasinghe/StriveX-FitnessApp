@@ -238,7 +238,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
 
   const contentUI = (
     <div
-      className={isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'}
+      className={`${isInline ? 'kinetic-card' : 'kinetic-card animate-scale-up'} trainer-chat-root`}
       style={{
         width: '100%',
         maxWidth: isInline ? '100%' : '1080px',
@@ -254,6 +254,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
     >
       {/* Left Sidebar: Roster Conversations List */}
       <div
+        className="trainer-chat-roster-pane"
         style={{
           width: '320px',
           minWidth: '320px',
@@ -372,9 +373,10 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
       </div>
 
       {/* Right Column: Chat Window & Controls */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="trainer-chat-pane" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Header */}
         <div
+          className="trainer-chat-pane-header"
           style={{
             padding: '14px 20px',
             background: 'var(--surface-glass)',
@@ -488,7 +490,7 @@ export const TrainerChatModal = ({ isOpen, onClose, defaultClientId, onOpenTelem
         </div>
 
         {/* Quick Cues & Input Area */}
-        <div style={{ padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="trainer-chat-input-bar" style={{ padding: '16px 20px', background: 'rgba(0,0,0,0.3)', borderTop: '1px solid var(--border-subtle)' }}>
           {/* Quick Cues Bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '10px', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>

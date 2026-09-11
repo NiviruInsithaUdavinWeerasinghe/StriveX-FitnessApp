@@ -16,8 +16,11 @@ import {
   Radio,
   FileSpreadsheet,
   LayoutDashboard,
-  Building2
+  Building2,
+  Menu,
+  X
 } from 'lucide-react';
+import './AdminMobile.css';
 
 import { FinancialLedgerModal } from './FinancialLedgerModal';
 import { StaffManagerModal } from './StaffManagerModal';
@@ -131,6 +134,7 @@ export const AdminDashboard = () => {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastAudience, setBroadcastAudience] = useState('all');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const filteredLogs = SYSTEM_AUDIT_LOGS.filter((log) => {
     const matchesFilter = activeLogFilter === 'all' || log.type === activeLogFilter;
@@ -182,9 +186,10 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex' }}>
+    <div className="admin-layout-root" style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex' }}>
       {/* LEFT NAVIGATION SIDEBAR */}
       <aside
+        className="admin-desktop-sidebar"
         style={{
           width: '260px',
           minWidth: '260px',
@@ -309,9 +314,123 @@ export const AdminDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+      <div className="admin-main-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '60px' }}>
+        {/* MOBILE TOP BAR (<= 900px) */}
+        <div className="admin-mobile-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111', fontWeight: 900 }}>
+              <Building2 size={16} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem', color: 'var(--text-primary)' }}>STRIVEX</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setIsBroadcastModalOpen(true)}
+              className="kinetic-btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '0.74rem' }}
+            >
+              <Radio size={13} color="var(--accent)" />
+              <span>Broadcast</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportAudit}
+              className="kinetic-btn-ghost"
+              style={{ padding: '6px 10px', fontSize: '0.74rem' }}
+              title="Export CSV Audit"
+            >
+              <FileSpreadsheet size={15} color="var(--accent)" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                background: isMobileNavOpen ? 'rgba(212, 255, 0, 0.15)' : 'var(--surface-input)',
+                border: isMobileNavOpen ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                color: isMobileNavOpen ? 'var(--accent)' : 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Toggle Menu"
+            >
+              {isMobileNavOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          </div>
+        </div>
+
+        {/* MOBILE SLIDE-DOWN MENU (TOP RIGHT DROPDOWN) */}
+        {isMobileNavOpen && (
+          <>
+            <div className="admin-mobile-menu-backdrop" onClick={() => setIsMobileNavOpen(false)} />
+            <div className="admin-mobile-menu-dropdown">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <img
+                  src={user?.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop'}
+                  alt="Elena Rostova"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Elena Rostova
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 700 }}>
+                    Head of Operations • Admin HQ
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', marginTop: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="kinetic-btn-secondary"
+                  style={{ padding: '10px 14px', justifyContent: 'center', fontSize: '0.82rem', gap: '8px' }}
+                >
+                  {theme === 'dark' ? <Sun size={16} color="var(--accent)" /> : <Moon size={16} color="var(--accent)" />}
+                  <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileNavOpen(false);
+                  logout();
+                }}
+                className="kinetic-btn-ghost"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  gap: '8px',
+                  color: '#ef4444',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  marginTop: '4px'
+                }}
+              >
+                <LogOut size={16} />
+                <span>Log Out of Admin Console</span>
+              </button>
+            </div>
+          </>
+        )}
+
         {/* Top Header */}
         <header
+          className="admin-desktop-header"
           style={{
             position: 'sticky',
             top: 0,
@@ -336,7 +455,7 @@ export const AdminDashboard = () => {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="admin-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               type="button"
               onClick={() => setIsBroadcastModalOpen(true)}
@@ -361,12 +480,13 @@ export const AdminDashboard = () => {
         </header>
 
         {/* Tab Content Space */}
-        <main style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1 }}>
+        <main className="admin-main-content" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1 }}>
           {/* TAB 1: EXECUTIVE OVERVIEW */}
           {activeTab === 'overview' && (
             <>
               {/* Row 1: Executive KPI Cards Grid */}
               <div
+                className="admin-kpi-grid"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
@@ -427,6 +547,7 @@ export const AdminDashboard = () => {
 
               {/* Row 2: Revenue Distribution by Tier & Live System Audit Trail */}
               <div
+                className="admin-overview-columns"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1.2fr 2fr',
@@ -492,8 +613,9 @@ export const AdminDashboard = () => {
                 </div>
 
                 {/* Column 2: Live System Audit Trail & Events */}
-                <div className="kinetic-card" style={{ padding: '28px' }}>
+                <div className="kinetic-card admin-audit-card" style={{ padding: '28px' }}>
                   <div
+                    className="admin-audit-header"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -513,7 +635,7 @@ export const AdminDashboard = () => {
                     </div>
 
                     {/* Event Filter Pills */}
-                    <div style={{ display: 'flex', gap: '6px' }}>
+                    <div className="admin-audit-filters" style={{ display: 'flex', gap: '6px' }}>
                       {['all', 'billing', 'booking', 'system', 'security'].map((flt) => (
                         <button
                           key={flt}
@@ -573,6 +695,7 @@ export const AdminDashboard = () => {
                     {filteredLogs.map((log) => (
                       <div
                         key={log.id}
+                        className="admin-audit-item"
                         style={{
                           padding: '14px 16px',
                           borderRadius: 'var(--radius-md)',
@@ -614,7 +737,7 @@ export const AdminDashboard = () => {
                         </div>
 
                         <span
-                          className="kinetic-badge"
+                          className="kinetic-badge admin-audit-item-badge"
                           style={{
                             fontSize: '0.74rem',
                             fontWeight: 800,
@@ -751,6 +874,28 @@ export const AdminDashboard = () => {
           </div>
         </div>
       )}
+      {/* STICKY MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="admin-mobile-bottom-nav">
+        {[
+          { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+          { id: 'financials', label: 'Ledger', icon: CreditCard },
+          { id: 'staff', label: 'Staff', icon: Users }
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveTab(item.id)}
+              className={`admin-mobile-bottom-tab ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={19} color={isActive ? 'var(--accent)' : 'var(--text-tertiary)'} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 };
